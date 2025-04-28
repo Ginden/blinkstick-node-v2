@@ -1,32 +1,63 @@
 {
-  "name": "blinkstick",
-  "description": "Blickstick API for Node.js",
+  "name": "@ginden/blinkstick-v2",
+  "description": "Improved Blickstick API for Node.js",
+  "scripts": {
+    "prepare": "tsc",
+    "test:manual": "ts-node test/manual/manual-test.ts",
+    "fix": "npm run prettier && npm run lint:fix",
+    "lint": "eslint src",
+    "lint:fix": "npm run lint -- --fix",
+    "prettier": "prettier --write src test"
+  },
   "keywords": [
     "blinkstick",
-    "led"
+    "led",
+    "fork"
   ],
   "author": {
-    "name": "Arvydas Juskevicius",
-    "url": "http://twitter.com/arvydev"
+    "email": "michalwadas@gmail.com",
+    "name": "Michał Wadas"
   },
+  "files": [
+    "dist"
+  ],
   "contributors": [
+    {
+      "name": "Arvydas Juskevicius",
+      "url": "http://twitter.com/arvydev"
+    },
     {
       "name": "Paul Cuthbertson",
       "email": "npm@paulcuth.me.uk",
       "url": "http://paulcuth.me.uk"
     }
   ],
-  "version": "1.2.0",
+  "version": "2.0.0",
   "engines": {
-    "node": ">=4.0.0"
+    "node": ">=20.0.0"
   },
   "license": "SEE LICENSE IN LICENSE.txt",
-  "main": "./blinkstick",
+  "main": "./dist/index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/arvydas/blinkstick-node"
+    "url": "https://github.com/Ginden/blinkstick-node-v2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.25.1",
+    "@types/node": "^20.17.32",
+    "@types/prompts": "^2.4.9",
+    "eslint": "^9.25.1",
+    "globals": "^16.0.0",
+    "prettier": "^3.5.3",
+    "prompts": "^2.4.2",
+    "rimraf": "^6.0.1",
+    "ts-node": "^10.9.2",
+    "type-fest": "^4.40.1",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.31.1"
   },
   "dependencies": {
-    "node-hid": "1.1.0"
+    "node-hid": "^3.1.2",
+    "tsafe": "^1.8.5"
   }
 }
