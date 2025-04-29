@@ -1,0 +1,26 @@
+name: Main
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        type: choice
+        description: "Bump version"
+        options:
+          - patch
+          - minor
+          - major
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run prettier
+      - run: |
+          npm version ${{ github.event.inputs.bump }}
+      - name: Release
+        uses: softprops/action-gh-release@v2
