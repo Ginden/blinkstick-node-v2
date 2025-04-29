@@ -40,7 +40,7 @@
   "main": "./dist/index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Ginden/blinkstick-node-v2"
+    "url": "git+https://github.com/Ginden/blinkstick-node-v2.git"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.1",
