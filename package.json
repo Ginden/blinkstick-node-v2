@@ -1,6 +1,10 @@
 {
   "name": "@ginden/blinkstick-v2",
   "description": "Improved Blickstick API for Node.js",
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "prepare": "tsc",
     "test:manual": "ts-node test/manual/manual-test.ts",
