@@ -11,7 +11,7 @@ What is BlinkStick? It's a smart USB-controlled LED device. More info about it h
 
 - TypeScript
 - All methods taking callbacks now return Promises
-- Most animation methods allow AbortSignal
+- Most animation methods allow `AbortSignal` (this is only partially supported, your mileage may vary)
 - Many methods return results of setting a feature report on device instead of `undefined`]
 - Requires Node.js 20.0 or higher
 
