@@ -2,7 +2,7 @@ import { HIDAsync, type Device } from 'node-hid';
 import { BlinkStick } from '../blinkstick';
 import { blinkstickFinalizationRegistry } from '../blinkstick-finalization-registry';
 
-type MinimalDevice = Pick<
+export type MinimalDevice = Pick<
   Device,
   'vendorId' | 'productId' | 'path' | 'serialNumber' | 'manufacturer' | 'product'
 >;

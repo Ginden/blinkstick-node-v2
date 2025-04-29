@@ -1,4 +1,8 @@
+/**
+ * Simple type that describes a Blinkstick device.
+ */
 export type BlinkstickDeviceDefinition = {
+  // Number of LEDs
   ledCount: number;
 };
 

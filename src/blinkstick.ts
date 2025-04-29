@@ -50,10 +50,17 @@ export class BlinkStick<HidDevice extends HID | HIDAsync> {
       this.getVersionMajor() == 1 && this.getVersionMinor() >= 1 && this.getVersionMinor() <= 3;
   }
 
+  /**
+   * This allows BlinkStick instances to be used with explicit resource management
+   */
   async [Symbol.asyncDispose]() {
     await this.close();
   }
 
+  /**
+   * Low-level method that directly sends a feature report to the device.
+   * @param data
+   */
   async sendFeatureReport(data: number[] | Buffer) {
     return await this.device.sendFeatureReport(data);
   }
@@ -100,8 +107,7 @@ export class BlinkStick<HidDevice extends HID | HIDAsync> {
   /**
    * Get the major version from serial number
    *
-   * @method getVersionMajor
-   * @return {Number} Major version number from serial
+   * @return Major version number from serial
    */
   getVersionMajor(): number {
     return parseInt(this.serial.substring(this.serial.length - 3, this.serial.length - 2));
@@ -110,8 +116,7 @@ export class BlinkStick<HidDevice extends HID | HIDAsync> {
   /**
    * Get the minor version from serial number
    *
-   * @method getVersionMinor
-   * @return {Number} Minor version number from serial
+   * @return Minor version number from serial
    */
   getVersionMinor(): number {
     return parseInt(this.serial.substring(this.serial.length - 1, this.serial.length));
@@ -356,10 +361,9 @@ export class BlinkStick<HidDevice extends HID | HIDAsync> {
   /**
    * Set a feature report to the device.
    *
-   * @method setFeatureReport
-   * @param {Number} reportId Report ID to receive
-   * @param {Array} data Data to send to the device
-   * @param {Number} maxRetries Maximum number of retries
+   * @param reportId Report ID to receive
+   * @param data Data to send to the device
+   * @param maxRetries Maximum number of retries
    */
   async setFeatureReport(reportId: number, data: number[] | Buffer, maxRetries: number = 5) {
     return retryNTimes(maxRetries, async () => {
@@ -388,7 +392,6 @@ export class BlinkStick<HidDevice extends HID | HIDAsync> {
    * - duration=1000: How long should the morph animation last in milliseconds
    * - steps=50: How many steps for color changes
    *
-   * @method morph
    */
   async morph(...args: ColorOptions<MorphOptions>) {
     const params = interpretParameters(...args);
