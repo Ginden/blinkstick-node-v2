@@ -17,6 +17,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        with:
+          node-version: 20
+          cache: 'npm'
+          registry-url: 'registry.npmjs.org'
       - run: npm ci
       - run: npm run lint
       - run: npm run prettier
