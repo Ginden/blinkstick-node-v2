@@ -26,3 +26,17 @@ jobs:
           NEW_VERSION=$(npm version ${{ github.event.inputs.bump }})
           echo "New version: $NEW_VERSION"
           git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git HEAD:master "$NEW_VERSION"
+      - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+            tag_name: ${{ github.ref }}
+            release_name: Release ${{ github.ref }}
+            body: |
+              ## Changelog
+              - Bumped version to ${{ github.event.inputs.bump }}
+            files: |
+              dist/*
