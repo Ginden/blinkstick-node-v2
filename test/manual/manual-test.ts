@@ -7,7 +7,7 @@ import { retryNTimes } from '../../src/utils/retry-n-times';
 
 const reportIssueUrl = `https://github.com/Ginden/blinkstick-node-v2/issues/new`;
 
-const questionsAsked: { question: string; result }[] = [];
+const questionsAsked: { question: string; result: boolean }[] = [];
 
 async function yesOrThrow(question: string, errorMsg: string = 'User did not confirm') {
   const { yes } = await prompts({

@@ -1,7 +1,7 @@
 import { HIDAsync } from 'node-hid';
 
 export const blinkstickFinalizationRegistry = new FinalizationRegistry((hidDevice: HIDAsync) => {
-  const isClosed = (hidDevice as any)._closed as boolean;
+  const isClosed = (hidDevice as unknown as { _closed: boolean })._closed;
   if (isClosed) {
     return;
   } else {

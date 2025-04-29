@@ -146,6 +146,7 @@ export class BlinkStick<HidDevice extends HID | HIDAsync> {
   async setColor(...options: ColorOptions<SetColorOptions>) {
     const params = interpretParameters(...options);
     if (this.requiresSoftwareColorPatch) {
+      // eslint-disable-next-line prefer-const
       let [cr, cg, cb] = await this.getColor();
 
       if (params.red == cg && params.green == cr && params.blue == cb) {
