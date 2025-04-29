@@ -1,4 +1,4 @@
-name: Main
+name: Bump package version
 
 on:
   workflow_dispatch:
@@ -26,5 +26,3 @@ jobs:
           NEW_VERSION=$(npm version ${{ github.event.inputs.bump }})
           echo "New version: $NEW_VERSION"
           git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git HEAD:master "$NEW_VERSION"
-      - name: Release
-        uses: softprops/action-gh-release@v2
