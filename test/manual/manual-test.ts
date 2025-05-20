@@ -1,60 +1,77 @@
 import prompts from 'prompts';
-import blinkstick, { BlinkStick, createBlinkstickAsync } from '../../src';
+import blinkstick, {
+  BlinkStick,
+  BlinkstickAsync,
+  BlinkstickSync,
+  createBlinkstickAsync,
+  createBlinkstickSync,
+} from '../../src';
 import { assert } from 'tsafe';
 import { Device, HIDAsync } from 'node-hid';
 import { writeFile } from 'node:fs/promises';
 import { retryNTimes } from '../../src/utils/retry-n-times';
+import { questionsAsked } from './questions-asked';
+import { reportIssueUrl, yesOrThrow } from './helpers';
+import { Entries } from 'type-fest';
+import { sections } from './sections';
+import { br, hr } from './print';
 
-const reportIssueUrl = `https://github.com/Ginden/blinkstick-node-v2/issues/new`;
-
-const questionsAsked: { question: string; result: boolean }[] = [];
-
-async function yesOrThrow(question: string, errorMsg: string = 'User did not confirm') {
-  const { yes } = await prompts({
-    type: 'toggle',
-    name: 'yes',
-    message: question,
-    initial: Math.random() > 0.5,
-    active: 'yes',
-    inactive: 'no',
-  });
-
-  questionsAsked.push({ question, result: yes });
-
-  assert(yes, `${errorMsg}. Please report a bug at ${reportIssueUrl}.`);
-}
-
-let blinkstickDevice: BlinkStick<HIDAsync> | null = null;
+let blinkstickDevice: BlinkstickAsync | BlinkstickSync | null = null;
 let device: Device | null = null;
 
 (async () => {
   const devices = await blinkstick.findRawDevicesAsync();
   assert(devices.length > 0, 'No devices found');
-  const selectedDevice =
-    devices.length === 1
-      ? { device: devices[0]! }
-      : await prompts({
-          type: 'select',
-          name: 'device',
-          message: 'Select a device',
-          choices: devices.map((device) => ({
-            title: `${device.product} at ${device.path}`,
-            value: device,
-          })),
-        });
-  console.log(`Selected device: ${selectedDevice.device.product} at ${selectedDevice.device.path}`);
-  assert(selectedDevice.device, 'No device selected');
+  const selection = await prompts({
+    type: 'select',
+    name: 'device',
+    message: 'Select a device',
+    choices: devices
+      .map((device) => ({
+        title: `${device.product} at ${device.path}`,
+        value: device,
+      }))
+      .flatMap(({ title, value: device }) => [
+        {
+          title: `${title} (async mode)`,
+          value: {
+            title: `${title} (async mode)`,
+            device,
+            async: true,
+          },
+        },
+        {
+          title: `${title} (sync mode)`,
+          value: {
+            title: `${title} (async mode)`,
+            device,
+            async: false,
+          },
+        },
+      ]),
+  });
+  const selectedDeviceOption = selection.device;
+  const { device: selectedDevice, title, async } = selectedDeviceOption;
 
-  device = selectedDevice.device;
+  const selectedMode = async ? 'async' : 'sync';
 
-  blinkstickDevice = await createBlinkstickAsync(selectedDevice.device);
+  console.log(`Selected device: ${title}`);
+  assert(selectedDevice, 'No device selected');
+
+  device = selectedDevice;
+
+  blinkstickDevice =
+    selectedMode === 'async'
+      ? await createBlinkstickAsync(selectedDevice)
+      : createBlinkstickSync(selectedDevice);
+
   assert(blinkstickDevice);
 
   const deviceDescription = blinkstickDevice.describeDevice();
 
   assert(
     deviceDescription !== null,
-    'Library do not provide a description for this device. Create Pull Request to add it.',
+    `Library do not provide a description for this device (${blinkstickDevice.product}). Create Pull Request to add it.`,
   );
 
   const { ledCount } = deviceDescription;
@@ -63,66 +80,53 @@ let device: Device | null = null;
   await blinkstickDevice.turnOffAll();
   await yesOrThrow('Are all LEDs off?', 'All LEDs are should be off');
 
-  console.log('Now we will turn on the first LED to blue.');
-  await blinkstickDevice.setColor('rgb(0, 0, 255)', { index: 0 });
-  await yesOrThrow('Is the first LED blue?', 'First LED should be blue');
+  const { sectionsEnabled }: { sectionsEnabled: { name: string; fn: Function }[] } = await prompts({
+    message: `Select sections to test`,
+    type: 'multiselect',
+    name: 'sectionsEnabled',
+    choices: Object.entries(sections).map(([title, value]) => ({
+      title: title,
+      value: { name: title, fn: value },
+      selected: true,
+    })),
+  });
 
-  if (ledCount > 1) {
-    console.log('Now we will turn on the first two LEDs to red and green.');
-
-    await Promise.all([
-      blinkstickDevice.setColor('red', { index: 0 }),
-      blinkstickDevice.setColor('green', { index: 1 }),
-    ]);
-    await yesOrThrow(
-      'Are the first two LEDs red and green?',
-      'First two LEDs should be red and green',
-    );
+  for (const { name, fn } of sectionsEnabled) {
+    console.log(`First, we will turn off all LEDs.`);
     await blinkstickDevice.turnOffAll();
-
-    console.log(
-      `Now we will pulse both LEDs as yellow and blue for 2 seconds. Yellow one will be pulsing much faster than the other.`,
-    );
-
-    await Promise.all([
-      retryNTimes(10, async () => {
-        await blinkstickDevice!.pulse('yellow', { index: 0, duration: 200 });
-        throw new Error('Bunk');
-      }),
-      retryNTimes(20, async () => {
-        await blinkstickDevice!.pulse('blue', { index: 1, duration: 100 });
-        throw new Error('Bunk');
-      }),
-    ]).catch(() => null);
-
-    await yesOrThrow(
-      `Was the first LED pulsing yellow and the second blue?`,
-      'First LED should be yellow and the second blue',
-    );
+    console.log(`Now we will run ${name} tests.`);
+    await fn(blinkstickDevice, deviceDescription);
+    br();
+    hr();
+    br();
   }
 })()
+  .finally(() => {
+    return blinkstickDevice?.turnOffAll();
+  })
   .then(() => {
     console.log('Test completed successfully');
     return process.exit(0);
   })
   .catch(async (err: any) => {
+    console.error(err);
     console.error(`Test failed. All details will be saved in manual-test.log at repository root`);
     console.error(`Consider creating an issue at ${reportIssueUrl}`);
 
     const ret = {
-      error: Object.fromEntries(Object.entries(err)),
+      error: Object.fromEntries(Object.entries(err).concat([['stack', err.stack]])),
       device,
       questionsAsked,
       blinkstick: {
         describeDevice: blinkstickDevice?.describeDevice(),
-        infoBlock1: await blinkstickDevice?.getInfoBlock1(),
-        infoBlock2: await blinkstickDevice?.getInfoBlock2(),
+        infoBlock1: (await blinkstickDevice?.getInfoBlock1Raw())?.toString('hex'),
+        infoBlock2: (await blinkstickDevice?.getInfoBlock2Raw())?.toString('hex'),
         inverse: blinkstickDevice?.inverse,
         animation: blinkstickDevice?.animationsEnabled,
         requiresSoftwarePatch: blinkstickDevice?.requiresSoftwareColorPatch,
         version: {
-          major: blinkstickDevice?.getVersionMajor(),
-          minor: blinkstickDevice?.getVersionMinor(),
+          major: blinkstickDevice?.getVersionMajor() ?? null,
+          minor: blinkstickDevice?.getVersionMinor() ?? null,
         },
       },
     };

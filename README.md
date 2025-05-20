@@ -93,15 +93,26 @@ await blinkstick.pulse('rgb(255, 0, 0)');
 await blinkstick.setColor('red');
 ```
 
+### Known issues
+
+- Dreaded `could not get feature report from device` - this error occurs somewhere in the `node-hid` library and its dependencies,
+  and is most likely to occur when calling methods in tight loops. See https://github.com/node-hid/node-hid/issues/561
+
 ## Permission problems
 
 If you get an error message on Linux:
 
     Error: cannot open device with path /dev/hidraw0
 
-Please run the following command and restart your computer:
+Please run the following command:
 
     echo "KERNEL==\"hidraw*\", SUBSYSTEM==\"hidraw\", ATTRS{idVendor}==\"20a0\", ATTRS{idProduct}==\"41e5\", MODE=\"0666\"" | sudo tee /etc/udev/rules.d/85-blinkstick-hid.rules
+
+Then either restart the computer or run the following command to reload udev rules:
+
+    sudo udevadm control --reload-rules && sudo udevadm trigger
+
+
 
 ## Contributing
 

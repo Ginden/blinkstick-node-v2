@@ -2,6 +2,7 @@ import usb, { HID, HIDAsync } from 'node-hid';
 import { findRawDevices, findRawDevicesAsync } from './find-raw-devices';
 import { BlinkStick } from '../blinkstick';
 import { createBlinkstickAsync } from './create-blinkstick-async';
+import { BlinkstickSync } from '../blinkstick.sync';
 
 /**
  * Find BlinkSticks using a filter, using synchronous USB device enumeration.
@@ -18,12 +19,7 @@ export function findBlinkSticks(filter?: (device: usb.Device) => boolean): Blink
       const hidDevice = device.path
         ? new HID(device.path)
         : new HID(device.vendorId, device.productId);
-      return new BlinkStick<HID>(
-        hidDevice,
-        device.serialNumber!,
-        device.manufacturer!,
-        device.product!,
-      );
+      return new BlinkstickSync(hidDevice);
     });
 }
 

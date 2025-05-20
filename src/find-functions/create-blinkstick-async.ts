@@ -1,6 +1,7 @@
 import { HIDAsync, type Device } from 'node-hid';
 import { BlinkStick } from '../blinkstick';
 import { blinkstickFinalizationRegistry } from '../blinkstick-finalization-registry';
+import { BlinkstickAsync } from '../blinkstick.async';
 
 export type MinimalDevice = Pick<
   Device,
@@ -16,16 +17,11 @@ export type MinimalDevice = Pick<
  *
  * @param device
  */
-export async function createBlinkstickAsync(device: MinimalDevice): Promise<BlinkStick<HIDAsync>> {
+export async function createBlinkstickAsync(device: MinimalDevice): Promise<BlinkstickAsync> {
   const hidDevice = device.path
     ? await HIDAsync.open(device.path)
     : await HIDAsync.open(device.vendorId, device.productId);
-  const blinkstick = new BlinkStick<HIDAsync>(
-    hidDevice,
-    device.serialNumber!,
-    device.manufacturer!,
-    device.product!,
-  );
+  const blinkstick = new BlinkstickAsync(hidDevice, await hidDevice.getDeviceInfo());
 
   blinkstickFinalizationRegistry.register(blinkstick, hidDevice, blinkstick);
 

@@ -24,3 +24,8 @@ export async function getInfoBlock(device: BlinkStick<HID | HIDAsync>, location:
 
   return result;
 }
+
+export async function getInfoBlockRaw(device: BlinkStick<HID | HIDAsync>, location: number) {
+  const buffer = await device.getFeatureReport(location, 33);
+  return Buffer.from(buffer, 1);
+}

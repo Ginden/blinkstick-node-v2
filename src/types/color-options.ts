@@ -1,5 +1,6 @@
 import { COLOR_KEYWORDS } from '../color-keywords';
 import { Channel } from './channel';
+import { RgbTuple } from './rgb-tuple';
 
 export type AllPossibleColorOptions = {
   channel?: Channel;
@@ -20,12 +21,18 @@ export type ColorOptions<AdditionalOptions = AllPossibleColorOptions> =
       css: `#${string}`,
       additionalOptions?: AdditionalOptions,
     ]
-  | [{ r: number; g: number; b: number }, additionalOptions?: AdditionalOptions]
+  | [ColorObject, additionalOptions?: AdditionalOptions]
   | [css: string, additionalOptions?: AdditionalOptions];
 
-export type NormalizedColorOptions<AdditionalOptions = AllPossibleColorOptions> = {
-  red: number;
-  green: number;
-  blue: number;
-  options: AdditionalOptions;
+export type SaneColorParam = RgbTuple | ColorObject | keyof typeof COLOR_KEYWORDS;
+
+export type ColorObject = {
+  r: number;
+  g: number;
+  b: number;
 };
+
+export interface NormalizedColorOptions<AdditionalOptions = AllPossibleColorOptions>
+  extends ColorObject {
+  options: AdditionalOptions;
+}

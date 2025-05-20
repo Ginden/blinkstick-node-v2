@@ -1,4 +1,4 @@
-import { AllPossibleColorOptions, NormalizedColorOptions } from '../types/color-options';
+import { AllPossibleColorOptions, NormalizedColorOptions } from '../../types/color-options';
 
 export function normalizeHexColor(
   color: string,
@@ -17,9 +17,9 @@ export function normalizeHexColor(
     );
   } else if (color.length === 6) {
     return {
-      red: parseInt(color.slice(0, 2), 16),
-      green: parseInt(color.slice(2, 4), 16),
-      blue: parseInt(color.slice(4, 6), 16),
+      r: parseInt(color.slice(0, 2), 16),
+      g: parseInt(color.slice(2, 4), 16),
+      b: parseInt(color.slice(4, 6), 16),
       options: options || {},
     };
   }

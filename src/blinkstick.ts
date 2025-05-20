@@ -1,7 +1,7 @@
-import { HID, HIDAsync } from 'node-hid';
+import { Device, HID, HIDAsync } from 'node-hid';
 import { determineReportId } from './utils/hid/determine-report-id';
 import { decimalToHex } from './utils/decimal-to-hex';
-import { getInfoBlock } from './utils/hid/get-info-block';
+import { getInfoBlock, getInfoBlockRaw } from './utils/hid/get-info-block';
 import { setInfoBlock } from './utils/hid/set-info-block';
 import { ColorOptions, NormalizedColorOptions } from './types/color-options';
 import { clampRgb } from './utils/clamp';
@@ -11,43 +11,66 @@ import { MorphOptions } from './color-change-options/morph-options';
 import { SetColorOptions } from './color-change-options/set-color-options';
 import { retryNTimes } from './utils/retry-n-times';
 import { Channel } from './types/channel';
-import { interpretParameters } from './utils/interpret-parameters';
+import {
+  interpretParameters,
+  interpretParametersInversed,
+} from './utils/colors/interpret-parameters';
 import { BlinkStickProMode } from './types/mode';
 import { BlinkstickDeviceDefinition, blinkstickDevicesDefinitions } from './definitions/devices';
 import { isDefined } from './utils/is-defined';
+import { AnimationRunner } from './animations/animation-runner';
+import { LedGroup } from './led/led-group';
+import { asBuffer } from './as-buffer';
+import { Led } from './led/led';
+import { RgbTuple } from './types/rgb-tuple';
 
 /**
  * Main class responsible for controlling BlinkStick devices.
  */
-
-export class BlinkStick<HidDevice extends HID | HIDAsync> {
+export abstract class BlinkStick<HidDevice extends HID | HIDAsync> {
+  public abstract readonly isSync: boolean;
   private abortSignal: AbortSignal | null = null;
-  public inverse: boolean;
+  /**
+   * Changes the default retry count for sending feature reports.
+   * Yes - it is buggy.
+   */
+  public defaultRetryCount = 5;
   public animationsEnabled: boolean;
   readonly requiresSoftwareColorPatch: boolean;
   readonly device: HidDevice;
   readonly serial: string;
   readonly manufacturer: string;
   readonly product: string;
+  protected _animation?: AnimationRunner;
+  protected _inverse = false;
+
+  public interpretParameters: typeof interpretParameters = interpretParameters;
 
   /**
    *
-   * @param {HID | HIDAsync} device The USB device
-   * @param {String} [serialNumber] Serial number of the device. Used only in Windows.
-   * @param {String} [manufacturer] Manufacturer of the device. Used only in Windows.
-   * @param {String} [product] Product name of the device. Used only in Windows.
+   * @internal This is not intended to be used outside of the library. End-users should use `find*` functions
    */
-  constructor(device: HidDevice, serialNumber: string, manufacturer: string, product: string) {
+  protected constructor(device: HidDevice, deviceInfo: Device) {
     this.device = device;
-    this.serial = serialNumber;
-    this.manufacturer = manufacturer;
-    this.product = product;
+    this.serial = deviceInfo.serialNumber ?? '';
+    this.manufacturer = deviceInfo.manufacturer ?? '';
+    this.product = deviceInfo.product ?? '';
 
-    this.inverse = false;
     this.animationsEnabled = true;
 
     this.requiresSoftwareColorPatch =
       this.getVersionMajor() == 1 && this.getVersionMinor() >= 1 && this.getVersionMinor() <= 3;
+  }
+
+  public get inverse() {
+    return this._inverse;
+  }
+
+  public set inverse(value: boolean) {
+    this._inverse = value;
+    if (this._inverse) {
+      this.interpretParameters = interpretParametersInversed;
+    }
   }
 
   /**
@@ -55,6 +78,26 @@ export class BlinkStick<HidDevice extends HID | HIDAsync> {
    */
   async [Symbol.asyncDispose]() {
     await this.close();
+  }
+
+  /**
+   * Gets animation runner for the device.
+   * If device has unknown number of LEDs, getter will return null.
+   * If device is in inverse mode, getter will return null.
+   */
+  get animation(): AnimationRunner | null {
+    if (this.inverse) {
+      return null;
+    }
+    if (this._animation) {
+      return this._animation;
+    }
+    if (this.describeDevice()?.ledCount) {
+      this._animation = new AnimationRunner(this);
+      return this._animation;
+    } else {
+      return null;
+    }
   }
 
   /**
@@ -77,6 +120,7 @@ export class BlinkStick<HidDevice extends HID | HIDAsync> {
    * </pre>
    *
    * Software version defines the capabilities of the device
+   * @deprecated Use `.serial` directly
    */
   getSerial() {
     return this.serial;
@@ -124,6 +168,7 @@ export class BlinkStick<HidDevice extends HID | HIDAsync> {
 
   /**
    * Get the manufacturer of the device
+   * @deprecated Use `.manufacturer` directly
    */
   getManufacturer() {
     return this.manufacturer;
@@ -131,6 +176,7 @@ export class BlinkStick<HidDevice extends HID | HIDAsync> {
 
   /**
    * Get the description of the device
+   * @deprecated Use `.product` directly
    */
   getDescription() {
     return this.product;
@@ -148,13 +194,13 @@ export class BlinkStick<HidDevice extends HID | HIDAsync> {
    *     setColor(color_name, [options]); // use 'random', 'red', 'green', 'yellow' and other CSS supported names
    *
    */
-  async setColor(...options: ColorOptions<SetColorOptions>) {
+  async setColor(...options: ColorOptions<SetColorOptions>): Promise<Buffer | null> {
     const params = interpretParameters(...options);
     if (this.requiresSoftwareColorPatch) {
       // eslint-disable-next-line prefer-const
       let [cr, cg, cb] = await this.getColor();
 
-      if (params.red == cg && params.green == cr && params.blue == cb) {
+      if (params.r == cg && params.g == cr && params.b == cb) {
         // TODO: figure out why original code never changed cb here.
         if (cr > 0) {
           cr = cr - 1;
@@ -162,27 +208,45 @@ export class BlinkStick<HidDevice extends HID | HIDAsync> {
           cg = cg - 1;
         }
         await this.sendColor(interpretParameters(cr, cg, cb));
-        await this.sendColor(interpretParameters(params.red, params.green, params.blue));
+        await this.sendColor(interpretParameters(params.r, params.g, params.b));
       } else {
-        await this.sendColor(interpretParameters(params.red, params.green, params.blue));
+        await this.sendColor(interpretParameters(params.r, params.g, params.b));
       }
       return null;
     } else {
-      return this.sendColor(params);
+      return asBuffer(await this.sendColor(params));
     }
+  }
+
+  async setColorAndForget(...options: ColorOptions<SetColorOptions>) {
+    await this.sendColorAndForget(interpretParameters(...options));
   }
 
   private async sendColor(params: NormalizedColorOptions) {
     const {
-      red: r,
-      green: g,
-      blue: b,
+      r,
+      g,
+      b,
       options: { channel = 0, index = 0 },
     } = params;
     if (params.options.channel === 0 && params.options.index === 0) {
-      return await this.setFeatureReport(1, [1, r, g, b]);
+      return await this.setFeatureReport(1, Buffer.from([1, r, g, b]));
     } else {
-      return await this.setFeatureReport(5, [5, channel, index, r, g, b]);
+      return await this.setFeatureReport(5, Buffer.from([5, channel, index, r, g, b]));
+    }
+  }
+
+  private async sendColorAndForget(params: NormalizedColorOptions) {
+    const {
+      r,
+      g,
+      b,
+      options: { channel = 0, index = 0 },
+    } = params;
+    if (channel === 0 && index === 0) {
+      return await this.setFeatureReportAndForget(Buffer.from([1, r, g, b]));
+    } else {
+      return await this.setFeatureReportAndForget(Buffer.from([5, channel, index, r, g, b]));
     }
   }
 
@@ -211,11 +275,11 @@ export class BlinkStick<HidDevice extends HID | HIDAsync> {
    * http://www.blinkstick.com/help/tutorials/blinkstick-pro-modes
    */
   async setMode(mode: BlinkStickProMode) {
-    return await this.setFeatureReport(0x0004, [4, mode]);
+    return asBuffer(await this.setFeatureReport(0x0004, asBuffer([4, mode])));
   }
 
   async getMode() {
-    return await this.getFeatureReport(4, 33);
+    return asBuffer(await this.getFeatureReport(4, 33));
   }
 
   async setRandomColor() {
@@ -226,7 +290,7 @@ export class BlinkStick<HidDevice extends HID | HIDAsync> {
    * Get the current color visible on BlinkStick
    * @param index The index of the LED, 0 is default
    */
-  async getColor(index = 0): Promise<[red: number, green: number, blue: number]> {
+  async getColor(index = 0): Promise<RgbTuple> {
     if (index === 0) {
       const buffer = await this.getFeatureReport(0x0001, 33);
       if (buffer) {
@@ -246,10 +310,10 @@ export class BlinkStick<HidDevice extends HID | HIDAsync> {
    *  .getColors(8);
    * @return {Array} Callback returns an array of LED data in the following format: [g0, r0, b0, g1, r1, b1...]
    * * */
-  async getColors(count: number): Promise<number[] | Buffer> {
+  async getColors(count: number): Promise<Buffer> {
     const { reportId, maxLeds } = determineReportId(count * 3);
     const report = await this.getFeatureReport(reportId, maxLeds * 3 + 2);
-    return report.slice(2, report.length - 1);
+    return report.subarray(2, report.length - 1);
   }
 
   /**
@@ -258,25 +322,34 @@ export class BlinkStick<HidDevice extends HID | HIDAsync> {
    * @param channel Channel is represented as 0=R, 1=G, 2=B
    * @param data LED data in the following format: [g0, r0, b0, g1, r1, b1...]
    */
-  async setColors(channel: Channel, data: number[] | Uint8Array) {
-    const params = determineReportId(data.length);
+  async setColors(channel: Channel, data: number[] | Uint8Array | Buffer) {
+    const { reportId, maxLeds } = determineReportId(data.length);
+    const maxDataBytes = maxLeds * 3;
+    const reportLength = 2 + maxDataBytes;
+    const report = Buffer.alloc(reportLength);
+    report[0] = reportId;
+    report[1] = channel;
 
-    let i = 0;
+    const copyLength = Math.min(data.length, maxDataBytes);
+    const source = asBuffer(data);
+    source.copy(report, 2, 0, copyLength);
 
-    const report = [params.reportId, channel];
+    return await this.setFeatureReport(reportId, asBuffer(report));
+  }
 
-    for (const item of data) {
-      if (i < params.maxLeds * 3) {
-        report.push(item);
-        i += 1;
-      }
-    }
+  async setColorsAndForget(channel: Channel, data: number[] | Uint8Array | Buffer) {
+    const { reportId, maxLeds } = determineReportId(data.length);
+    const maxDataBytes = maxLeds * 3;
+    const reportLength = 2 + maxDataBytes;
+    const report = Buffer.alloc(reportLength);
+    report[0] = reportId;
+    report[1] = channel;
 
-    for (let j = i; j < params.maxLeds * 3; j++) {
-      report.push(0);
-    }
+    const copyLength = Math.min(data.length, maxDataBytes);
+    const source = asBuffer(data);
+    source.copy(report, 2, 0, copyLength);
 
-    return await this.setFeatureReport(params.reportId, report);
+    return await this.setFeatureReportAndForget(asBuffer(report));
   }
 
   /**
@@ -293,9 +366,14 @@ export class BlinkStick<HidDevice extends HID | HIDAsync> {
    * This is a 32 byte array that can contain any data. It's supposed to
    * hold the "Name" of the device making it easier to identify rather than
    * a serial number.
+   * @deprecated Use `getInfoBlock1Raw` instead
    */
   async getInfoBlock1() {
     return await getInfoBlock(this, 0x0002);
+  }
+
+  async getInfoBlock1Raw() {
+    return await getInfoBlockRaw(this, 0x0002);
   }
 
   /**
@@ -323,9 +401,14 @@ export class BlinkStick<HidDevice extends HID | HIDAsync> {
    *         console.log(data);
    *     });
    *
+   * @deprecated Use `getInfoBlock2Raw` instead
    */
   async getInfoBlock2() {
     return await getInfoBlock(this, 0x0003);
+  }
+
+  async getInfoBlock2Raw() {
+    return await getInfoBlockRaw(this, 0x0003);
   }
 
   async setInfoBlock2(data: string) {
@@ -337,9 +420,7 @@ export class BlinkStick<HidDevice extends HID | HIDAsync> {
   }
 
   async turnOffAll(ledCount: number = this.describeDevice()!.ledCount) {
-    await Promise.all(
-      Array.from({ length: ledCount }, (_, i) => this.setColor(0, 0, 0, { index: i })),
-    );
+    await this.leds().setColor([0, 0, 0]);
   }
 
   async blink(...options: ColorOptions) {
@@ -352,24 +433,37 @@ export class BlinkStick<HidDevice extends HID | HIDAsync> {
     const delay = params.options.delay ?? 500;
 
     for (let i = 0; i < repeats; i++) {
-      await this.setColor(params.red, params.green, params.blue, params.options);
+      await this.setColor(params.r, params.g, params.b, params.options);
       await setTimeout(delay, null, { signal: abortSignal });
       await this.setColor(0, 0, 0, params.options);
     }
   }
 
   /**
-   * Set a feature report to the device.
+   * Set a feature report to the device, and returns read data from the device.
    *
    * @param reportId Report ID to receive
    * @param data Data to send to the device
    * @param maxRetries Maximum number of retries
    */
-  async setFeatureReport(reportId: number, data: number[] | Buffer, maxRetries: number = 5) {
+  async setFeatureReport(
+    reportId: number,
+    data: Buffer,
+    maxRetries: number = this.defaultRetryCount,
+  ): Promise<Buffer> {
     return retryNTimes(maxRetries, async () => {
       await this.sendFeatureReport(data);
-      return await this.device.getFeatureReport(reportId, data.length);
+      return asBuffer(await this.device.getFeatureReport(reportId, data.length));
     });
+  }
+
+  /**
+   * Set a feature report to the device, and forget about it.
+   * @param data
+   * @param maxRetries
+   */
+  async setFeatureReportAndForget(data: Buffer, maxRetries: number = 1) {
+    await this.sendFeatureReport(data);
   }
 
   /**
@@ -391,7 +485,7 @@ export class BlinkStick<HidDevice extends HID | HIDAsync> {
    * - index=0: The index of the LED
    * - duration=1000: How long should the morph animation last in milliseconds
    * - steps=50: How many steps for color changes
-   *
+   * @deprecated Use animation API instead
    */
   async morph(...args: ColorOptions<MorphOptions>) {
     const params = interpretParameters(...args);
@@ -405,9 +499,9 @@ export class BlinkStick<HidDevice extends HID | HIDAsync> {
 
     for (let count = 0; count < steps; count++) {
       if (!this.animationsEnabled) return;
-      const nextRed = clampRgb(cr + ((params.red - cr) / steps) * count);
-      const nextGreen = clampRgb(cg + ((params.green - cg) / steps) * count);
-      const nextBlue = clampRgb(cb + ((params.blue - cb) / steps) * count);
+      const nextRed = clampRgb(cr + ((params.r - cr) / steps) * count);
+      const nextGreen = clampRgb(cg + ((params.g - cg) / steps) * count);
+      const nextBlue = clampRgb(cb + ((params.b - cb) / steps) * count);
       await this.setColor(nextRed, nextGreen, nextBlue, params.options);
       await setTimeout(stepDuration, null, { signal });
     }
@@ -432,11 +526,12 @@ export class BlinkStick<HidDevice extends HID | HIDAsync> {
    * - index=0: The index of the LED
    * - duration=1000: How long should the pulse animation last in milliseconds
    * - steps=50: How many steps for color changes
+   * @deprecated Use animation API instead
    */
   async pulse(...options: ColorOptions<MorphOptions>) {
     const params = interpretParameters(...options);
 
-    await this.morph(params.red, params.green, params.blue, params.options);
+    await this.morph(params.r, params.g, params.b, params.options);
     await this.morph(0, 0, 0, params.options);
   }
 
@@ -447,8 +542,16 @@ export class BlinkStick<HidDevice extends HID | HIDAsync> {
    * @param {Number} length Expected length of the report
    * @param {Number} maxRetries Maximum number of retries
    */
-  async getFeatureReport(reportId: number, length: number, maxRetries: number = 5) {
-    return retryNTimes(maxRetries, async () => this.device.getFeatureReport(reportId, length));
+  async getFeatureReport(
+    reportId: number,
+    length: number,
+    maxRetries: number = 5,
+  ): Promise<Buffer> {
+    return retryNTimes(maxRetries, async () => this.getFeatureReportRaw(reportId, length));
+  }
+
+  async getFeatureReportRaw(reportId: number, length: number): Promise<Buffer> {
+    return asBuffer(await this.device.getFeatureReport(reportId, length));
   }
 
   /**
@@ -460,7 +563,19 @@ export class BlinkStick<HidDevice extends HID | HIDAsync> {
       null
     );
   }
+
+  public leds(ledCount = this.describeDevice()!.ledCount): LedGroup {
+    return new LedGroup(this, ledCount);
+  }
+
+  public led(index: number): Led {
+    if (index < 0 || index >= this.describeDevice()!.ledCount) {
+      throw new Error(
+        `Index ${index} is out of bounds. Must be between 0 and ${this.describeDevice()!.ledCount - 1}`,
+      );
+    }
+    return new Led(this, index);
+  }
 }
 
-export type BlinkStickSync = BlinkStick<HID>;
-export type BlinkStickAsync = BlinkStick<HIDAsync>;
+export type BlinkstickAny = BlinkStick<HID | HIDAsync>;
