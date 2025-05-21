@@ -1,6 +1,6 @@
-import { SimpleFrame } from './simple-frame';
-import { ComplexFrame } from './complex-frame';
-import { RgbTuple } from '../types';
+import { SimpleFrame } from '../simple-frame';
+import { ComplexFrame } from '../complex-frame';
+import { RgbTuple } from '../../types';
 import { assert } from 'tsafe';
 
 export async function* convertSimpleFramesToComplexFrame1(

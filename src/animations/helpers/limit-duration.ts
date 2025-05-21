@@ -1,6 +1,6 @@
-import { AnimationDescription } from '../../animation-description';
-import { ComplexFrame } from '../../complex-frame';
-import { SimpleFrame } from '../../simple-frame';
+import { AnimationDescription } from '../animation-description';
+import { ComplexFrame } from '../complex-frame';
+import { SimpleFrame } from '../simple-frame';
 
 /**
  * Sets maximum duration for an animation.

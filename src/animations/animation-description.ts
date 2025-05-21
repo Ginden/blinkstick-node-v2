@@ -1,11 +1,11 @@
 import { SaneColorParam } from '../types';
 import { SimpleFrame } from './simple-frame';
 import { ComplexFrame } from './complex-frame';
-import { pulse } from './common-animations/pulse';
-import { repeat } from './common-animations/helpers/repeat';
+import { pulse } from './common/pulse';
+import { repeat } from './helpers/repeat';
 import { parseSaneColorParam } from '../utils/colors/parse-sane-color-param';
-import { morph } from './common-animations/morph';
-import { morphMany } from './common-animations/morph-many';
+import { morph } from './common/morph';
+import { morphMany } from './common/morph-many';
 
 export abstract class Animation {
   static repeat(animation: AnimationDescription, repeatCount: number) {

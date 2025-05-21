@@ -6,7 +6,7 @@ import { setInfoBlock } from '../utils/hid/set-info-block';
 import { ColorOptions, NormalizedColorOptions } from '../types/color-options';
 import { clampRgb } from '../utils/clamp';
 import { setTimeout } from 'timers/promises';
-import { blinkstickFinalizationRegistry } from '../blinkstick-finalization-registry';
+import { blinkstickFinalizationRegistry } from './blinkstick-finalization-registry';
 import { MorphOptions } from '../color-change-options/morph-options';
 import { SetColorOptions } from '../color-change-options/set-color-options';
 import { retryNTimes } from '../utils/retry-n-times';
@@ -16,7 +16,7 @@ import {
   interpretParametersInversed,
 } from '../utils/colors/interpret-parameters';
 import { BlinkStickProMode } from '../types/enums/mode';
-import { BlinkstickDeviceDefinition, deviceDescriptions } from '../device-descriptions';
+import { deviceDescriptions } from '../consts/device-descriptions';
 import { isDefined } from '../utils/is-defined';
 import { AnimationRunner } from '../animations/animation-runner';
 import { LedGroup } from '../led/led-group';

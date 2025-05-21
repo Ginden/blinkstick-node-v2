@@ -7,6 +7,7 @@
   },
   "scripts": {
     "prepare": "tsc",
+    "test": "vitest run",
     "test:manual": "ts-node test/manual/manual-test.ts",
     "fix": "npm run prettier && npm run lint:fix",
     "lint": "eslint src",

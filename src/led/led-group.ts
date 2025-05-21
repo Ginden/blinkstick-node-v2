@@ -1,4 +1,4 @@
-import { BlinkstickAny } from '../blinkstick/blinkstick';
+import { BlinkstickAny } from '../core/blinkstick';
 import { SaneColorParam } from '../types';
 import { parseSaneColorParam } from '../utils/colors/parse-sane-color-param';
 

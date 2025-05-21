@@ -1,5 +1,5 @@
-import { AnimationDescription } from '../../animation-description';
-import { Frame } from '../../frame';
+import { AnimationDescription } from '../animation-description';
+import { Frame } from '../frame';
 import AsyncIterator = NodeJS.AsyncIterator;
 
 export function repeat(animation: AnimationDescription, times: number): AnimationDescription {

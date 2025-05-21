@@ -1,4 +1,4 @@
-import { COLOR_KEYWORDS } from '../color-keywords';
+import { COLOR_KEYWORDS } from '../consts/color-keywords';
 import { Channel } from './enums/channel';
 import { RgbTuple } from './rgb-tuple';
 

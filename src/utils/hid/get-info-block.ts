@@ -1,4 +1,4 @@
-import { BlinkStick } from '../../blinkstick/blinkstick';
+import { BlinkStick } from '../../core/blinkstick';
 import type { HID, HIDAsync } from 'node-hid';
 
 /**

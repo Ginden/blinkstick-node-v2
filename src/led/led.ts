@@ -1,4 +1,4 @@
-import { BlinkstickAny } from '../blinkstick/blinkstick';
+import { BlinkstickAny } from '../core/blinkstick';
 import { RgbTuple } from '../types';
 
 export class Led {

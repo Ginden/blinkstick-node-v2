@@ -1,5 +1,5 @@
 import { SaneColorParam } from '../../types';
-import { COLOR_KEYWORDS } from '../../color-keywords';
+import { COLOR_KEYWORDS } from '../../consts/color-keywords';
 import { normalizeHexColor } from './normalize-hex-color';
 import { RgbTuple } from '../../types/rgb-tuple';
 import { typeGuard } from 'tsafe';

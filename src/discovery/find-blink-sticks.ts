@@ -1,8 +1,8 @@
 import usb, { HID, HIDAsync } from 'node-hid';
 import { findRawDevices, findRawDevicesAsync } from './find-raw-devices';
-import { BlinkStick } from '../blinkstick/blinkstick';
+import { BlinkStick } from '../core/blinkstick';
 import { createBlinkstickAsync } from './create-blinkstick-async';
-import { BlinkstickSync } from '../blinkstick/blinkstick.sync';
+import { BlinkstickSync } from '../core/blinkstick.sync';
 
 /**
  * Find BlinkSticks using a filter, using synchronous USB device enumeration.

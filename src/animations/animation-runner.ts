@@ -1,7 +1,7 @@
-import { BlinkstickAny } from '../blinkstick/blinkstick';
+import { BlinkstickAny } from '../core/blinkstick';
 import { AnimationDescription } from './animation-description';
 import { assert } from 'tsafe';
-import { combine } from './common-animations/helpers/combine';
+import { combine } from './helpers/combine';
 import { SimpleFrame } from './simple-frame';
 import { ComplexFrame } from './complex-frame';
 import { scheduler } from 'node:timers/promises';

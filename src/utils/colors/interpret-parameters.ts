@@ -2,7 +2,7 @@ import { ColorOptions, NormalizedColorOptions } from '../../types/color-options'
 import { randomIntInclusive } from '../random-int-inclusive';
 import { clampRgb } from '../clamp';
 import { typeGuard } from 'tsafe';
-import { COLOR_KEYWORDS } from '../../color-keywords';
+import { COLOR_KEYWORDS } from '../../consts/color-keywords';
 import { normalizeHexColor } from './normalize-hex-color';
 import parseCss from 'color-rgba';
 import {getRandomColor} from "./get-random-color";
