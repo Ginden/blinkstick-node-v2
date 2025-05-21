@@ -35,6 +35,12 @@ export class AnimationRunner {
     this.isRunning = false;
   }
 
+  /**
+   * Runs the animation
+   * If the animation is already running, it will throw an error
+   * Will wait for the animation to finish before returning
+   * @param animations
+   */
   async run(...animations: AnimationDescription[]) {
     if (this.isRunning) {
       throw new Error('Animation is already running');
@@ -42,9 +48,14 @@ export class AnimationRunner {
     return this.runNew(...animations);
   }
 
+  /**
+   * Will replace the current animation and run the new one
+   * Optional callback will be called when the animation is finished
+   */
   runAndForget(animations: AnimationDescription[], cb?: (err: Error | null) => unknown) {
-    this.runNew(...animations).catch((err) => {
+    void this.runNew(...animations).catch((err) => {
       if (err === abortError) {
+        cb?.(null);
         return;
       } else {
         cb?.(err);
@@ -52,8 +63,15 @@ export class AnimationRunner {
     });
   }
 
+  /**
+   * Runs the animation, replacing the current one
+   * If the animation is already running, it will be stopped
+   * @param animations
+   */
   async runNew(...animations: AnimationDescription[]) {
     this.isRunning = true;
+    this.abortController.abort(abortError);
+    this.abortController = new AbortController();
     const currentAnimation = combine(...animations);
     const { signal } = this.abortController;
     try {
@@ -77,7 +95,7 @@ export class AnimationRunner {
 
   private async applyComplexFrame(frame: ComplexFrame) {
     assert(this.leds.length === frame.colors.length, 'Frame and LEDs length mismatch');
-    await this.blinkstick.setColorsAndForget(
+    await this.blinkstick.setColors(
       0,
       convertArrayOfRgbTuplesToBulkSetBuffer(frame.colors, this.buffer),
     );
@@ -93,8 +111,6 @@ export class AnimationRunner {
       await this.applyComplexFrame(frame);
     }
     const timeElapsed = performance.now() - t0;
-    signal.throwIfAborted();
-    await scheduler.wait(Math.max(duration - timeElapsed, 0));
-    signal.throwIfAborted();
+    await scheduler.wait(Math.max(duration - timeElapsed, 0), { signal });
   }
 }

@@ -15,6 +15,16 @@ What is BlinkStick? It's a smart USB-controlled LED device. More info about it h
 - Many methods return results of setting a feature report on device instead of `undefined`]
 - Requires Node.js 20.0 or higher
 
+## Big changes in v2.1
+
+- Added support for arbitrary animations
+- Deprecated lots of methods
+- Added subclasses `BlinkStickSync` and `BlinkStickAsync` for sync and async APIs and future specialization
+
+**BREAKING CHANGES**:
+
+- Restored original return types of several methods
+
 ### Tested devices
 
 - BlinkStick Nano

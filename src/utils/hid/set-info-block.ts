@@ -1,5 +1,7 @@
 import type { HID, HIDAsync } from 'node-hid';
 import { BlinkStick } from '../../blinkstick';
+import { asBuffer } from '../../as-buffer';
+import { assert } from 'tsafe';
 
 /**
  * Sets an infoblock on a device.
@@ -19,11 +21,13 @@ export async function setInfoBlock(
     if (data.length !== 33) {
       throw new Error('Data length is not 33 bytes');
     }
-    return await device.setFeatureReport(location, Buffer.alloc(33, data));
+    const sentBuffer = asBuffer(data);
+    assert(sentBuffer[0] === location, 'Data location does not match the expected location');
+    return await device.setFeatureReport(Buffer.alloc(33, data));
   }
 
-  buffer[0] = 0;
+  buffer[0] = location;
   for (let i = 0; i < l; i++) buffer[i + 1] = data.charCodeAt(i);
 
-  return await device.setFeatureReport(location, buffer);
+  return await device.setFeatureReport(buffer);
 }

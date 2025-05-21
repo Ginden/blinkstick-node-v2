@@ -12,13 +12,9 @@ function prepareBuffer(buffer: Uint8Array, red: number, green: number, blue: num
 
 export class LedGroup {
   private readonly buffer: Buffer;
-  constructor(
-    public readonly blinkstick: BlinkstickAny,
-    public readonly ledCount: number,
-  ) {
+  constructor(public readonly blinkstick: BlinkstickAny) {
     this.blinkstick = blinkstick;
-    this.ledCount = ledCount;
-    this.buffer = Buffer.alloc(ledCount * 3);
+    this.buffer = Buffer.alloc(blinkstick.ledCount * 3);
   }
 
   public setColor(color: SaneColorParam) {
@@ -30,6 +26,6 @@ export class LedGroup {
   public setColorAndForget(color: SaneColorParam) {
     const [r, g, b] = parseSaneColorParam(color);
     prepareBuffer(this.buffer, r, g, b);
-    return this.blinkstick.setColorsAndForget(0, this.buffer);
+    return this.blinkstick.setColors(0, this.buffer);
   }
 }
