@@ -1,5 +1,11 @@
 import { assert } from 'tsafe';
-import {BlinkstickAny, BlinkstickDeviceDefinition, ComplexFrame, RgbTuple, SimpleFrame} from '../../../src';
+import {
+  BlinkstickAny,
+  BlinkstickDeviceDefinition,
+  ComplexFrame,
+  RgbTuple,
+  SimpleFrame,
+} from '../../../src';
 import { yesOrThrow } from '../helpers';
 import { Animation } from '../../../src/animations/animation-description';
 
@@ -55,11 +61,11 @@ export async function animationApi(
     const singleDuration = 300;
     const iterations = 10;
     const getRandomRainbowColor = () => rainbowRgbs[Math.floor(Math.random() * rainbowRgbs.length)];
-    const iterator = (function *() {
-        for (let i = 0; i < iterations; i++) {
-            const tuples = Array.from({ length: ledCount }, () => getRandomRainbowColor());
-            yield new ComplexFrame(tuples, singleDuration);
-        }
+    const iterator = (function* () {
+      for (let i = 0; i < iterations; i++) {
+        const tuples = Array.from({ length: ledCount }, () => getRandomRainbowColor());
+        yield new ComplexFrame(tuples, singleDuration);
+      }
     })();
 
     console.log(
@@ -71,6 +77,5 @@ export async function animationApi(
       'Were LEDs blinking independently?',
       'All LEDs should be blinking independently',
     );
-
   }
 }

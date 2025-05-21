@@ -1,5 +1,4 @@
 import { RgbTuple } from '../../types';
-import { AnimationDescription } from '../animation-description';
 import { SimpleFrame } from '../simple-frame';
 import { clampRgb } from '../../utils';
 

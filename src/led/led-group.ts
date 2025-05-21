@@ -1,6 +1,5 @@
 import { BlinkstickAny } from '../blinkstick';
-import { ColorOptions, SaneColorParam } from '../types';
-import { interpretParameters } from '../utils/colors/interpret-parameters';
+import { SaneColorParam } from '../types';
 import { parseSaneColorParam } from '../utils/colors/parse-sane-color-param';
 
 function prepareBuffer(buffer: Uint8Array, red: number, green: number, blue: number) {

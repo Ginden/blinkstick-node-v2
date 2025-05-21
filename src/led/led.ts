@@ -1,4 +1,4 @@
-import { BlinkStick, BlinkstickAny } from '../blinkstick';
+import { BlinkstickAny } from '../blinkstick';
 
 export class Led {
   constructor(

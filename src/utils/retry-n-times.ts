@@ -7,7 +7,7 @@ import { scheduler } from 'node:timers/promises';
  * @param fn
  */
 export async function retryNTimes<V>(maxRetries: number, fn: () => Promise<V>): Promise<V> {
-  const wait = (ms: number)=> ms === 0 ? scheduler.yield() : scheduler.wait(ms);
+  const wait = (ms: number) => (ms === 0 ? scheduler.yield() : scheduler.wait(ms));
   if (maxRetries === 1) {
     return await fn();
   }
@@ -17,7 +17,7 @@ export async function retryNTimes<V>(maxRetries: number, fn: () => Promise<V>): 
       return await fn();
     } catch (ex) {
       error ??= ex as Error;
-      await wait(retries**2);
+      await wait(retries ** 2);
     }
   }
   throw Object.assign(error!, {

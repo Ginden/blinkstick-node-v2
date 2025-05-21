@@ -1,6 +1,5 @@
 import { BlinkstickAny } from '../blinkstick';
 import { AnimationDescription } from './animation-description';
-import { Led } from '../led/led';
 import { assert } from 'tsafe';
 import { combine } from './common-animations/helpers/combine';
 import { SimpleFrame } from './simple-frame';
@@ -98,8 +97,4 @@ export class AnimationRunner {
     await scheduler.wait(Math.max(duration - timeElapsed, 0));
     signal.throwIfAborted();
   }
-}
-
-function isSimpleFrame(frame: SimpleFrame | ComplexFrame): frame is SimpleFrame {
-  return frame instanceof SimpleFrame || !Array.isArray(frame.colors);
 }

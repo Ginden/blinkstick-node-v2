@@ -1,4 +1,4 @@
-import { ColorObject, SaneColorParam } from '../../types';
+import { SaneColorParam } from '../../types';
 import { COLOR_KEYWORDS } from '../../color-keywords';
 import { normalizeHexColor } from './normalize-hex-color';
 import { RgbTuple } from '../../types/rgb-tuple';

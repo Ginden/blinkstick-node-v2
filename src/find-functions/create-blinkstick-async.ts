@@ -1,5 +1,4 @@
 import { HIDAsync, type Device } from 'node-hid';
-import { BlinkStick } from '../blinkstick';
 import { blinkstickFinalizationRegistry } from '../blinkstick-finalization-registry';
 import { BlinkstickAsync } from '../blinkstick.async';
 
