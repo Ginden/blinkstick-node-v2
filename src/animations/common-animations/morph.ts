@@ -4,7 +4,7 @@ import { RgbTuple } from '../../types/rgb-tuple';
 import { clampRgb } from '../../utils/clamp';
 import { SimpleFrame } from '../simple-frame';
 
-export function* morph(from: RgbTuple, to: RgbTuple, overMs: number, steps = 100) {
+export function* morph(from: RgbTuple, to: RgbTuple, overMs: number, steps = 100): Iterable<SimpleFrame> {
   assert(steps > 0, 'steps must be greater than 0');
   const stepDuration = overMs / steps;
   for (let i = 0; i < steps; i++) {

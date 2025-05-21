@@ -1,5 +1,5 @@
 import { assert } from 'tsafe';
-import { BlinkstickAny, BlinkstickDeviceDefinition, RgbTuple, SimpleFrame } from '../../../src';
+import {BlinkstickAny, BlinkstickDeviceDefinition, ComplexFrame, RgbTuple, SimpleFrame} from '../../../src';
 import { yesOrThrow } from '../helpers';
 import { Animation } from '../../../src/animations/animation-description';
 
@@ -36,18 +36,41 @@ export async function animationApi(
       `Animation should take at least ${expectedTime}ms, but took ${elapsedTime}ms`,
     );
     console.log(
-      `Animation took ${elapsedTime - expectedTime}ms $(${((100 * elapsedTime) / expectedTime - 100).toFixed(1)}% of expected value)`,
+      `Animation took ${elapsedTime}ms $(${Number(((100 * elapsedTime) / expectedTime).toFixed(1))}% of expected value)`,
     );
     await yesOrThrow('Did all LEDs go through the rainbow?', 'All LEDs should be rainbow colored');
   }
 
   // Morph
   {
-    const singleDuration = 300;
+    const singleDuration = 150;
     console.log(
       `🌈 Now we will use animation API to morph the color of all LEDs going through the rainbow. This should take ${rainbowRgbs.length * singleDuration}ms.`,
     );
     await animationRunner.run(Animation.morphMany(rainbowRgbs, rainbowRgbs.length * 350));
     await yesOrThrow('Did all LEDs go through the rainbow?', 'All LEDs should be rainbow colored');
+  }
+
+  {
+    const singleDuration = 300;
+    const iterations = 10;
+    const getRandomRainbowColor = () => rainbowRgbs[Math.floor(Math.random() * rainbowRgbs.length)];
+    const iterator = (function *() {
+        for (let i = 0; i < iterations; i++) {
+            const tuples = Array.from({ length: ledCount }, () => getRandomRainbowColor());
+            yield new ComplexFrame(tuples, singleDuration);
+        }
+    })();
+
+    console.log(
+      `🌈 Now we will use animation API to change the color of all LEDs going through the rainbow, but independently. This should take ${iterations * singleDuration}ms.`,
+    );
+
+    await blinkstickDevice.animation.run(iterator);
+    await yesOrThrow(
+      'Were LEDs blinking independently?',
+      'All LEDs should be blinking independently',
+    );
+
   }
 }

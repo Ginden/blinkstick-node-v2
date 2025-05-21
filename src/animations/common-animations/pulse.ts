@@ -7,7 +7,7 @@ export type PulseOptions = {
   totalDuration: number;
 };
 
-export function* pulse([r, g, b]: RgbTuple, { steps, totalDuration }: PulseOptions) {
+export function* pulse([r, g, b]: RgbTuple, { steps, totalDuration }: PulseOptions): Iterable<SimpleFrame> {
   const stepDuration = (totalDuration / (steps * 2)) | 0;
   for (let i = 0; i < steps; i++) {
     const brightness = i * (255 / steps);

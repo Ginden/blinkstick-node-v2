@@ -13,9 +13,13 @@ export abstract class Animation {
     steps: number,
     totalDuration: number,
     repeatCount: number = 1,
-  ): AnimationDescription {
+  ) {
     const actualColorTuple = parseSaneColorParam(color);
-    return repeat(pulse(actualColorTuple, { steps, totalDuration }), repeatCount);
+    const pulseIterator = pulse(actualColorTuple, { steps, totalDuration });
+    if (repeatCount === 1) {
+      return pulseIterator;
+    }
+    return repeat(pulseIterator, repeatCount);
   }
 
   static morph(

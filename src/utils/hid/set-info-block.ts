@@ -8,7 +8,7 @@ import { BlinkStick } from '../../blinkstick';
  * @param {String | Buffer} data The value to push to the device. Should be <= 32 chars.
  */
 export async function setInfoBlock(
-  device: BlinkStick<HIDAsync | HID>,
+  device: Pick<BlinkStick<HIDAsync | HID>, 'setFeatureReport' | 'device'>,
   location: number,
   data: string | Buffer,
 ) {

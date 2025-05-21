@@ -7,7 +7,7 @@ export function* morphMany(
   tuples: RgbTuple[],
   overMs: number,
   steps = tuples.length * 50,
-): AnimationDescription {
+): Iterable<SimpleFrame> {
   const stepDuration = overMs / steps;
   for (let i = 0; i < tuples.length - 1; i++) {
     const from = tuples[i];
