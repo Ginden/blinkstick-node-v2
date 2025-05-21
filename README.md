@@ -15,21 +15,43 @@ What is BlinkStick? It's a smart USB-controlled LED device. More info about it h
 - Many methods return results of setting a feature report on device instead of `undefined`]
 - Requires Node.js 20.0 or higher
 
-## Big changes in v2.1
+## Big changes in v3
 
 - Added support for arbitrary animations
-- Deprecated lots of methods
+- Removed lots of low-level or unnecessary methods
 - Added subclasses `BlinkStickSync` and `BlinkStickAsync` for sync and async APIs and future specialization
+  - Likely future specialization will be `BlinkStickProSync` and `BlinkStickProAsync`, as the Pro device seems to have lots of unusual features
 
 **BREAKING CHANGES**:
 
 - Restored original return types of several methods
+- No `string` when dealing with low-level data - use `Buffer` instead, we assume that you know what you are doing
 
-### Tested devices
+### Devices
+
+If you want to gift or buy me a BlinkStick device for testing purposes, please email me.
+
+**Tested**:
 
 - BlinkStick Nano
 
-If you want to buy me a BlinkStick device for testing purposes, please email me.
+**Should work**:
+
+- BlinkStick
+- BlinkStick Strip
+- Blinkstick Strip Mini
+
+***Variable LED count**
+
+_BlinkStick Flex_ and _BlinkStick Pro_ come with a variable number of LEDs.
+
+This library _probably can_ work with them, but you need to set the number of LEDs in the constructor before using any method.
+
+```ts
+blinkstick.ledCount = 42;
+```
+
+If you don't set the number of LEDs, the library will assume that you have one LED.
 
 ## Requirements
 
@@ -56,7 +78,7 @@ npm install @ginden/blinkstick-v2
 
 ### Async (recommended)
 
-Using async APIs is the recommended way. While even sync APIs use Promises, they block the event loop, which is not a
+Using async APIs is the recommended way. While even sync APIs use Promises, they may block the event loop, which is not a
 good practice.
 
 Read docs of [`node-hid`](https://github.com/node-hid/node-hid?tab=readme-ov-file#async-vs-sync-api) for more
@@ -101,7 +123,55 @@ await blinkstick.pulse('ff0000');
 await blinkstick.pulse('rgb(255, 0, 0)');
 
 await blinkstick.setColor('red');
+
+// Will work only if you have at least 2 LEDs
+await blinkstick.led(0).setColor('green');
+await blinkstick.led(1).setColor('blue');
+
+// Set color of all LEDs
+await blinkstick.leds().setColor('yellow');
 ```
+
+## Async API
+
+Currently, both APIs are identical in functionality and API. The only difference is that async API uses internally `HIDAsync`
+from `node-hid` library, while sync API uses `HID`.
+
+### Animation API
+
+Let's start with an example:
+
+```ts
+import {findFirst, Animation} from "@ginden/blinkstick-v2";
+import {animationApi} from "./animation-api";
+
+const blinkstick = findFirst();
+
+const animation = Animation.repeat(Animation.morphMany([
+  'blue',
+  'purple',
+  'red',
+  'yellow',
+  'green',
+  'cyan'
+], 5000), 12);
+
+blinkstick.animation.runAndForget(animation);
+```
+
+`Animation` class is a simple convenience wrapper for several common animations and generates `AnimationDescription` objects.
+
+What is `AnimationDescription`? It's an iterable object that contains all the frames of the animation.
+
+```ts
+export type AnimationDescription =
+        | Iterable<SimpleFrame | ComplexFrame>
+        | AsyncIterable<SimpleFrame | ComplexFrame>;
+```
+
+`SimpleFrame` is a class of `{rgb: RgbTuple, duration: number}`. It's used by animation runner to change color of all LEDs at once.
+
+`ComplexFrame` is a class of `{leds: RgbTuple[], duration: number}`. It's used by animation runner to change color of each LED separately. Number of LEDs must match the number of LEDs in the device.
 
 ### Known issues
 

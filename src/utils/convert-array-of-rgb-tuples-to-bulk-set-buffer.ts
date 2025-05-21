@@ -1,5 +1,10 @@
 import { RgbTuple } from '../types/rgb-tuple';
 
+/**
+ * Converts an array of RGB tuples to a buffer for bulk setting.
+ * @param tuples
+ * @param buffer
+ */
 export function convertArrayOfRgbTuplesToBulkSetBuffer(tuples: RgbTuple[], buffer: Buffer) {
   // We need to set LED data in the following format: [g0, r0, b0, g1, r1, b1...]
 

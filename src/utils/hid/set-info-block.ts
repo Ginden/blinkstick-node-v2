@@ -1,6 +1,6 @@
 import type { HID, HIDAsync } from 'node-hid';
-import { BlinkStick } from '../../blinkstick';
-import { asBuffer } from '../../as-buffer';
+import { BlinkStick } from '../../blinkstick/blinkstick';
+import { asBuffer } from '../as-buffer';
 import { assert } from 'tsafe';
 
 /**

@@ -1,4 +1,4 @@
-import { BlinkstickAny } from '../blinkstick';
+import { BlinkstickAny } from '../blinkstick/blinkstick';
 import { AnimationDescription } from './animation-description';
 import { assert } from 'tsafe';
 import { combine } from './common-animations/helpers/combine';
@@ -15,15 +15,17 @@ export class AnimationRunner {
   private abortController = new AbortController();
   private ledGroup;
   private leds;
-  private buffer;
-  private isRunning = false;
+  public ledCount;
+  protected buffer;
+  protected isRunning = false;
 
   constructor(public readonly blinkstick: BlinkstickAny) {
     this.ledGroup = blinkstick.leds();
-    this.leds = Array.from({ length: blinkstick.describeDevice()!.ledCount }, (_, index) =>
+    this.leds = Array.from({ length: blinkstick.ledCount }, (_, index) =>
       this.blinkstick.led(index),
     );
     this.buffer = Buffer.alloc(this.leds.length * 3);
+    this.ledCount = this.leds.length;
   }
 
   /**
@@ -89,11 +91,11 @@ export class AnimationRunner {
     }
   }
 
-  private async applySimpleFrame(frame: SimpleFrame) {
+  protected async applySimpleFrame(frame: SimpleFrame) {
     await this.ledGroup.setColorAndForget(frame.rgb);
   }
 
-  private async applyComplexFrame(frame: ComplexFrame) {
+  protected async applyComplexFrame(frame: ComplexFrame) {
     assert(this.leds.length === frame.colors.length, 'Frame and LEDs length mismatch');
     await this.blinkstick.setColors(
       0,
@@ -101,7 +103,7 @@ export class AnimationRunner {
     );
   }
 
-  private async applyFrame(frame: Frame, signal: AbortSignal) {
+  protected async applyFrame(frame: Frame, signal: AbortSignal) {
     signal.throwIfAborted();
     const { duration } = frame;
     const t0 = performance.now();

@@ -1,6 +1,6 @@
 import { HIDAsync, type Device } from 'node-hid';
 import { blinkstickFinalizationRegistry } from '../blinkstick-finalization-registry';
-import { BlinkstickAsync } from '../blinkstick.async';
+import { BlinkstickAsync } from '../blinkstick/blinkstick.async';
 
 export type MinimalDevice = Pick<
   Device,

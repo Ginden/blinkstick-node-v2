@@ -1,4 +1,4 @@
-export * from './channel';
 export * from './color-options';
-export * from './mode';
+export * from './enums/channel';
+export * from './enums/mode';
 export * from './rgb-tuple';

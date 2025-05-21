@@ -6,7 +6,7 @@ export type BlinkstickDeviceDefinition = {
   ledCount: number;
 };
 
-export const blinkstickDevicesDefinitions = {
+export const deviceDescriptions = {
   // This one is tested...
   'BlinkStick Nano': {
     ledCount: 2,

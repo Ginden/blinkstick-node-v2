@@ -1,3 +1,9 @@
+/**
+ * Clamp a number to a range
+ * @param value
+ * @param min
+ * @param max
+ */
 export function clamp(value: number, min: number, max: number): number {
   if (value < min) {
     return min;
@@ -14,5 +20,5 @@ export function clamp(value: number, min: number, max: number): number {
  * @param value
  */
 export function clampRgb(value: number): number {
-  return clamp(value | 0, 0, 255);
+  return clamp(value | 0, 0, 255) | 0;
 }

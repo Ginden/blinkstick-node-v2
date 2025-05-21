@@ -8,6 +8,10 @@ import { morph } from './common-animations/morph';
 import { morphMany } from './common-animations/morph-many';
 
 export abstract class Animation {
+  static repeat(animation: AnimationDescription, repeatCount: number) {
+    return repeat(animation, repeatCount);
+  }
+
   static pulse(
     color: SaneColorParam,
     steps: number,

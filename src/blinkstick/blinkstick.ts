@@ -1,28 +1,28 @@
 import { Device, HID, HIDAsync } from 'node-hid';
-import { determineReportId } from './utils/hid/determine-report-id';
-import { decimalToHex } from './utils/decimal-to-hex';
-import { getInfoBlock, getInfoBlockRaw } from './utils/hid/get-info-block';
-import { setInfoBlock } from './utils/hid/set-info-block';
-import { ColorOptions, NormalizedColorOptions } from './types/color-options';
-import { clampRgb } from './utils/clamp';
+import { determineReportId } from '../utils/hid/determine-report-id';
+import { decimalToHex } from '../utils/decimal-to-hex';
+import { getInfoBlock, getInfoBlockRaw } from '../utils/hid/get-info-block';
+import { setInfoBlock } from '../utils/hid/set-info-block';
+import { ColorOptions, NormalizedColorOptions } from '../types/color-options';
+import { clampRgb } from '../utils/clamp';
 import { setTimeout } from 'timers/promises';
-import { blinkstickFinalizationRegistry } from './blinkstick-finalization-registry';
-import { MorphOptions } from './color-change-options/morph-options';
-import { SetColorOptions } from './color-change-options/set-color-options';
-import { retryNTimes } from './utils/retry-n-times';
-import { Channel } from './types/channel';
+import { blinkstickFinalizationRegistry } from '../blinkstick-finalization-registry';
+import { MorphOptions } from '../color-change-options/morph-options';
+import { SetColorOptions } from '../color-change-options/set-color-options';
+import { retryNTimes } from '../utils/retry-n-times';
+import { Channel } from '../types/enums/channel';
 import {
   interpretParameters,
   interpretParametersInversed,
-} from './utils/colors/interpret-parameters';
-import { BlinkStickProMode } from './types/mode';
-import { BlinkstickDeviceDefinition, blinkstickDevicesDefinitions } from './definitions/devices';
-import { isDefined } from './utils/is-defined';
-import { AnimationRunner } from './animations/animation-runner';
-import { LedGroup } from './led/led-group';
-import { asBuffer } from './as-buffer';
-import { Led } from './led/led';
-import { RgbTuple } from './types/rgb-tuple';
+} from '../utils/colors/interpret-parameters';
+import { BlinkStickProMode } from '../types/enums/mode';
+import { BlinkstickDeviceDefinition, deviceDescriptions } from '../device-descriptions';
+import { isDefined } from '../utils/is-defined';
+import { AnimationRunner } from '../animations/animation-runner';
+import { LedGroup } from '../led/led-group';
+import { asBuffer } from '../utils/as-buffer';
+import { Led } from '../led/led';
+import { RgbTuple } from '../types/rgb-tuple';
 import { assert } from 'tsafe';
 
 /**
@@ -30,13 +30,12 @@ import { assert } from 'tsafe';
  */
 export abstract class BlinkStick<HidDevice extends HID | HIDAsync = HID | HIDAsync> {
   public abstract readonly isSync: boolean;
-  private abortSignal: AbortSignal | null = null;
+  protected abortController: AbortController = new AbortController();
   /**
    * Changes the default retry count for sending feature reports.
    * Yes - it is buggy.
    */
   public defaultRetryCount = 5;
-  public animationsEnabled: boolean;
   public ledCount: number;
   readonly requiresSoftwareColorPatch: boolean;
   readonly device: HidDevice;
@@ -66,8 +65,8 @@ export abstract class BlinkStick<HidDevice extends HID | HIDAsync = HID | HIDAsy
       this.serial.substring(this.serial.length - 2, this.serial.length - 1),
     );
 
-    this.animationsEnabled = true;
-    this.ledCount = this.describeDevice()?.ledCount ?? 0;
+    this.ledCount =
+      deviceDescriptions[this.product as keyof typeof deviceDescriptions]?.ledCount ?? 0;
 
     this.requiresSoftwareColorPatch =
       this.versionMajor == 1 && this.versionMinor >= 1 && this.versionMinor <= 3;
@@ -142,57 +141,16 @@ export abstract class BlinkStick<HidDevice extends HID | HIDAsync = HID | HIDAsy
    */
   async close() {
     blinkstickFinalizationRegistry.unregister(this);
-    this.stop();
+    await this.stop();
     await this.device.close();
   }
 
   /**
    * Stop all animations
    */
-  stop() {
-    this.animationsEnabled = false;
-    return this;
-  }
-
-  enableAnimations() {
-    this.animationsEnabled = true;
-    return this;
-  }
-
-  /**
-   * Get the major version from serial number
-   *
-   * @return Major version number from serial
-   * @deprecated Use `.versionMajor` directly
-   */
-  getVersionMajor(): number {
-    return this.versionMajor;
-  }
-
-  /**
-   * Get the minor version from serial number
-   *
-   * @return Minor version number from serial
-   * @deprecated Use `.versionMinor` directly
-   */
-  getVersionMinor(): number {
-    return this.versionMinor;
-  }
-
-  /**
-   * Get the manufacturer of the device
-   * @deprecated Use `.manufacturer` directly
-   */
-  getManufacturer() {
-    return this.manufacturer;
-  }
-
-  /**
-   * Get the description of the device
-   * @deprecated Use `.product` directly
-   */
-  getDescription() {
-    return this.product;
+  async stop() {
+    await this.animation?.stop();
+    this.abortController = new AbortController();
   }
 
   /**
@@ -208,6 +166,7 @@ export abstract class BlinkStick<HidDevice extends HID | HIDAsync = HID | HIDAsy
    *
    */
   async setColor(...options: ColorOptions<SetColorOptions>): Promise<void> {
+    const { interpretParameters } = this;
     const params = interpretParameters(...options);
     if (this.requiresSoftwareColorPatch) {
       // eslint-disable-next-line prefer-const
@@ -386,17 +345,13 @@ export abstract class BlinkStick<HidDevice extends HID | HIDAsync = HID | HIDAsy
    *         console.log(data);
    *     });
    *
-   * @deprecated Use `getInfoBlock2Raw` instead
    */
   async getInfoBlock2() {
-    return await getInfoBlock(this, 0x0003);
-  }
-
-  async getInfoBlock2Raw() {
     return await getInfoBlockRaw(this, 0x0003);
   }
 
-  async setInfoBlock2(data: string) {
+
+  async setInfoBlock2(data: Buffer) {
     return await setInfoBlock(this, 0x0003, data);
   }
 
@@ -409,9 +364,10 @@ export abstract class BlinkStick<HidDevice extends HID | HIDAsync = HID | HIDAsy
   }
 
   async blink(...options: ColorOptions) {
+    const { interpretParameters } = this;
     const params = interpretParameters(...options);
     const abortSignal = AbortSignal.any(
-      [this.abortSignal, params.options.signal].filter(isDefined),
+      [this.abortController.signal, params.options.signal].filter(isDefined),
     );
 
     const repeats = params.options.repeats ?? 1;
@@ -477,13 +433,15 @@ export abstract class BlinkStick<HidDevice extends HID | HIDAsync = HID | HIDAsy
 
     const duration = params.options.duration ?? 1000;
     const steps = params.options.steps ?? 50;
-    const signal = params.options.signal ?? undefined;
     const stepDuration = Math.round(duration / steps);
 
     const [cr, cg, cb] = await this.getColor(params.options.index ?? 0);
 
+    const signal = AbortSignal.any(
+      [this.abortController.signal, params.options.signal].filter(isDefined),
+    );
+
     for (let count = 0; count < steps; count++) {
-      if (!this.animationsEnabled) return;
       const nextRed = clampRgb(cr + ((params.r - cr) / steps) * count);
       const nextGreen = clampRgb(cg + ((params.g - cg) / steps) * count);
       const nextBlue = clampRgb(cb + ((params.b - cb) / steps) * count);
@@ -537,17 +495,6 @@ export abstract class BlinkStick<HidDevice extends HID | HIDAsync = HID | HIDAsy
 
   async getFeatureReportRaw(reportId: number, length: number): Promise<Buffer> {
     return asBuffer(await this.device.getFeatureReport(reportId, length));
-  }
-
-  /**
-   * Returns library-defined device description.
-   * @deprecated Use `.ledCount` directly
-   */
-  describeDevice(): Readonly<BlinkstickDeviceDefinition> | null {
-    return (
-      blinkstickDevicesDefinitions[this.product as keyof typeof blinkstickDevicesDefinitions] ??
-      null
-    );
   }
 
   public leds(): LedGroup {
