@@ -350,7 +350,6 @@ export abstract class BlinkStick<HidDevice extends HID | HIDAsync = HID | HIDAsy
     return await getInfoBlockRaw(this, 0x0003);
   }
 
-
   async setInfoBlock2(data: Buffer) {
     return await setInfoBlock(this, 0x0003, data);
   }

@@ -5,7 +5,7 @@ import { typeGuard } from 'tsafe';
 import { COLOR_KEYWORDS } from '../../consts/color-keywords';
 import { normalizeHexColor } from './normalize-hex-color';
 import parseCss from 'color-rgba';
-import {getRandomColor} from "./get-random-color";
+import { getRandomColor } from './get-random-color';
 
 function randomColor<AdditionalOptions>(options: AdditionalOptions) {
   return {

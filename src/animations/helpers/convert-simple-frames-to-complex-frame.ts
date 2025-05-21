@@ -2,6 +2,7 @@ import { SimpleFrame } from '../simple-frame';
 import { ComplexFrame } from '../complex-frame';
 import { RgbTuple } from '../../types';
 import { assert } from 'tsafe';
+import {types} from "node:util";
 
 export async function* convertSimpleFramesToComplexFrame1(
   simpleFrames: Iterable<SimpleFrame>[],
@@ -15,6 +16,8 @@ export async function* convertSimpleFramesToComplexFrame1(
   // Create iterators for each simple animation
   const iterators = simpleFrames.map((frames) => {
     const iterator = frames[Symbol.iterator]();
+    assert(!types.isGeneratorObject(frames), 'Passing a generator object to convertSimpleFramesToComplexFrame1 will not work as expected - wrap the call in a function');
+    assert(!types.isGeneratorObject(iterator), 'Passing a generator object to convertSimpleFramesToComplexFrame1 will not work as expected - wrap the call in a function');
     // Initialize with default state - currently active frame and remaining time
     return {
       iterator,
