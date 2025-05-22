@@ -1,11 +1,10 @@
 import { SaneColorParam } from '../types';
-import { SimpleFrame } from './simple-frame';
-import { ComplexFrame } from './complex-frame';
 import { pulse } from './common/pulse';
 import { repeat } from './helpers/repeat';
 import { parseSaneColorParam } from '../utils/colors/parse-sane-color-param';
 import { morph } from './common/morph';
 import { morphMany } from './common/morph-many';
+import { Frame } from './frame';
 
 export abstract class Animation {
   static repeat(animation: AnimationDescription, repeatCount: number) {
@@ -42,6 +41,4 @@ export abstract class Animation {
   }
 }
 
-export type AnimationDescription =
-  | Iterable<SimpleFrame | ComplexFrame>
-  | AsyncIterable<SimpleFrame | ComplexFrame>;
+export type AnimationDescription = Iterable<Frame> | AsyncIterable<Frame>;

@@ -109,7 +109,7 @@ export class AnimationRunner {
     const t0 = performance.now();
     if (frame instanceof SimpleFrame) {
       await this.applySimpleFrame(frame);
-    } else {
+    } else if (frame instanceof ComplexFrame) {
       await this.applyComplexFrame(frame);
     }
     const timeElapsed = performance.now() - t0;

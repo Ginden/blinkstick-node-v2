@@ -7,6 +7,8 @@ export * from './complex-frame';
 export * from './frame';
 export * from './helpers/combine';
 export * from './helpers/convert-simple-frames-to-complex-frame';
+export * from './helpers/iterate';
 export * from './helpers/limit-duration';
 export * from './helpers/repeat';
+export * from './helpers/wrap-generator-function-in-object';
 export * from './simple-frame';

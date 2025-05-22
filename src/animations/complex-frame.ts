@@ -1,4 +1,5 @@
 import { RgbTuple } from '../types/rgb-tuple';
+import { SimpleFrame } from './simple-frame';
 
 /**
  * Complex frame represents a single frame of animation with multiple colors and a specific duration.
@@ -14,5 +15,12 @@ export class ComplexFrame {
   constructor(colors: RgbTuple[], duration: number) {
     this.colors = colors;
     this.duration = duration;
+  }
+
+  static fromSimpleFrame(frame: SimpleFrame, ledCount: number) {
+    const { rgb, duration } = frame;
+    const rgbCopy = [...rgb] as RgbTuple;
+    const colors = Array.from({ length: ledCount }, () => rgbCopy);
+    return new ComplexFrame(colors, duration);
   }
 }

@@ -14,4 +14,8 @@ export class Led {
   getColor(): Promise<RgbTuple> {
     return this.blinkstick.getColor(this.index);
   }
+
+  turnOff() {
+    return this.setColor(0, 0, 0);
+  }
 }

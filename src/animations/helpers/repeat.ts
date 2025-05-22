@@ -1,7 +1,4 @@
 import { AnimationDescription } from '../animation-description';
-import { Frame } from '../frame';
-import AsyncIterator = NodeJS.AsyncIterator;
-import { iterate } from './iterate';
 import { assert } from 'tsafe';
 import { types } from 'node:util';
 
@@ -15,7 +12,7 @@ export function repeat(
   times: number,
 ): AnimationDescription {
   if (times === 1) {
-    return animation;
+    return typeof animation === 'function' ? animation() : animation;
   }
   assert(times > 0, 'Times must be greater than 0');
   assert(
@@ -24,12 +21,12 @@ export function repeat(
   );
   if (times === Infinity) {
     return {
-      [Symbol.asyncIterator]: async function* (): AsyncIterator<Frame> {
+      [Symbol.asyncIterator]: async function* () {
         while (true) {
-          yield* iterate(animation);
+          yield* typeof animation === 'function' ? animation() : animation;
         }
       },
-    };
+    } as AnimationDescription;
   }
   return {
     [Symbol.asyncIterator]: async function* () {
