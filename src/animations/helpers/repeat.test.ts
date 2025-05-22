@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { repeat } from '../../index';
 import { SimpleFrame } from '../../index';
-import {asyncCollect} from "./iterate";
+import { asyncCollect } from './iterate';
 
 describe('repeat', () => {
   async function* base() {
@@ -26,15 +26,14 @@ describe('repeat', () => {
 
   it('repeats the animation twice for times=2', async () => {
     // This one fails
-    const frames: SimpleFrame[] = await asyncCollect(repeat(() => base(), 2)) as SimpleFrame[];
+    const frames: SimpleFrame[] = (await asyncCollect(repeat(() => base(), 2))) as SimpleFrame[];
     const actual = frames.map((f) => f.rgb);
     const expected = [
-        [1, 1, 1],
-        [2, 2, 2],
-        [1, 1, 1],
-        [2, 2, 2],
+      [1, 1, 1],
+      [2, 2, 2],
+      [1, 1, 1],
+      [2, 2, 2],
     ] as const;
-
 
     expect(actual.length).toEqual(expected.length);
 

@@ -6,13 +6,14 @@
     "access": "public"
   },
   "scripts": {
-    "prepare": "tsc",
+    "prepare": "husky",
     "test": "vitest run",
     "test:manual": "ts-node test/manual/manual-test.ts",
     "fix": "npm run prettier && npm run lint:fix",
     "lint": "eslint src",
     "lint:fix": "npm run lint -- --fix",
-    "prettier": "prettier --write src test"
+    "prettier:check": "prettier --check src test README.md",
+    "prettier": "prettier --write src test README.md"
   },
   "keywords": [
     "blinkstick",
@@ -52,8 +53,10 @@
     "@types/color-rgba": "^2.1.3",
     "@types/node": "^20.17.32",
     "@types/prompts": "^2.4.9",
+    "concurrently": "^9.1.2",
     "eslint": "^9.25.1",
     "globals": "^16.0.0",
+    "husky": "^9.1.7",
     "prettier": "^3.5.3",
     "prompts": "^2.4.2",
     "rimraf": "^6.0.1",

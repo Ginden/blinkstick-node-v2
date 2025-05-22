@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest';
 import { morph } from './morph';
-import { SimpleFrame } from '../simple-frame';
 
 describe('morph', () => {
   it('throws if steps <= 0', () => {

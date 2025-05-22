@@ -1,5 +1,4 @@
 import { ColorOptions, NormalizedColorOptions } from '../../types/color-options';
-import { randomIntInclusive } from '../random-int-inclusive';
 import { clampRgb } from '../clamp';
 import { typeGuard } from 'tsafe';
 import { COLOR_KEYWORDS } from '../../consts/color-keywords';

@@ -41,7 +41,7 @@ If you want to gift or buy me a BlinkStick device for testing purposes, please e
 - BlinkStick Strip
 - Blinkstick Strip Mini
 
-***Variable LED count**
+**\*Variable LED count**
 
 _BlinkStick Flex_ and _BlinkStick Pro_ come with a variable number of LEDs.
 
@@ -142,19 +142,15 @@ from `node-hid` library, while sync API uses `HID`.
 Let's start with an example:
 
 ```ts
-import {findFirst, Animation} from "@ginden/blinkstick-v2";
-import {animationApi} from "./animation-api";
+import { findFirst, Animation } from '@ginden/blinkstick-v2';
+import { animationApi } from './animation-api';
 
 const blinkstick = findFirst();
 
-const animation = Animation.repeat(Animation.morphMany([
-  'blue',
-  'purple',
-  'red',
-  'yellow',
-  'green',
-  'cyan'
-], 5000), 12);
+const animation = Animation.repeat(
+  Animation.morphMany(['blue', 'purple', 'red', 'yellow', 'green', 'cyan'], 5000),
+  12,
+);
 
 blinkstick.animation.runAndForget(animation);
 ```
@@ -165,8 +161,8 @@ What is `AnimationDescription`? It's an iterable object that contains all the fr
 
 ```ts
 export type AnimationDescription =
-        | Iterable<SimpleFrame | ComplexFrame>
-        | AsyncIterable<SimpleFrame | ComplexFrame>;
+  | Iterable<SimpleFrame | ComplexFrame>
+  | AsyncIterable<SimpleFrame | ComplexFrame>;
 ```
 
 `SimpleFrame` is a class of `{rgb: RgbTuple, duration: number}`. It's used by animation runner to change color of all LEDs at once.
@@ -191,8 +187,6 @@ Please run the following command:
 Then either restart the computer or run the following command to reload udev rules:
 
     sudo udevadm control --reload-rules && sudo udevadm trigger
-
-
 
 ## Contributing
 

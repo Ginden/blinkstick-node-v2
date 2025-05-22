@@ -1,5 +1,4 @@
 import { BlinkStick } from '../../core/blinkstick';
-import type { HID, HIDAsync } from 'node-hid';
 
 /**
  * Get an infoblock from a device.
