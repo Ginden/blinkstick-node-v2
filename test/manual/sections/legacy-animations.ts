@@ -1,12 +1,9 @@
-import { BlinkstickAny, BlinkstickDeviceDefinition } from '../../../src';
+import { BlinkstickAny } from '../../../src';
 import { retryNTimes } from '../../../src/utils/retry-n-times';
 import { yesOrThrow } from '../helpers';
 
-export async function legacyAnimations(
-  blinkstickDevice: BlinkstickAny,
-  description: BlinkstickDeviceDefinition,
-) {
-  const { ledCount } = description;
+export async function legacyAnimations(blinkstickDevice: BlinkstickAny) {
+  const { ledCount } = blinkstickDevice;
 
   console.log(`Now we will pulse the first LED as green for 2 seconds.`);
   await retryNTimes(10, async () => {

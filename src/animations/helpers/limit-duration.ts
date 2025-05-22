@@ -1,5 +1,5 @@
 import { assert } from 'tsafe';
-import { AnimationDescription } from '../animation-description';
+import { FrameIterable } from '../animation-description';
 import { ComplexFrame } from '../complex-frame';
 import { SimpleFrame } from '../simple-frame';
 import { types } from 'node:util';
@@ -10,11 +10,10 @@ import { Frame } from '../frame';
  * The last frame can be shortened to fit the maximum duration.
  */
 export function limitDuration(
-  animation: AnimationDescription,
+  animation: FrameIterable,
   maximumDuration: number,
 ): AsyncIterable<Frame> {
   assert(maximumDuration > 0, 'maximumDuration must be greater than 0');
-  assert(!types.isGeneratorObject(animation), 'animation must not be an async generator');
   return {
     [Symbol.asyncIterator]: async function* (): AsyncGenerator<Frame> {
       let timeTook = 0;

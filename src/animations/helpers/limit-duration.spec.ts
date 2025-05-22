@@ -18,6 +18,7 @@ describe('limitDuration', () => {
       [1, 1, 1],
       [2, 2, 2],
     ]);
+    expect(frames.reduce((a, b) => a + b.duration, 0)).toEqual(30);
   });
 
   it('truncates last frame if exceeding max', async () => {

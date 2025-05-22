@@ -1,18 +1,15 @@
 import prompts from 'prompts';
 import blinkstick, {
-  BlinkStick,
   BlinkstickAsync,
   BlinkstickSync,
   createBlinkstickAsync,
   createBlinkstickSync,
 } from '../../src';
 import { assert } from 'tsafe';
-import { Device, HIDAsync } from 'node-hid';
+import { Device } from 'node-hid';
 import { writeFile } from 'node:fs/promises';
-import { retryNTimes } from '../../src/utils/retry-n-times';
 import { questionsAsked } from './questions-asked';
 import { reportIssueUrl, yesOrThrow } from './helpers';
-import { Entries } from 'type-fest';
 import { sections } from './sections';
 import { br, hr } from './print';
 
@@ -67,14 +64,7 @@ let device: Device | null = null;
 
   assert(blinkstickDevice);
 
-  const deviceDescription = blinkstickDevice.describeDevice();
-
-  assert(
-    deviceDescription !== null,
-    `Library do not provide a description for this device (${blinkstickDevice.product}). Create Pull Request to add it.`,
-  );
-
-  const { ledCount } = deviceDescription;
+  const { ledCount } = blinkstickDevice;
 
   console.log(`Now we will disable all (${ledCount}) LEDS on the device.`);
   await blinkstickDevice.turnOffAll();
@@ -95,7 +85,7 @@ let device: Device | null = null;
     console.log(`First, we will turn off all LEDs.`);
     await blinkstickDevice.turnOffAll();
     console.log(`Now we will run ${name} tests.`);
-    await fn(blinkstickDevice, deviceDescription);
+    await fn(blinkstickDevice);
     br();
     hr();
     br();
@@ -118,15 +108,18 @@ let device: Device | null = null;
       device,
       questionsAsked,
       blinkstick: {
-        describeDevice: blinkstickDevice?.describeDevice(),
-        infoBlock1: (await blinkstickDevice?.getInfoBlock1Raw())?.toString('hex'),
-        infoBlock2: (await blinkstickDevice?.getInfoBlock2Raw())?.toString('hex'),
+        ledCount: blinkstickDevice?.ledCount,
+        manufacturer: blinkstickDevice?.manufacturer,
+        product: blinkstickDevice?.product,
+        isSync: blinkstickDevice?.isSync,
+        serial: blinkstickDevice?.serial,
+        infoBlock1: (await blinkstickDevice?.getInfoBlock1())?.toString('hex'),
+        infoBlock2: (await blinkstickDevice?.getInfoBlock2())?.toString('hex'),
         inverse: blinkstickDevice?.inverse,
-        animation: blinkstickDevice?.animationsEnabled,
         requiresSoftwarePatch: blinkstickDevice?.requiresSoftwareColorPatch,
         version: {
-          major: blinkstickDevice?.getVersionMajor() ?? null,
-          minor: blinkstickDevice?.getVersionMinor() ?? null,
+          major: blinkstickDevice?.versionMajor ?? null,
+          minor: blinkstickDevice?.versionMinor ?? null,
         },
       },
     };

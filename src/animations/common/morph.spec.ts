@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { morph } from './morph';
+import { RgbTuple } from '../../types';
 
 describe('morph', () => {
   it('throws if steps <= 0', () => {
@@ -13,8 +14,16 @@ describe('morph', () => {
     expect(frames[1].rgb).toEqual([20, 40, 60]);
   });
 
-  it('yields default steps of 100 frames', () => {
-    const frames = Array.from(morph([0, 0, 0], [100, 100, 100], 200));
-    expect(frames).toHaveLength(100);
+  it('yields reasonable number of frames', () => {
+    const frames = Array.from(morph([0, 0, 0], [100, 100, 100], 600));
+    expect(frames.length).toBeLessThanOrEqual(40); // 15ms per frame, 600ms total
+    expect(frames.length).toBeGreaterThanOrEqual(6); // 100ms per frame, 600ms total
+  });
+
+  it('handles black => white transition', () => {
+    const black = [0, 0, 0] as RgbTuple;
+    const white = [255, 255, 255] as RgbTuple;
+    const frames = Array.from(morph(black, white, 100, 5));
+    expect(frames).toHaveLength(5);
   });
 });

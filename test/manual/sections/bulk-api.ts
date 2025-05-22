@@ -1,12 +1,9 @@
-import { BlinkstickAny, BlinkstickDeviceDefinition } from '../../../src';
+import { BlinkstickAny } from '../../../src';
 import { yesOrThrow } from '../helpers';
 import { RgbTuple } from '../../../src/types/rgb-tuple';
 
-export async function bulkApi(
-  blinkstickDevice: BlinkstickAny,
-  description: BlinkstickDeviceDefinition,
-) {
-  if (description.ledCount < 2) {
+export async function bulkApi(blinkstickDevice: BlinkstickAny) {
+  if (blinkstickDevice.ledCount < 2) {
     console.log('This device does not support bulk API');
     return;
   }

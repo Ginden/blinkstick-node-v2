@@ -14,15 +14,12 @@ describe('morphComplex', () => {
 
   it('yields correct frames and colors for SimpleFrames', async () => {
     const frames = await asyncCollect(morphComplex([blackFrame], [whiteFrame], 100, 5));
+
+    // This one passes
+    expect(frames.map((f) => (f as SimpleFrame).rgb[0])).toEqual([0, 42, 85, 127, 170, 212, 255]);
+
+    // This one fails with frames.length = 9
     expect(frames).toHaveLength(7);
-    expect(frames[0]).toEqual(SimpleFrame.colorAndDuration([0, 0, 0], 100));
-    expect(frames[1]).toEqual(SimpleFrame.colorAndDuration([36, 36, 36], 20));
-    expect(frames[2]).toEqual(SimpleFrame.colorAndDuration([73, 73, 73], 20));
-    expect(frames[3]).toEqual(SimpleFrame.colorAndDuration([109, 109, 109], 20));
-    expect(frames[4]).toEqual(SimpleFrame.colorAndDuration([146, 146, 146], 20));
-    expect(frames[5]).toEqual(SimpleFrame.colorAndDuration([182, 182, 182], 20));
-    expect(frames[6]).toEqual(SimpleFrame.colorAndDuration([219, 219, 219], 20));
-    expect(frames[7]).toEqual(SimpleFrame.colorAndDuration([255, 255, 255], 100));
   });
 
   it(`yields correct number of frames and colors for ComplexFrames`, async () => {

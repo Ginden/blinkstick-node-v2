@@ -1,12 +1,8 @@
-import { BlinkstickAny, BlinkstickDeviceDefinition } from '../../../src';
+import { BlinkstickAny } from '../../../src';
 import { yesOrThrow } from '../helpers';
-import { assert } from 'tsafe';
 
-export async function basicQuestions(
-  blinkstickDevice: BlinkstickAny,
-  deviceDescription: BlinkstickDeviceDefinition,
-) {
-  const { ledCount } = deviceDescription;
+export async function basicQuestions(blinkstickDevice: BlinkstickAny) {
+  const { ledCount } = blinkstickDevice;
 
   console.log('🟦 Now we will turn on the first LED to blue.');
   await blinkstickDevice.setColor(0, 0, 255, { index: 0 });

@@ -14,13 +14,13 @@ export class ComplexFrame {
 
   constructor(colors: RgbTuple[], duration: number) {
     this.colors = colors;
-    this.duration = duration;
+    this.duration = duration | 0;
   }
 
   static fromSimpleFrame(frame: SimpleFrame, ledCount: number) {
     const { rgb, duration } = frame;
     const rgbCopy = [...rgb] as RgbTuple;
     const colors = Array.from({ length: ledCount }, () => rgbCopy);
-    return new ComplexFrame(colors, duration);
+    return new ComplexFrame(colors, duration | 0);
   }
 }

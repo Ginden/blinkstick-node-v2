@@ -1,4 +1,4 @@
-import { AnimationDescription } from '../animation-description';
+import { FrameIterable } from '../animation-description';
 import { assert } from 'tsafe';
 import { types } from 'node:util';
 
@@ -8,9 +8,9 @@ import { types } from 'node:util';
  * @param times
  */
 export function repeat(
-  animation: AnimationDescription | (() => AnimationDescription),
+  animation: FrameIterable | (() => FrameIterable),
   times: number,
-): AnimationDescription {
+): FrameIterable {
   if (times === 1) {
     return typeof animation === 'function' ? animation() : animation;
   }
@@ -26,7 +26,7 @@ export function repeat(
           yield* typeof animation === 'function' ? animation() : animation;
         }
       },
-    } as AnimationDescription;
+    } as FrameIterable;
   }
   return {
     [Symbol.asyncIterator]: async function* () {

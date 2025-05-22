@@ -2,9 +2,10 @@ import { assert } from 'tsafe';
 import { RgbTuple } from '../../types/rgb-tuple';
 import { clampRgb } from '../../utils/clamp';
 import { SimpleFrame } from '../simple-frame';
+import { assertFpsBelow100 } from '../helpers/assert-fps-below-100';
 
 /**
- * Adds intermediate frames between two RGB colors.
+ * Generates intermediate frames between two RGB colors.
  * @param from
  * @param to
  * @param overMs
@@ -14,9 +15,10 @@ export function morph(
   from: RgbTuple,
   to: RgbTuple,
   overMs: number,
-  steps = 100,
+  steps = overMs / 16,
 ): Iterable<SimpleFrame> {
   assert(steps > 0, 'steps must be greater than 0');
+  assertFpsBelow100(overMs, steps);
   return {
     *[Symbol.iterator]() {
       const stepDuration = overMs / steps;

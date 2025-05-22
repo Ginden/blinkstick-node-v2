@@ -1,5 +1,5 @@
 import assert from 'assert';
-import { AnimationDescription } from '../animation-description';
+import { FrameIterable } from '../animation-description';
 import { Frame } from '../frame';
 import { ComplexFrame } from '../complex-frame';
 import { SimpleFrame } from '../simple-frame';
@@ -7,6 +7,7 @@ import { NullFrame } from '../null-frame';
 import { morph } from './morph';
 import { clampRgb } from '../../utils';
 import { RgbTuple } from '../../types';
+import { assertFpsBelow100 } from '../helpers/assert-fps-below-100';
 
 /**
  * Morphs between two complex frames.
@@ -15,9 +16,11 @@ export function morphBetweenComplexFrames(
   firstFrameAsComplexFrame: ComplexFrame,
   lastFrameAsComplexFrame: ComplexFrame,
   overMs: number,
-  steps: number,
+  stepsRaw?: number,
 ): Iterable<ComplexFrame> {
+  const steps = (stepsRaw ?? overMs / 60) | 0;
   assert(steps > 0, 'Steps must be greater than 0');
+  assert(steps * 10 < overMs, 'Frame FPS is too high, please reduce steps or increase overMs');
   return {
     *[Symbol.iterator]() {
       const firstFrame = firstFrameAsComplexFrame.colors;
@@ -47,15 +50,17 @@ export function morphBetweenComplexFrames(
  * @param source
  * @param target
  * @param overMs
- * @param steps
+ * @param stepsRaw
  */
 export function morphComplex(
-  source: AnimationDescription,
-  target: AnimationDescription,
+  source: FrameIterable,
+  target: FrameIterable,
   overMs: number,
-  steps = 100,
+  stepsRaw?: number,
 ): AsyncIterable<Frame> {
+  const steps = (stepsRaw ?? overMs / 17) | 0;
   assert(steps > 0, 'Steps must be greater than 0');
+  assertFpsBelow100(overMs, steps);
   return {
     [Symbol.asyncIterator]: async function* () {
       let lastSourceFrame: SimpleFrame | ComplexFrame | undefined = undefined;
@@ -67,6 +72,9 @@ export function morphComplex(
         lastSourceFrame = frame;
       }
       assert(lastSourceFrame, 'Source animation is empty');
+
+      // We do this, because generator[Symbol.asyncIterator]() === generator - there is no "forking"
+      // Therefore, we can take the first frame from the target animation and then yield all other frames
       const targetAsGenerator = (async function* () {
         yield* target;
       })();
@@ -79,13 +87,7 @@ export function morphComplex(
       }
       // Give me pattern matching plz
       if (firstTargetFrame instanceof SimpleFrame && lastSourceFrame instanceof SimpleFrame) {
-        console.log(`morph`, {
-          from: firstTargetFrame.rgb,
-          to: lastSourceFrame.rgb,
-          overMs,
-          steps,
-        });
-        yield* morph(firstTargetFrame.rgb, lastSourceFrame.rgb, overMs, steps);
+        yield* morph(lastSourceFrame.rgb, firstTargetFrame.rgb, overMs, steps);
       } else {
         const ledCount = [firstTargetFrame, lastSourceFrame]
           .filter<ComplexFrame>((v) => v instanceof ComplexFrame)
@@ -99,12 +101,7 @@ export function morphComplex(
             ? lastSourceFrame
             : ComplexFrame.fromSimpleFrame(lastSourceFrame, ledCount);
 
-        yield* morphBetweenComplexFrames(
-          firstFrameAsComplexFrame,
-          lastFrameAsComplexFrame,
-          overMs,
-          steps,
-        );
+        yield* morphBetweenComplexFrames(firstFrameAsComplexFrame, lastFrameAsComplexFrame, overMs);
       }
 
       yield firstTargetFrame;

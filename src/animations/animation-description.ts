@@ -1,24 +1,26 @@
-import { SaneColorParam } from '../types';
+import { ColorInput } from '../types';
 import { pulse } from './common/pulse';
 import { repeat } from './helpers/repeat';
 import { parseSaneColorParam } from '../utils/colors/parse-sane-color-param';
 import { morph } from './common/morph';
 import { morphMany } from './common/morph-many';
 import { Frame } from './frame';
+import { assertFpsBelow100 } from './helpers/assert-fps-below-100';
 
 export abstract class Animation {
-  static repeat(animation: AnimationDescription, repeatCount: number) {
+  static repeat(animation: FrameIterable, repeatCount: number) {
     return repeat(animation, repeatCount);
   }
 
   static pulse(
-    color: SaneColorParam,
-    steps: number,
-    totalDuration: number,
+    color: ColorInput,
+    overMs: number,
+    steps: number = overMs / 60,
     repeatCount: number = 1,
   ) {
+    assertFpsBelow100(overMs, steps);
     const actualColorTuple = parseSaneColorParam(color);
-    const pulseIterator = pulse(actualColorTuple, { steps, totalDuration });
+    const pulseIterator = pulse(actualColorTuple, { steps, overMs });
     if (repeatCount === 1) {
       return pulseIterator;
     }
@@ -26,19 +28,21 @@ export abstract class Animation {
   }
 
   static morph(
-    from: SaneColorParam,
-    to: SaneColorParam,
+    from: ColorInput,
+    to: ColorInput,
     overMs: number,
-    steps: number = 100,
-  ): AnimationDescription {
+    steps: number = overMs / 60,
+  ): FrameIterable {
+    assertFpsBelow100(overMs, steps);
     const baseRgb = parseSaneColorParam(from);
     const targetRgb = parseSaneColorParam(to);
     return morph(baseRgb, targetRgb, overMs, steps);
   }
 
-  static morphMany(tuples: SaneColorParam[], overMs: number, steps = tuples.length * 50) {
+  static morphMany(tuples: ColorInput[], overMs: number, steps = overMs / 60) {
+    assertFpsBelow100(overMs, steps);
     return morphMany(tuples.map(parseSaneColorParam), overMs, steps);
   }
 }
 
-export type AnimationDescription = Iterable<Frame> | AsyncIterable<Frame>;
+export type FrameIterable = Iterable<Frame> | AsyncIterable<Frame>;

@@ -1,18 +1,11 @@
 import { assert } from 'tsafe';
-import {
-  BlinkstickAny,
-  BlinkstickDeviceDefinition,
-  ComplexFrame,
-  RgbTuple,
-  SimpleFrame,
-} from '../../../src';
+import { asyncCollect, BlinkstickAny, ComplexFrame, RgbTuple, SimpleFrame } from '../../../src';
 import { yesOrThrow } from '../helpers';
 import { Animation } from '../../../src/animations/animation-description';
+import { AnimationBuilder } from '../../../src/animations/animation-builder';
+import { assertAnimationLength } from '../assert-animation-length';
 
-export async function animationApi(
-  blinkstickDevice: BlinkstickAny,
-  { ledCount }: BlinkstickDeviceDefinition,
-) {
+export async function animationApi(blinkstickDevice: BlinkstickAny) {
   const animationRunner = blinkstickDevice.animation;
   assert(animationRunner, 'Animation runner should be defined');
   const rainbowRgbs: RgbTuple[] = [
@@ -37,23 +30,23 @@ export async function animationApi(
     const time = Date.now();
     await animationRunner.run(rainbowRgbs.map((rgb) => new SimpleFrame(rgb, singleDuration)));
     const elapsedTime = Date.now() - time;
-    assert(
-      elapsedTime >= expectedTime - 50,
-      `Animation should take at least ${expectedTime}ms, but took ${elapsedTime}ms`,
-    );
-    console.log(
-      `Animation took ${elapsedTime}ms $(${Number(((100 * elapsedTime) / expectedTime).toFixed(1))}% of expected value)`,
-    );
+    assertAnimationLength(elapsedTime, expectedTime);
     await yesOrThrow('Did all LEDs go through the rainbow?', 'All LEDs should be rainbow colored');
   }
 
   // Morph
   {
-    const singleDuration = 150;
+    const singleDuration = 300;
     console.log(
       `🌈 Now we will use animation API to morph the color of all LEDs going through the rainbow. This should take ${rainbowRgbs.length * singleDuration}ms.`,
     );
-    await animationRunner.run(Animation.morphMany(rainbowRgbs, rainbowRgbs.length * 350));
+    const t0 = Date.now();
+    const expectedDuration = rainbowRgbs.length * singleDuration;
+    await animationRunner.run(Animation.morphMany(rainbowRgbs, expectedDuration));
+    const elapsedTime = Date.now() - t0;
+
+    assertAnimationLength(elapsedTime, expectedDuration);
+
     await yesOrThrow('Did all LEDs go through the rainbow?', 'All LEDs should be rainbow colored');
   }
 
@@ -63,7 +56,9 @@ export async function animationApi(
     const getRandomRainbowColor = () => rainbowRgbs[Math.floor(Math.random() * rainbowRgbs.length)];
     const iterator = (function* () {
       for (let i = 0; i < iterations; i++) {
-        const tuples = Array.from({ length: ledCount }, () => getRandomRainbowColor());
+        const tuples = Array.from({ length: blinkstickDevice.ledCount }, () =>
+          getRandomRainbowColor(),
+        );
         yield new ComplexFrame(tuples, singleDuration);
       }
     })();
@@ -72,10 +67,49 @@ export async function animationApi(
       `🌈 Now we will use animation API to change the color of all LEDs going through the rainbow, but independently. This should take ${iterations * singleDuration}ms.`,
     );
 
+    const t0 = Date.now();
+
     await blinkstickDevice.animation.run(iterator);
+    const elapsedTime = Date.now() - t0;
+    await blinkstickDevice.turnOffAll();
+
+    assertAnimationLength(elapsedTime, iterations * singleDuration);
+
     await yesOrThrow(
       'Were LEDs blinking independently?',
       'All LEDs should be blinking independently',
     );
+  }
+
+  // AnimationBuilder
+  {
+    const singleDuration = 500;
+    const animation = AnimationBuilder.startWithBlack(50)
+      .addPulse('red', singleDuration)
+      .addPulse('green', singleDuration)
+      .addPulse('blue', singleDuration)
+      .addStaticFrame(SimpleFrame.colorAndDuration('lightsteelblue', singleDuration))
+      .addPulse('red', singleDuration)
+      .stillColor('green', singleDuration)
+      .morphToColor('blue', singleDuration)
+      .morphToColor('black', singleDuration)
+      .build();
+
+    const collected = await asyncCollect(animation);
+    const duration = collected.reduce((acc, frame) => acc + frame.duration, 0);
+
+    console.log(
+      `🌈 Now we will use animation API to run a complex animation. This should take ${duration}ms.`,
+    );
+    const t0 = Date.now();
+    await animationRunner.run(collected);
+    const elapsedTime = Date.now() - t0;
+    assertAnimationLength(elapsedTime, duration);
+    await yesOrThrow(
+      'Did all LEDs go through the complex animation?',
+      'All LEDs should be going through the complex animation',
+    );
+
+    await blinkstickDevice.turnOffAll();
   }
 }

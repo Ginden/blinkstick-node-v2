@@ -1,5 +1,5 @@
 import { BlinkstickAny } from '../core/blinkstick';
-import { AnimationDescription } from './animation-description';
+import { FrameIterable } from './animation-description';
 import { assert } from 'tsafe';
 import { combine } from './helpers/combine';
 import { SimpleFrame } from './simple-frame';
@@ -40,10 +40,11 @@ export class AnimationRunner {
   /**
    * Runs the animation
    * If the animation is already running, it will throw an error
+   *
    * Will wait for the animation to finish before returning
    * @param animations
    */
-  async run(...animations: AnimationDescription[]) {
+  async run(...animations: FrameIterable[]) {
     if (this.isRunning) {
       throw new Error('Animation is already running');
     }
@@ -54,7 +55,7 @@ export class AnimationRunner {
    * Will replace the current animation and run the new one
    * Optional callback will be called when the animation is finished
    */
-  runAndForget(animations: AnimationDescription[], cb?: (err: Error | null) => unknown) {
+  runAndForget(animations: FrameIterable[], cb?: (err: Error | null) => unknown) {
     void this.runNew(...animations).catch((err) => {
       if (err === abortError) {
         cb?.(null);
@@ -70,15 +71,22 @@ export class AnimationRunner {
    * If the animation is already running, it will be stopped
    * @param animations
    */
-  async runNew(...animations: AnimationDescription[]) {
+  async runNew(...animations: FrameIterable[]) {
     this.isRunning = true;
     this.abortController.abort(abortError);
     this.abortController = new AbortController();
     const currentAnimation = combine(...animations);
     const { signal } = this.abortController;
+    let sumFrameDuration = 0;
+    let sumTimeElapsed = 0;
     try {
       for await (const frame of currentAnimation) {
+        const t0 = performance.now();
         await this.applyFrame(frame, signal);
+        const timeElapsed = performance.now() - t0;
+        const frameDuration = frame.duration;
+        sumFrameDuration += frameDuration;
+        sumTimeElapsed += timeElapsed;
       }
     } catch (err) {
       if (err === abortError) {
@@ -88,6 +96,9 @@ export class AnimationRunner {
       }
     } finally {
       this.isRunning = false;
+      console.log(
+        `Animation finished. Expected: ${sumFrameDuration | 0}ms, Actual: ${sumTimeElapsed | 0}ms`,
+      );
     }
   }
 
@@ -113,6 +124,7 @@ export class AnimationRunner {
       await this.applyComplexFrame(frame);
     }
     const timeElapsed = performance.now() - t0;
-    await scheduler.wait(Math.max(duration - timeElapsed, 0), { signal });
+    const waitTime = Math.max(Math.round(duration - timeElapsed), 0);
+    if (waitTime > 0) await scheduler.wait(waitTime, { signal });
   }
 }

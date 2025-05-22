@@ -1,4 +1,5 @@
-import { AllPossibleColorOptions, NormalizedColorOptions } from '../../types/color-options';
+import { NormalizedColorOptions } from '../../types/color-options';
+import {AllPossibleColorOptions} from "../../types/all-possible-color-options";
 
 export function normalizeHexColor(
   color: string,

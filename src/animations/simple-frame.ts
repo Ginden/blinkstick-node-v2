@@ -1,6 +1,6 @@
 import { RgbTuple } from '../types/rgb-tuple';
 import { ConditionalPick, JsonValue } from 'type-fest';
-import { SaneColorParam } from '../types';
+import { ColorInput } from '../types';
 import { parseSaneColorParam } from '../utils';
 
 /**
@@ -11,15 +11,15 @@ export class SimpleFrame {
   readonly rgb: RgbTuple;
 
   static fromProperties(props: ConditionalPick<SimpleFrame, JsonValue>) {
-    return new SimpleFrame(props.rgb, props.duration);
+    return new SimpleFrame(props.rgb, props.duration | 0);
   }
 
-  static colorAndDuration(color: SaneColorParam, duration: number): SimpleFrame {
-    return new SimpleFrame(parseSaneColorParam(color), duration);
+  static colorAndDuration(color: ColorInput, duration: number): SimpleFrame {
+    return new SimpleFrame(parseSaneColorParam(color), duration | 0);
   }
 
   constructor(rgb: RgbTuple, duration: number) {
     this.rgb = rgb;
-    this.duration = duration;
+    this.duration = duration | 0;
   }
 }

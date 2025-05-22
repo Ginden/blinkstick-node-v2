@@ -33,7 +33,6 @@ export abstract class BlinkStick<HidDevice extends HID | HIDAsync = HID | HIDAsy
   protected abortController: AbortController = new AbortController();
   /**
    * Changes the default retry count for sending feature reports.
-   * Yes - it is buggy.
    */
   public defaultRetryCount = 5;
   public ledCount: number;
@@ -310,13 +309,8 @@ export abstract class BlinkStick<HidDevice extends HID | HIDAsync = HID | HIDAsy
    * This is a 32 byte array that can contain any data. It's supposed to
    * hold the "Name" of the device making it easier to identify rather than
    * a serial number.
-   * @deprecated Use `getInfoBlock1Raw` instead
    */
-  async getInfoBlock1(): Promise<string> {
-    return await getInfoBlock(this, 0x0002);
-  }
-
-  async getInfoBlock1Raw(): Promise<Buffer> {
+  async getInfoBlock1(): Promise<Buffer> {
     return await getInfoBlockRaw(this, 0x0002);
   }
 
@@ -330,7 +324,7 @@ export abstract class BlinkStick<HidDevice extends HID | HIDAsync = HID | HIDAsy
    *     setInfoBlock1("abcdefg");
    * @param data
    */
-  async setInfoBlock1(data: string) {
+  async setInfoBlock1(data: Buffer) {
     return await setInfoBlock(this, 0x0002, data);
   }
 
@@ -501,8 +495,8 @@ export abstract class BlinkStick<HidDevice extends HID | HIDAsync = HID | HIDAsy
   }
 
   public led(index: number): Led {
-    assert(index > 0, 'Index must be greater than 0');
-    assert(index <= this.ledCount, 'Index must be less than or equal to ledCount');
+    assert(index >= 0, 'Index must be greater than 0');
+    assert(index < this.ledCount, 'Index must be less than ledCount');
 
     return new Led(this, index);
   }

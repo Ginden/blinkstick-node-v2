@@ -1,3 +1,4 @@
+export * from './as-buffer';
 export * from './clamp';
 export * from './colors/get-random-color';
 export * from './colors/interpret-parameters';
