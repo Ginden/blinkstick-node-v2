@@ -1,9 +1,12 @@
 import { RgbTuple } from '../../types';
-import { SimpleFrame } from '../simple-frame';
+import { SimpleFrame } from '../frame/simple-frame';
 import { clampRgb } from '../../utils';
 import { assertFpsBelow100 } from '../helpers/assert-fps-below-100';
 import { assert } from 'tsafe';
 
+/**
+ * Smooth transition between multiple RGB colors.
+ */
 export function morphMany(
   tuples: RgbTuple[],
   overMs: number,

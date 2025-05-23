@@ -1,5 +1,12 @@
 import { assert } from 'tsafe';
-import { asyncCollect, BlinkstickAny, ComplexFrame, RgbTuple, SimpleFrame } from '../../../src';
+import {
+  asyncCollect,
+  BlinkstickAny,
+  ComplexFrame,
+  RgbTuple,
+  SimpleFrame,
+  wrapGeneratorForAnimation,
+} from '../../../src';
 import { yesOrThrow } from '../helpers';
 import { Animation } from '../../../src/animations/animation-description';
 import { AnimationBuilder } from '../../../src/animations/animation-builder';
@@ -54,14 +61,14 @@ export async function animationApi(blinkstickDevice: BlinkstickAny) {
     const singleDuration = 300;
     const iterations = 10;
     const getRandomRainbowColor = () => rainbowRgbs[Math.floor(Math.random() * rainbowRgbs.length)];
-    const iterator = (function* () {
+    const iterator = wrapGeneratorForAnimation(function* () {
       for (let i = 0; i < iterations; i++) {
         const tuples = Array.from({ length: blinkstickDevice.ledCount }, () =>
           getRandomRainbowColor(),
         );
         yield new ComplexFrame(tuples, singleDuration);
       }
-    })();
+    });
 
     console.log(
       `🌈 Now we will use animation API to change the color of all LEDs going through the rainbow, but independently. This should take ${iterations * singleDuration}ms.`,
@@ -84,6 +91,12 @@ export async function animationApi(blinkstickDevice: BlinkstickAny) {
   // AnimationBuilder
   {
     const singleDuration = 500;
+
+    const duration = singleDuration * 10;
+    console.log(
+      `🌈 Now we will use animation API to run a complex animation. This should take ${duration}ms.`,
+    );
+
     const animation = AnimationBuilder.startWithBlack(50)
       .addPulse('red', singleDuration)
       .addPulse('green', singleDuration)
@@ -96,11 +109,7 @@ export async function animationApi(blinkstickDevice: BlinkstickAny) {
       .build();
 
     const collected = await asyncCollect(animation);
-    const duration = collected.reduce((acc, frame) => acc + frame.duration, 0);
 
-    console.log(
-      `🌈 Now we will use animation API to run a complex animation. This should take ${duration}ms.`,
-    );
     const t0 = Date.now();
     await animationRunner.run(collected);
     const elapsedTime = Date.now() - t0;

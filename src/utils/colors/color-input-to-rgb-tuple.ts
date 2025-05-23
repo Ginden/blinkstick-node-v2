@@ -4,7 +4,7 @@ import { normalizeHexColor } from './normalize-hex-color';
 import { RgbTuple } from '../../types/rgb-tuple';
 import { typeGuard } from 'tsafe';
 
-export function parseSaneColorParam(color: ColorInput): RgbTuple {
+export function colorInputToRgbTuple(color: ColorInput): RgbTuple {
   if (
     typeof color === 'string' &&
     typeGuard<keyof typeof COLOR_KEYWORDS>(color, color in COLOR_KEYWORDS)

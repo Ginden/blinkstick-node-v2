@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { limitDuration } from './limit-duration';
-import { SimpleFrame } from '../simple-frame';
+import { SimpleFrame } from '../frame/simple-frame';
 
 describe('limitDuration', () => {
   async function* makeFrames() {

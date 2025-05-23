@@ -1,3 +1,7 @@
+/**
+ * Collects all items from an iterable or async iterable into an array.
+ * @param iterable
+ */
 export async function asyncCollect<V>(iterable: Iterable<V> | AsyncIterable<V>): Promise<V[]> {
   const ret: V[] = [];
   for await (const item of iterable) {

@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import { morphBetweenComplexFrames, morphComplex } from './morph-complex';
-import { SimpleFrame } from '../simple-frame';
+import { SimpleFrame } from '../frame/simple-frame';
 import { asyncCollect } from '../helpers/iterate';
-import { ComplexFrame } from '../complex-frame';
+import { ComplexFrame } from '../frame/complex-frame';
 
 describe('morphComplex', () => {
   const blackFrame = SimpleFrame.colorAndDuration('black', 100);

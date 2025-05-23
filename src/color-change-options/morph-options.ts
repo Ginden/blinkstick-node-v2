@@ -1,3 +1,6 @@
+/**
+ * @deprecated Use Animation API instead.
+ */
 export type MorphOptions = {
   index?: number;
   duration?: number;

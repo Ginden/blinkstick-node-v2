@@ -1,5 +1,5 @@
-import { SimpleFrame } from '../simple-frame';
-import { ComplexFrame } from '../complex-frame';
+import { SimpleFrame } from '../frame/simple-frame';
+import { ComplexFrame } from '../frame/complex-frame';
 import { RgbTuple } from '../../types';
 import { assert } from 'tsafe';
 
@@ -12,18 +12,19 @@ interface LedState {
 }
 
 /**
- * Implementation that follows the expectations expressed in
- * `convert-simple-frames-to-complex-frame.test.ts`.
+ * This function allows you to convert a set of simple frames into complex frames -
+ * effectively animating each LED independently.
  *
  * 1. A complex frame is emitted whenever *any* LED changes its colour.
+ *
  * 2. If a LED changes its colour, **all other LEDs** that still have at least
  *    one more simple frame will also transition to their next frame – even if
  *    their current one has not finished yet. This keeps colour-changes across
  *    LEDs perfectly aligned (see the third test case).
- * 3. When a LED runs out of simple frames it continues to show the colour of
- *    its *last* frame.
+ *
+ * 3. When a LED runs out of simple frames it transitions to `fillMissingEndWith` parameter value, defaulting to black.
  */
-export function convertSimpleFramesToComplexFrame1(
+export function convertSimpleFramesToComplexFrame(
   simpleFrames: Exclude<Iterable<SimpleFrame>, Generator>[],
   fillMissingEndWith: RgbTuple = [0, 0, 0],
   ledCount: number = simpleFrames.length,

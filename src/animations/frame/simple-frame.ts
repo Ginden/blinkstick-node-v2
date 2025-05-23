@@ -1,7 +1,7 @@
-import { RgbTuple } from '../types/rgb-tuple';
+import { RgbTuple } from '../../types/rgb-tuple';
 import { ConditionalPick, JsonValue } from 'type-fest';
-import { ColorInput } from '../types';
-import { parseSaneColorParam } from '../utils';
+import { ColorInput } from '../../types';
+import { colorInputToRgbTuple } from '../../utils';
 
 /**
  * SimpleFrame represents a single frame of animation with a specific color and duration.
@@ -15,7 +15,7 @@ export class SimpleFrame {
   }
 
   static colorAndDuration(color: ColorInput, duration: number): SimpleFrame {
-    return new SimpleFrame(parseSaneColorParam(color), duration | 0);
+    return new SimpleFrame(colorInputToRgbTuple(color), duration | 0);
   }
 
   constructor(rgb: RgbTuple, duration: number) {

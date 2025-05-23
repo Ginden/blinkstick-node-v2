@@ -1,9 +1,9 @@
 import assert from 'assert';
 import { FrameIterable } from '../animation-description';
-import { Frame } from '../frame';
-import { ComplexFrame } from '../complex-frame';
-import { SimpleFrame } from '../simple-frame';
-import { NullFrame } from '../null-frame';
+import { Frame } from '../frame/frame';
+import { ComplexFrame } from '../frame/complex-frame';
+import { SimpleFrame } from '../frame/simple-frame';
+import { WaitFrame } from '../frame/wait-frame';
 import { morph } from './morph';
 import { clampRgb } from '../../utils';
 import { RgbTuple } from '../../types';
@@ -47,10 +47,6 @@ export function morphBetweenComplexFrames(
 
 /**
  * Smooth transition between two animations.
- * @param source
- * @param target
- * @param overMs
- * @param stepsRaw
  */
 export function morphComplex(
   source: FrameIterable,
@@ -66,7 +62,7 @@ export function morphComplex(
       let lastSourceFrame: SimpleFrame | ComplexFrame | undefined = undefined;
       for await (const frame of source) {
         yield frame;
-        if (frame instanceof NullFrame) {
+        if (frame instanceof WaitFrame) {
           continue;
         }
         lastSourceFrame = frame;
@@ -82,7 +78,7 @@ export function morphComplex(
       const { value: firstTargetFrame } = await targetAsGenerator.next();
       assert(firstTargetFrame, 'Target animation is empty');
       // MORPH LOGIC HERE
-      if (firstTargetFrame instanceof NullFrame) {
+      if (firstTargetFrame instanceof WaitFrame) {
         throw new Error('Cannot morph to a NullFrame');
       }
       // Give me pattern matching plz

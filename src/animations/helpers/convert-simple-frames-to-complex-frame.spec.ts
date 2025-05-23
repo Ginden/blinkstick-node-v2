@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { convertSimpleFramesToComplexFrame1 } from './convert-simple-frames-to-complex-frame';
-import { SimpleFrame } from '../simple-frame';
-import { ComplexFrame } from '../complex-frame';
+import { convertSimpleFramesToComplexFrame } from './convert-simple-frames-to-complex-frame';
+import { SimpleFrame } from '../frame/simple-frame';
+import { ComplexFrame } from '../frame/complex-frame';
 import { asyncCollect } from './iterate';
 
 describe('convertSimpleFramesToComplexFrame1', () => {
@@ -9,7 +9,7 @@ describe('convertSimpleFramesToComplexFrame1', () => {
     const sf1 = [new SimpleFrame([1, 1, 1], 10)];
     const sf2 = [new SimpleFrame([2, 2, 2], 10)];
     const frames: ComplexFrame[] = await asyncCollect(
-      convertSimpleFramesToComplexFrame1([sf1, sf2]),
+      convertSimpleFramesToComplexFrame([sf1, sf2]),
     );
     expect(frames).toHaveLength(1);
     expect(frames[0].duration).toBe(10);
@@ -23,7 +23,7 @@ describe('convertSimpleFramesToComplexFrame1', () => {
     const sf1 = [new SimpleFrame([1, 1, 1], 10), new SimpleFrame([2, 2, 2], 10)];
     const sf2 = [new SimpleFrame([3, 3, 3], 20)];
     const frames: ComplexFrame[] = await asyncCollect(
-      convertSimpleFramesToComplexFrame1([sf1, sf2]),
+      convertSimpleFramesToComplexFrame([sf1, sf2]),
     );
     expect(frames).toHaveLength(2);
     const [firstFrame, secondFrame] = frames;
@@ -47,7 +47,7 @@ describe('convertSimpleFramesToComplexFrame1', () => {
     ];
     const sf2 = [new SimpleFrame([4, 4, 4], 15), new SimpleFrame([5, 5, 5], 15)];
     const frames: ComplexFrame[] = await asyncCollect(
-      convertSimpleFramesToComplexFrame1([sf1, sf2]),
+      convertSimpleFramesToComplexFrame([sf1, sf2]),
     );
     expect(frames).toHaveLength(4);
     const [firstFrame, secondFrame, thirdFrame, fourthFrame] = frames;

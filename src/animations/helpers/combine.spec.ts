@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { combine } from './combine';
-import { SimpleFrame } from '../simple-frame';
+import { SimpleFrame } from '../frame/simple-frame';
 
 describe('combine', () => {
   it('throws if no animations provided', () => {

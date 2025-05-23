@@ -1,13 +1,14 @@
 import { assert } from 'tsafe';
 import { FrameIterable } from '../animation-description';
-import { ComplexFrame } from '../complex-frame';
-import { SimpleFrame } from '../simple-frame';
+import { ComplexFrame } from '../frame/complex-frame';
+import { SimpleFrame } from '../frame/simple-frame';
 import { types } from 'node:util';
-import { Frame } from '../frame';
+import { Frame } from '../frame/frame';
 
 /**
  * Sets maximum duration for an animation.
  * The last frame can be shortened to fit the maximum duration.
+ * Frames beyond the maximum duration are dropped
  */
 export function limitDuration(
   animation: FrameIterable,

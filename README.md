@@ -60,15 +60,6 @@ If you don't set the number of LEDs, the library will assume that you have one L
 ## Requirements
 
 - Node.js, version 20.0 or higher
-- Libusb for Mac OSX and Linux
-
-#### Raspberry Pi
-
-Install `libudev` and `libusb` development packages:
-
-```shell
-sudo apt-get install libusb-1.0-0-dev libudev-dev -y
-```
 
 ## Install BlinkStick node module
 
@@ -157,21 +148,87 @@ const animation = Animation.repeat(
 );
 
 blinkstick.animation.runAndForget(animation);
+
+// Or, let's consider using AnimationBuilder
+
+import { AnimationBuilder } from '@ginden/blinkstick-v2';
+
+const complexAnimation = AnimationBuilder.startWithBlack(50)
+  // Add black-read-black pulse over 1 second
+  .addPulse('red', 1000)
+  // Appends new animation to the end of the current one
+  .append(
+    AnimationBuilder
+      // Starts with white color
+      .startWithColor('white', 1000)
+      // Pulses to green over 500ms
+      .addPulse('green', 500)
+      // Pulses to yellow over 500ms
+      .addPulse([255, 255, 0], 500)
+      // Morphs to red over 500ms
+      .morph(
+        {
+          r: 255,
+          g: 0,
+          b: 0,
+        },
+        500,
+      )
+      // Waits with result of previous steps for 1 second
+      .wait(1000)
+      .build(),
+  )
+  // Repeats the whole animation 3 times
+  .repeat(3)
+  // Wait with last frame for 1 second
+  .wait(1000)
+  // Morphs to purple over 1 second
+  .morphToColor('purple', 1000)
+  // This is really advanced feature that allows you to transform each frame
+  .transformEachFrame((frame) => frame)
+  .build();
 ```
 
-`Animation` class is a simple convenience wrapper for several common animations and generates `AnimationDescription` objects.
+`Animation` bag class is a simple convenience wrapper for several common animations and generates `FrameIterable` objects.
 
-What is `AnimationDescription`? It's an iterable object that contains all the frames of the animation.
+`AnimationBuilder` is a more advanced class that allows you to build complex animations.
+
+What is `FrameIterable`?
 
 ```ts
-export type AnimationDescription =
-  | Iterable<SimpleFrame | ComplexFrame>
-  | AsyncIterable<SimpleFrame | ComplexFrame>;
+type FrameIterable = Iterable<Frame> | AsyncIterable<Frame>;
 ```
 
 `SimpleFrame` is a class of `{rgb: RgbTuple, duration: number}`. It's used by animation runner to change color of all LEDs at once.
 
 `ComplexFrame` is a class of `{leds: RgbTuple[], duration: number}`. It's used by animation runner to change color of each LED separately. Number of LEDs must match the number of LEDs in the device.
+
+`WaitFrame` is a class of `{duration: number}`. It's used by animation runner to wait for a given duration.
+
+### Generators
+
+Most of Animation APIs will throw if you pass a generator. This is there to prevent you from shooting yourself in the foot.
+
+Why?
+
+```ts
+import { SimpleFrame } from '@ginden/blinkstick-v2';
+
+function* gen() {
+  yield SimpleFrame.colorAndDuration('white', 500);
+  yield SimpleFrame.colorAndDuration('red', 500);
+}
+
+repeat(gen(), 3);
+
+// This would yield only 2 frames - generator doesn't implicitly "fork" when iterated multiple times
+```
+
+### Limitations
+
+All built-in methods will throw if you try to generate animation with FPS higher than 100. As `BlinkStick Nano` is de facto limited to 75 FPS, it should be enough.
+
+Your custom animation may be "faster" than that, but expect drift and other issues.
 
 ### Known issues
 
@@ -206,9 +263,15 @@ CI, and even typical automated testing is rather challenging.
 Run `npm run test:manual` and follow the instructions. You should physically see the device changing colors, and you
 will answer yes/no to the questions.
 
-### Automated tests (limited)
+### Automated tests
 
-Just run `npm test` and it will run the tests. You can also run `npm test -- --watch` to run the tests in watch mode.
+As most interesting parts of the library require a Blinkstick device and human eye to operate (both unavailable in GitHub Actions), we have rather limited automated tests, testing mostly utility functions and frame generation.
+
+Just run `npm test` and it will run the tests.
+
+### Coverage
+
+A proper coverage report would run both manual and automated tests. Feel free to open a PR if you have an idea how to do it.
 
 ## Maintainer
 
@@ -222,5 +285,6 @@ Just run `npm test` and it will run the tests. You can also run `npm test -- --w
 ## Copyright and License
 
 Copyright (c) 2014 Agile Innovative Ltd and contributors
+Copyright (c) 2025 Michał Wadas
 
 Released under MIT license.

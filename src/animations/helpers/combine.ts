@@ -1,6 +1,6 @@
 import { assert } from 'tsafe';
 import { FrameIterable } from '../animation-description';
-import { Frame } from '../frame';
+import { Frame } from '../frame/frame';
 
 export function combine(...animations: FrameIterable[]): AsyncIterable<Frame> {
   assert(animations.length > 0, 'At least one animation is required');

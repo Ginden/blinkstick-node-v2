@@ -1,15 +1,12 @@
 import { assert } from 'tsafe';
 import { RgbTuple } from '../../types/rgb-tuple';
 import { clampRgb } from '../../utils/clamp';
-import { SimpleFrame } from '../simple-frame';
+import { SimpleFrame } from '../frame/simple-frame';
 import { assertFpsBelow100 } from '../helpers/assert-fps-below-100';
 
 /**
  * Generates intermediate frames between two RGB colors.
- * @param from
- * @param to
- * @param overMs
- * @param steps
+ * These don't include the start and end frames.
  */
 export function morph(
   from: RgbTuple,

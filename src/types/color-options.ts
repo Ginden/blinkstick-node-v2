@@ -1,6 +1,6 @@
-import {COLOR_KEYWORDS} from '../consts/color-keywords';
-import {AllPossibleColorOptions} from "./all-possible-color-options";
-import {ColorObject} from "./color-object";
+import { COLOR_KEYWORDS } from '../consts/color-keywords';
+import { AllPossibleColorOptions } from './all-possible-color-options';
+import { ColorObject } from './color-object';
 
 /**
  * @deprecated Use newer APIs instead

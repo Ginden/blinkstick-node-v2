@@ -1,6 +1,6 @@
 import { BlinkstickAny } from '../core/blinkstick';
 import { ColorInput } from '../types';
-import { parseSaneColorParam } from '../utils/colors/parse-sane-color-param';
+import { colorInputToRgbTuple } from '../utils/colors/color-input-to-rgb-tuple';
 
 function prepareBuffer(buffer: Uint8Array, red: number, green: number, blue: number) {
   for (let i = 0; i < buffer.length; i = (i + 3) | 0) {
@@ -19,13 +19,13 @@ export class LedGroup {
   }
 
   public setColor(color: ColorInput) {
-    const [r, g, b] = parseSaneColorParam(color);
+    const [r, g, b] = colorInputToRgbTuple(color);
     prepareBuffer(this.buffer, r, g, b);
     return this.blinkstick.setColors(0, this.buffer);
   }
 
   public setColorAndForget(color: ColorInput) {
-    const [r, g, b] = parseSaneColorParam(color);
+    const [r, g, b] = colorInputToRgbTuple(color);
     prepareBuffer(this.buffer, r, g, b);
     return this.blinkstick.setColors(0, this.buffer);
   }

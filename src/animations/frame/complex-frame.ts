@@ -1,4 +1,4 @@
-import { RgbTuple } from '../types/rgb-tuple';
+import { RgbTuple } from '../../types/rgb-tuple';
 import { SimpleFrame } from './simple-frame';
 
 /**

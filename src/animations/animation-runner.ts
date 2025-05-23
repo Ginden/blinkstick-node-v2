@@ -2,19 +2,19 @@ import { BlinkstickAny } from '../core/blinkstick';
 import { FrameIterable } from './animation-description';
 import { assert } from 'tsafe';
 import { combine } from './helpers/combine';
-import { SimpleFrame } from './simple-frame';
-import { ComplexFrame } from './complex-frame';
+import { SimpleFrame } from './frame/simple-frame';
+import { ComplexFrame } from './frame/complex-frame';
 import { scheduler } from 'node:timers/promises';
 import { performance } from 'node:perf_hooks';
-import { Frame } from './frame';
+import { Frame } from './frame/frame';
 import { convertArrayOfRgbTuplesToBulkSetBuffer } from '../utils/convert-array-of-rgb-tuples-to-bulk-set-buffer';
 
 const abortError = new Error('Animation aborted');
 
 export class AnimationRunner {
-  private abortController = new AbortController();
-  private ledGroup;
-  private leds;
+  protected abortController = new AbortController();
+  protected ledGroup;
+  protected leds;
   public ledCount;
   protected buffer;
   protected isRunning = false;
@@ -44,19 +44,23 @@ export class AnimationRunner {
    * Will wait for the animation to finish before returning
    * @param animations
    */
-  async run(...animations: FrameIterable[]) {
+  async run(animations: FrameIterable[], { signal }: { signal?: AbortSignal } = {}) {
     if (this.isRunning) {
       throw new Error('Animation is already running');
     }
-    return this.runNew(...animations);
+    return this.runNew(animations, { signal });
   }
 
   /**
    * Will replace the current animation and run the new one
    * Optional callback will be called when the animation is finished
    */
-  runAndForget(animations: FrameIterable[], cb?: (err: Error | null) => unknown) {
-    void this.runNew(...animations).catch((err) => {
+  runAndForget(
+    animations: FrameIterable[],
+    cb?: (err: Error | null) => unknown,
+    { signal }: { signal?: AbortSignal } = {},
+  ) {
+    void this.runNew(animations, { signal }).catch((err) => {
       if (err === abortError) {
         cb?.(null);
         return;
@@ -71,12 +75,14 @@ export class AnimationRunner {
    * If the animation is already running, it will be stopped
    * @param animations
    */
-  async runNew(...animations: FrameIterable[]) {
+  async runNew(animations: FrameIterable[], { signal: userSignal }: { signal?: AbortSignal } = {}) {
     this.isRunning = true;
     this.abortController.abort(abortError);
     this.abortController = new AbortController();
     const currentAnimation = combine(...animations);
-    const { signal } = this.abortController;
+    const signal = AbortSignal.any(
+      [this.abortController.signal, userSignal].filter((s): s is AbortSignal => s !== undefined),
+    );
     let sumFrameDuration = 0;
     let sumTimeElapsed = 0;
     try {

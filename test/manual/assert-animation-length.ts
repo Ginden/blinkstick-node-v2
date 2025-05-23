@@ -1,5 +1,4 @@
-export function assertAnimationLength(elapsed: number, expected: number) {
-  const tolerance = 0.05; // 5% tolerance
+export function assertAnimationLength(elapsed: number, expected: number, tolerance: number = 0.05) {
   const lowerBound = expected - expected * tolerance;
   const upperBound = expected + expected * tolerance;
   if (elapsed > upperBound) {
