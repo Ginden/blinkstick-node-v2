@@ -18,9 +18,9 @@ export function normalizeHexColor(
     );
   } else if (color.length === 6) {
     return {
-      r: parseInt(color.slice(0, 2), 16),
-      g: parseInt(color.slice(2, 4), 16),
-      b: parseInt(color.slice(4, 6), 16),
+      r: parseInt(color.slice(0, 2), 16) & 0xff,
+      g: parseInt(color.slice(2, 4), 16) & 0xff,
+      b: parseInt(color.slice(4, 6), 16) & 0xff,
       options: options || {},
     };
   }

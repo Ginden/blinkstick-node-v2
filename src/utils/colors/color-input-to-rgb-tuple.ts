@@ -13,10 +13,10 @@ export function colorInputToRgbTuple(color: ColorInput): RgbTuple {
     return [r, g, b];
   }
   if (Array.isArray(color)) {
-    return [color[0], color[1], color[2]];
+    return [color[0] & 0xff, color[1] & 0xff, color[2] & 0xff];
   }
   if (typeof color === 'object') {
-    return [color.r, color.g, color.b];
+    return [color.r & 0xff, color.g & 0xff, color.b & 0xff];
   }
   throw new TypeError(`Invalid color format`);
 }

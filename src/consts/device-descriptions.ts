@@ -6,6 +6,9 @@ export type BlinkstickDeviceDefinition = {
   ledCount: number;
 };
 
+/**
+ * Known Blinkstick devices and their LED counts.
+ */
 export const deviceDescriptions = {
   // This one is tested...
   'BlinkStick Nano': {

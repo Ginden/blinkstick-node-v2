@@ -9,6 +9,11 @@ import { assertFpsBelow100 } from './helpers/assert-fps-below-100';
 
 export abstract class Animation {
   /**
+   * This class is not meant to be instantiated.
+   * @private
+   */
+  private constructor() {}
+  /**
    * Shorthand for `repeat`
    * @param animation
    * @param repeatCount

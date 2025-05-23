@@ -1,7 +1,7 @@
 import { Device, HID, HIDAsync } from 'node-hid';
 import { determineReportId } from '../utils/hid/determine-report-id';
 import { decimalToHex } from '../utils/decimal-to-hex';
-import { getInfoBlock, getInfoBlockRaw } from '../utils/hid/get-info-block';
+import { getInfoBlockRaw } from '../utils/hid/get-info-block';
 import { setInfoBlock } from '../utils/hid/set-info-block';
 import { ColorOptions, NormalizedColorOptions } from '../types/color-options';
 import { clampRgb } from '../utils/clamp';
@@ -385,6 +385,7 @@ export abstract class BlinkStick<HidDevice extends HID | HIDAsync = HID | HIDAsy
     data: Buffer,
     maxRetries: number = this.defaultRetryCount,
   ): Promise<Buffer> {
+    assert(data[0] === reportId, 'First byte of data must be the report ID');
     return retryNTimes(maxRetries, async () => {
       await this.sendFeatureReport(data);
       return asBuffer(await this.device.getFeatureReport(reportId, data.length));
@@ -490,10 +491,17 @@ export abstract class BlinkStick<HidDevice extends HID | HIDAsync = HID | HIDAsy
     return asBuffer(await this.device.getFeatureReport(reportId, length));
   }
 
+  /**
+   * Gets API to control all LEDs on the device.
+   */
   public leds(): LedGroup {
     return new LedGroup(this);
   }
 
+  /**
+   * Gets API to control a single LED on the device.
+   * @param index
+   */
   public led(index: number): Led {
     assert(index >= 0, 'Index must be greater than 0');
     assert(index < this.ledCount, 'Index must be less than ledCount');

@@ -2,8 +2,8 @@ import { assert } from 'tsafe';
 import { FrameIterable } from '../animation-description';
 import { ComplexFrame } from '../frame/complex-frame';
 import { SimpleFrame } from '../frame/simple-frame';
-import { types } from 'node:util';
 import { Frame } from '../frame/frame';
+import { WaitFrame } from '../frame/wait-frame';
 
 /**
  * Sets maximum duration for an animation.
@@ -30,7 +30,7 @@ export function limitDuration(
           } else if (frame instanceof ComplexFrame) {
             yield new ComplexFrame(frame.colors, maximumDuration - timeTook);
           } else {
-            yield frame;
+            yield new WaitFrame(maximumDuration - timeTook);
           }
         } else {
           yield frame;

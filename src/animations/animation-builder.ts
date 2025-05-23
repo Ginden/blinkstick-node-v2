@@ -12,7 +12,13 @@ import { morphComplex } from './common/morph-complex';
 import { assertFpsBelow100 } from './helpers/assert-fps-below-100';
 import { repeat } from './helpers/repeat';
 import { transformEachFrame, TransformEachFrameCb } from './helpers/transform-each-frame';
+import { assert } from 'tsafe';
 
+/**
+ * Our primary class for building complex animations.
+ * You SHOULD use static methods to create an instance of this class,
+ * but you are an adult. You can extend this class and use it as you want.
+ */
 export class AnimationBuilder {
   protected subAnimations: FrameIterable[] = [];
 
@@ -127,6 +133,7 @@ export class AnimationBuilder {
   }
 
   build() {
+    assert(this.subAnimations.length > 0, 'No animations to build');
     return combine(...this.subAnimations);
   }
 }

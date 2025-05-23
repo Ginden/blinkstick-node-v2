@@ -1,6 +1,9 @@
 import { BlinkstickAny } from '../core/blinkstick';
 import { RgbTuple } from '../types';
 
+/**
+ * Class to control a single LED on a Blinkstick device.
+ */
 export class Led {
   constructor(
     public readonly blinkstick: BlinkstickAny,

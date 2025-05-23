@@ -2,14 +2,18 @@ import { BlinkstickAny } from '../core/blinkstick';
 import { ColorInput } from '../types';
 import { colorInputToRgbTuple } from '../utils/colors/color-input-to-rgb-tuple';
 
-function prepareBuffer(buffer: Uint8Array, red: number, green: number, blue: number) {
+function prepareBuffer(buffer: Buffer, red: number, green: number, blue: number) {
   for (let i = 0; i < buffer.length; i = (i + 3) | 0) {
-    buffer[i] = green;
-    buffer[i + 1] = red;
-    buffer[i + 2] = blue;
+    buffer.writeUInt8(green & 0xff, i); // G
+    buffer.writeUInt8(red & 0xff, i + 1); // R
+    buffer.writeUInt8(blue & 0xff, i + 2); // B
   }
 }
 
+/**
+ * Class to control a group of LEDs on a Blinkstick device.
+ * Currently, it supports only "all LEDs" mode, but it can be extended to support more complex patterns.
+ */
 export class LedGroup {
   private readonly buffer: Buffer;
 

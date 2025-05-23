@@ -4,7 +4,8 @@ import { findRawDevicesAsync } from './find-raw-devices';
 import { deviceDescriptions } from '../consts/device-descriptions';
 
 /**
- * Find first attached BlinkStick.
+ * Find first attached BlinkStick and create a BlinkStick object.
+ * Optionally takes a product name to filter by.
  */
 export function findFirst(productName?: keyof typeof deviceDescriptions) {
   if (productName) {
@@ -14,6 +15,10 @@ export function findFirst(productName?: keyof typeof deviceDescriptions) {
   return findBlinkSticks(() => true)[0] ?? null;
 }
 
+/**
+ * Find first attached BlinkStick asynchronously and create a BlinkStick object.
+ * @param productName
+ */
 export async function findFirstAsync(productName?: keyof typeof deviceDescriptions) {
   const devices = await findRawDevicesAsync();
   if (productName) {

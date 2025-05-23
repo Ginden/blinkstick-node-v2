@@ -1,5 +1,5 @@
 import usb, { HID, HIDAsync } from 'node-hid';
-import { findRawDevices, findRawDevicesAsync } from './find-raw-devices';
+import { findRawDevicesSync, findRawDevicesAsync } from './find-raw-devices';
 import { BlinkStick } from '../core/blinkstick';
 import { createBlinkstickAsync } from './create-blinkstick-async';
 import { BlinkstickSync } from '../core/blinkstick.sync';
@@ -13,7 +13,7 @@ export function findBlinkSticks(filter?: (device: usb.Device) => boolean): Blink
     filter = () => true;
   }
 
-  return findRawDevices()
+  return findRawDevicesSync()
     .filter(filter)
     .map((device) => {
       const hidDevice = device.path

@@ -11,6 +11,13 @@ import { convertArrayOfRgbTuplesToBulkSetBuffer } from '../utils/convert-array-o
 
 const abortError = new Error('Animation aborted');
 
+/**
+ * This class is responsible for running animations on a Blinkstick device.
+ * It handles the animation loop, applying frames to the device, and managing
+ * the animation state.
+ *
+ * It's bound to a single Blinkstick device and can only run one animation at a time.
+ */
 export class AnimationRunner {
   protected abortController = new AbortController();
   protected ledGroup;
@@ -29,7 +36,7 @@ export class AnimationRunner {
   }
 
   /**
-   * Stops the animation
+   * Stops current animation
    */
   stop() {
     this.abortController.abort(abortError);
@@ -72,8 +79,10 @@ export class AnimationRunner {
 
   /**
    * Runs the animation, replacing the current one
+   *
    * If the animation is already running, it will be stopped
-   * @param animations
+   *
+   * You can pass an optional AbortSignal to cancel the animation at any time
    */
   async runNew(animations: FrameIterable[], { signal: userSignal }: { signal?: AbortSignal } = {}) {
     this.isRunning = true;
@@ -120,6 +129,10 @@ export class AnimationRunner {
     );
   }
 
+  /**
+   * Applies a frame to the device and waits for the duration of the frame.
+   * @protected
+   */
   protected async applyFrame(frame: Frame, signal: AbortSignal) {
     signal.throwIfAborted();
     const { duration } = frame;

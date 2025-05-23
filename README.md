@@ -1,18 +1,87 @@
-This is a fork of [Blinkstick library](https://github.com/arvydas/blinkstick-node), but now in TypeScript with Promises.
+# BlinkStick v2 – modern TypeScript SDK for BlinkStick LEDs
 
-BlinkStick Node provides an interface to control Blinkstick
-devices connected to your computer with Node.js.
+> Control your BlinkStick devices from Node.js with a **TypeScript-first, Promise-powered** API and a powerful animation engine.
 
-What is BlinkStick? It's a smart USB-controlled LED device. More info about it here:
+## Why choose this fork?
 
-[http://www.blinkstick.com](http://www.blinkstick.com)
+• **Modern development stack** – written in TypeScript, ships with type definitions, uses modern JS features.
+• **Promises & `async`/`await` everywhere** – no legacy callbacks.  
+• **Rich animation toolkit** – create complex, FPS-safe animations with `Animation`, `AnimationBuilder` and helpers.  
+• **Color parsing super-powers** – English color names, CSS strings (`#ff0000`, `rgb(255,0,0)`), tuples… even `random`.  
+• **Support for async `node-hid` APIs** - you can control devices without blocking the event loop.
+• **Works with the official BlinkStick devices**
+• **Node 20+ ready** – leverages the latest language and runtime features.
+
+---
+
+### Quick install
+
+```bash
+npm i @ginden/blinkstick-v2
+```
+
+### Quick example
+
+```ts
+import { findFirstAsync } from '@ginden/blinkstick-v2';
+
+// Find the first connected device (throws if none are found)
+const blinkstick = await findFirstAsync();
+
+// Make the LED pulse between black ↔ purple for ~1 s.
+// The promise resolves with `undefined` once the pulse is finished.
+await blinkstick.pulse('purple');
+```
+
+👉 **Need more?** Browse the full, searchable API reference at <https://ginden.github.io/blinkstick-node-v2>.
+
+---
+
+<!-- TOC start (generated with https://github.com/derlin/bitdowntoc) -->
+
+- [About this project](#about-this-project)
+- [Changes from the original library in v2](#changes-from-the-original-library-in-v2)
+- [Big changes in v3](#big-changes-in-v3)
+- [Devices](#devices)
+- [Requirements](#requirements)
+- [Install BlinkStick node module](#install-blinkstick-node-module)
+- [Getting started](#getting-started)
+  - [Async (recommended)](#async-recommended)
+    - [Easy mistakes](#easy-mistakes)
+  - [Sync API](#sync-api)
+    - [Usage examples](#usage-examples)
+- [Animation API](#animation-api)
+  - [Generators](#generators)
+  - [Limitations](#limitations)
+  - [Known issues](#known-issues)
+- [Missing information / help wanted 🕵️‍♀️](#missing-information--help-wanted-)
+- [Permission problems](#permission-problems)
+- [Contributing](#contributing)
+- [Testing](#testing)
+  - [Manual test](#manual-test)
+  - [Automated tests](#automated-tests)
+  - [Coverage](#coverage)
+- [Maintainer](#maintainer)
+  - [Original maintainers](#original-maintainers)
+- [Copyright and License](#copyright-and-license)
+
+## <!-- TOC end -->
+
+## About this project
+
+This project is a **fork** of the original [blinkstick-node](https://github.com/arvydas/blinkstick-node) library.  
+It aims to keep the spirit and feature-set of the original while bringing the code base into the modern TypeScript & Promise world.
+
+BlinkStick Node provides an interface to control BlinkStick devices connected to your computer with Node.js.
+
+What is BlinkStick? It's a tiny USB-controlled RGB LED device. Learn more at <https://www.blinkstick.com>.
 
 ## Changes from the original library in v2
 
 - TypeScript
 - All methods taking callbacks now return Promises
 - Most animation methods allow `AbortSignal` (this is only partially supported, your mileage may vary)
-- ~ Many methods return results of setting a feature report on device instead of `undefined` ~ (this one was reverted in v3, as it caused crashes)
+- ~~Many methods return results of setting a feature report on device instead of `undefined`~~ (this one was reverted in v3, as it caused crashes)
 - Requires Node.js 20.0 or higher
 
 ## Big changes in v3
@@ -24,14 +93,14 @@ What is BlinkStick? It's a smart USB-controlled LED device. More info about it h
   - Exposed `AnimationBuilder` class for building animations
 - Removed lots of low-level or unnecessary methods
 - Added subclasses `BlinkStickSync` and `BlinkStickAsync` for sync and async APIs and future specialization
-  - Likely future specialization will be `BlinkStickProSync` and `BlinkStickProAsync`, as the Pro device seems to have lots of unusual features
+  - Future specializations will likely be `BlinkStickProSync` and `BlinkStickProAsync`, as the Pro device seems to have lots of unusual features
 
 **BREAKING CHANGES**:
 
 - Restored original return types of several methods
 - No `string` when dealing with low-level data - use `Buffer` instead, we assume that you know what you are doing
 
-### Devices
+## Devices
 
 If you want to gift or buy me a BlinkStick device for testing purposes, please email me.
 
@@ -43,9 +112,9 @@ If you want to gift or buy me a BlinkStick device for testing purposes, please e
 
 - BlinkStick
 - BlinkStick Strip
-- Blinkstick Strip Mini
+- BlinkStick Strip Mini
 
-**\*Variable LED count**
+**Variable LED count**
 
 _BlinkStick Flex_ and _BlinkStick Pro_ come with a variable number of LEDs.
 
@@ -79,6 +148,9 @@ good practice.
 Read docs of [`node-hid`](https://github.com/node-hid/node-hid?tab=readme-ov-file#async-vs-sync-api) for more
 information.
 
+Note: under the hood the async flavour wraps `node-hid`’s `HIDAsync` class, while the sync API talks to `HID`.  
+The async version keeps the Node.js event loop free during USB I/O and is therefore recommended for most real-world applications.
+
 ```ts
 import { BlinkStick, findFirstAsync } from '@ginden/blinkstick-v2';
 
@@ -101,7 +173,7 @@ import { BlinkStick, findFirst } from '@ginden/blinkstick-v2';
 const blinkstick = findFirst();
 ```
 
-### Usage
+#### Usage examples
 
 ```ts
 // Color names are allowed
@@ -127,17 +199,14 @@ await blinkstick.led(1).setColor('blue');
 await blinkstick.leds().setColor('yellow');
 ```
 
-## Async API
-
-Currently, both APIs are identical in functionality and API. The only difference is that async API uses internally `HIDAsync`
-from `node-hid` library, while sync API uses `HID`.
-
-### Animation API
+## Animation API
 
 Let's start with an example:
 
 ```ts
 import { findFirst, Animation } from '@ginden/blinkstick-v2';
+// `animationApi` is **your own** module with helper functions;
+// it is shown here only to illustrate that animations are just plain objects.
 import { animationApi } from './animation-api';
 
 const blinkstick = findFirst();
@@ -147,6 +216,7 @@ const animation = Animation.repeat(
   12,
 );
 
+// Fire-and-forget – the call resolves immediately, the animation continues in the background
 blinkstick.animation.runAndForget(animation);
 
 // Or, let's consider using AnimationBuilder
@@ -154,7 +224,7 @@ blinkstick.animation.runAndForget(animation);
 import { AnimationBuilder } from '@ginden/blinkstick-v2';
 
 const complexAnimation = AnimationBuilder.startWithBlack(50)
-  // Add black-read-black pulse over 1 second
+  // Add black-red-black pulse over 1 second
   .addPulse('red', 1000)
   // Appends new animation to the end of the current one
   .append(
@@ -234,6 +304,18 @@ Your custom animation may be "faster" than that, but expect drift and other issu
 
 - Dreaded `could not get feature report from device` - this error occurs somewhere in the `node-hid` library and its dependencies,
   and is most likely to occur when calling methods in tight loops. See https://github.com/node-hid/node-hid/issues/561
+
+## Missing information / help wanted 🕵️‍♀️
+
+The project is already usable in production, however some pieces of documentation are still scarce. Feel free to open a PR if you can help with any of the items below:
+
+1. **Device matrix** – a table that documents which features work on every BlinkStick model (Nano, Strip, Flex, Pro…).
+2. **LED channel / mode reference** – hands-on explanation of the low-level `setMode`, `setChannel` helpers and how they relate to the hardware.
+3. **Standalone CLI**
+4. **Animation cookbook** – ready-to-copy recipes such as breathing, rainbow cycles, theatre chase, progress bars, etc.
+5. **Troubleshooting on Windows** – the `udev` paragraph covers Linux, but Windows quirks and Zadig drivers need love too.
+
+Your contributions are highly appreciated! 🙏
 
 ## Permission problems
 

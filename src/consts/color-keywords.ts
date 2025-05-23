@@ -1,3 +1,6 @@
+/**
+ * Color keywords, taken as-is from original library.
+ */
 export const COLOR_KEYWORDS = {
   aqua: '#00ffff',
   aliceblue: '#f0f8ff',
