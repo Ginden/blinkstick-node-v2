@@ -35,7 +35,7 @@ export async function animationApi(blinkstickDevice: BlinkstickAny) {
     );
 
     const time = Date.now();
-    await animationRunner.run(rainbowRgbs.map((rgb) => new SimpleFrame(rgb, singleDuration)));
+    await animationRunner.run([rainbowRgbs.map((rgb) => new SimpleFrame(rgb, singleDuration))]);
     const elapsedTime = Date.now() - time;
     assertAnimationLength(elapsedTime, expectedTime);
     await yesOrThrow('Did all LEDs go through the rainbow?', 'All LEDs should be rainbow colored');
@@ -49,7 +49,7 @@ export async function animationApi(blinkstickDevice: BlinkstickAny) {
     );
     const t0 = Date.now();
     const expectedDuration = rainbowRgbs.length * singleDuration;
-    await animationRunner.run(Animation.morphMany(rainbowRgbs, expectedDuration));
+    await animationRunner.run([Animation.morphMany(rainbowRgbs, expectedDuration)]);
     const elapsedTime = Date.now() - t0;
 
     assertAnimationLength(elapsedTime, expectedDuration);
@@ -76,7 +76,7 @@ export async function animationApi(blinkstickDevice: BlinkstickAny) {
 
     const t0 = Date.now();
 
-    await blinkstickDevice.animation.run(iterator);
+    await blinkstickDevice.animation.run([iterator]);
     const elapsedTime = Date.now() - t0;
     await blinkstickDevice.turnOffAll();
 
@@ -111,7 +111,7 @@ export async function animationApi(blinkstickDevice: BlinkstickAny) {
     const collected = await asyncCollect(animation);
 
     const t0 = Date.now();
-    await animationRunner.run(collected);
+    await animationRunner.run([collected]);
     const elapsedTime = Date.now() - t0;
     assertAnimationLength(elapsedTime, duration);
     await yesOrThrow(

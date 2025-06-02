@@ -1,9 +1,11 @@
 import prompts from 'prompts';
-import blinkstick, {
+import {
+  findRawDevicesAsync,
   BlinkstickAsync,
   BlinkstickSync,
   createBlinkstickAsync,
   createBlinkstickSync,
+  attemptToGetDeviceDescription,
 } from '../../src';
 import { assert } from 'tsafe';
 import { Device } from 'node-hid';
@@ -17,7 +19,7 @@ let blinkstickDevice: BlinkstickAsync | BlinkstickSync | null = null;
 let device: Device | null = null;
 
 (async () => {
-  const devices = await blinkstick.findRawDevicesAsync();
+  const devices = await findRawDevicesAsync();
   assert(devices.length > 0, 'No devices found');
   const selection = await prompts({
     type: 'select',
@@ -25,7 +27,7 @@ let device: Device | null = null;
     message: 'Select a device',
     choices: devices
       .map((device) => ({
-        title: `${device.product} at ${device.path}`,
+        title: `${attemptToGetDeviceDescription(device)?.name ?? device.product} at ${device.path}`,
         value: device,
       }))
       .flatMap(({ title, value: device }) => [

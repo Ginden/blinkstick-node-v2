@@ -9,7 +9,7 @@ import { deviceDescriptions } from '../consts/device-descriptions';
  */
 export function findFirst(productName?: keyof typeof deviceDescriptions) {
   if (productName) {
-    const device = findBlinkSticks((device) => device.product === productName)[0];
+    const device = findBlinkSticks((device) => deviceDescriptions[productName].test(device))[0];
     return device ?? null;
   }
   return findBlinkSticks(() => true)[0] ?? null;
@@ -22,7 +22,7 @@ export function findFirst(productName?: keyof typeof deviceDescriptions) {
 export async function findFirstAsync(productName?: keyof typeof deviceDescriptions) {
   const devices = await findRawDevicesAsync();
   if (productName) {
-    const device = devices.find((device) => device.product === productName);
+    const device = devices.find((device) => deviceDescriptions[productName].test(device));
     if (device) {
       return await createBlinkstickAsync(device);
     } else {

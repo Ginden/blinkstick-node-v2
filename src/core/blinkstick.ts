@@ -16,7 +16,7 @@ import {
   interpretParametersInversed,
 } from '../utils/colors/interpret-parameters';
 import { BlinkStickProMode } from '../types/enums/mode';
-import { deviceDescriptions } from '../consts/device-descriptions';
+import { attemptToGetDeviceDescription } from '../consts/device-descriptions';
 import { isDefined } from '../utils/is-defined';
 import { AnimationRunner } from '../animations/animation-runner';
 import { LedGroup } from '../led/led-group';
@@ -64,8 +64,7 @@ export abstract class BlinkStick<HidDevice extends HID | HIDAsync = HID | HIDAsy
       this.serial.substring(this.serial.length - 2, this.serial.length - 1),
     );
 
-    this.ledCount =
-      deviceDescriptions[this.product as keyof typeof deviceDescriptions]?.ledCount ?? 0;
+    this.ledCount = attemptToGetDeviceDescription(deviceInfo)?.ledCount ?? 0;
 
     this.requiresSoftwareColorPatch =
       this.versionMajor == 1 && this.versionMinor >= 1 && this.versionMinor <= 3;
