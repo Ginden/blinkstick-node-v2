@@ -39,7 +39,7 @@
       "url": "http://paulcuth.me.uk"
     }
   ],
-  "version": "3.0.1",
+  "version": "3.1.0",
   "engines": {
     "node": ">=20.0.0"
   },
