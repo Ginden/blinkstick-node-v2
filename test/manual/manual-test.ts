@@ -11,7 +11,7 @@ import { assert } from 'tsafe';
 import { Device } from 'node-hid';
 import { writeFile } from 'node:fs/promises';
 import { questionsAsked } from './questions-asked';
-import { reportIssueUrl, yesOrThrow } from './helpers';
+import { reportIssueUrl, settle, yesOrThrow } from './helpers';
 import { sections } from './sections';
 import { br, hr } from './print';
 
@@ -84,14 +84,18 @@ let device: Device | null = null;
   });
 
   for (const { name, fn } of sectionsEnabled) {
+    br();
     console.log(`First, we will turn off all LEDs.`);
     await blinkstickDevice.turnOffAll();
     console.log(`Now we will run ${name} tests.`);
+    br();
     await fn(blinkstickDevice);
     br();
     hr();
     br();
   }
+
+  await yesOrThrow(`Was everything all right?`, 'User did not confirm to throw an error', true);
 })()
   .finally(() => {
     return blinkstickDevice?.turnOffAll();
@@ -115,8 +119,11 @@ let device: Device | null = null;
         product: blinkstickDevice?.product,
         isSync: blinkstickDevice?.isSync,
         serial: blinkstickDevice?.serial,
-        infoBlock1: (await blinkstickDevice?.getInfoBlock1())?.toString('hex'),
-        infoBlock2: (await blinkstickDevice?.getInfoBlock2())?.toString('hex'),
+        infoBlock1: await settle(blinkstickDevice?.getInfoBlock1(), (v) => v?.toString('hex')),
+        infoBlock2: await settle(blinkstickDevice?.getInfoBlock2(), (v) => v?.toString('hex')),
+        deviceLedCount: await settle(blinkstickDevice?.getLedCountFromDevice()),
+        mode: await settle(blinkstickDevice?.getMode()),
+        colors: await settle(blinkstickDevice?.getColors(blinkstickDevice.ledCount)),
         inverse: blinkstickDevice?.inverse,
         requiresSoftwarePatch: blinkstickDevice?.requiresSoftwareColorPatch,
         version: {

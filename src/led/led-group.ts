@@ -22,19 +22,19 @@ export class LedGroup {
     this.buffer = Buffer.alloc(blinkstick.ledCount * 3);
   }
 
-  public setColor(color: ColorInput) {
+  public async setColor(color: ColorInput) {
     const [r, g, b] = colorInputToRgbTuple(color);
     prepareBuffer(this.buffer, r, g, b);
-    return this.blinkstick.setColors(0, this.buffer);
+    return await this.blinkstick.setColors(0, this.buffer);
   }
 
-  public setColorAndForget(color: ColorInput) {
+  public async setColorAndForget(color: ColorInput) {
     const [r, g, b] = colorInputToRgbTuple(color);
     prepareBuffer(this.buffer, r, g, b);
-    return this.blinkstick.setColors(0, this.buffer);
+    return await this.blinkstick.setColors(0, this.buffer);
   }
 
-  public turnOff() {
-    return this.setColor([0, 0, 0]);
+  public async turnOff() {
+    return await this.setColor([0, 0, 0]);
   }
 }
