@@ -10,7 +10,7 @@ import { assert } from 'tsafe';
 export function morphMany(
   tuples: RgbTuple[],
   overMs: number,
-  steps = overMs / 17,
+  steps = (overMs / 33) | 0,
 ): Iterable<SimpleFrame> {
   assert(tuples.length > 1, 'At least two tuples are required for morphing.');
   assertFpsBelow100(overMs, steps);

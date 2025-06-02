@@ -14,6 +14,8 @@ import { questionsAsked } from './questions-asked';
 import { reportIssueUrl, settle, yesOrThrow } from './helpers';
 import { sections } from './sections';
 import { br, hr } from './print';
+import { benchmarkFps } from './benchmark-fps';
+import { asBuffer } from '../../src/utils';
 
 let blinkstickDevice: BlinkstickAsync | BlinkstickSync | null = null;
 let device: Device | null = null;
@@ -109,6 +111,9 @@ let device: Device | null = null;
     console.error(`Test failed. All details will be saved in manual-test.log at repository root`);
     console.error(`Consider creating an issue at ${reportIssueUrl}`);
 
+    const bufferConvert = (v: Buffer | Uint8Array | number[] | undefined) =>
+      v ? { type: 'buffer', data: asBuffer(v).toString('hex'), length: v.length } : null;
+
     const ret = {
       error: Object.fromEntries(Object.entries(err).concat([['stack', err.stack]])),
       device,
@@ -119,21 +124,53 @@ let device: Device | null = null;
         product: blinkstickDevice?.product,
         isSync: blinkstickDevice?.isSync,
         serial: blinkstickDevice?.serial,
-        infoBlock1: await settle(blinkstickDevice?.getInfoBlock1(), (v) => v?.toString('hex')),
-        infoBlock2: await settle(blinkstickDevice?.getInfoBlock2(), (v) => v?.toString('hex')),
+        infoBlock1: await settle(blinkstickDevice?.getInfoBlock1(), bufferConvert),
+        infoBlock2: await settle(blinkstickDevice?.getInfoBlock2(), bufferConvert),
         deviceLedCount: await settle(blinkstickDevice?.getLedCountFromDevice()),
         mode: await settle(blinkstickDevice?.getMode()),
-        colors: await settle(blinkstickDevice?.getColors(blinkstickDevice.ledCount)),
+        colors: await settle(blinkstickDevice?.getColors(blinkstickDevice.ledCount), bufferConvert),
         inverse: blinkstickDevice?.inverse,
         requiresSoftwarePatch: blinkstickDevice?.requiresSoftwareColorPatch,
         version: {
           major: blinkstickDevice?.versionMajor ?? null,
           minor: blinkstickDevice?.versionMinor ?? null,
         },
+        fpsBenchmark: blinkstickDevice ? await settle(benchmarkFps(blinkstickDevice)) : null,
       },
     };
 
-    await writeFile(`manual-test.log`, JSON.stringify(ret, null, 2));
+    await writeFile(
+      `manual-test.log`,
+      JSON.stringify(
+        ret,
+        (k, v) => {
+          if (v instanceof Error) {
+            return {
+              ...v,
+              name: v.name,
+              message: v.message,
+              stack: v.stack,
+            };
+          }
+          if (v instanceof Buffer) {
+            return {
+              type: 'Buffer',
+              length: v.length,
+              data: v.toString('hex'),
+            };
+          }
+          if (v instanceof Uint8Array) {
+            return {
+              type: 'Uint8Array',
+              length: v.length,
+              data: Buffer.from(v).toString('hex'),
+            };
+          }
+          return v;
+        },
+        2,
+      ),
+    );
 
     process.exit(1);
   })

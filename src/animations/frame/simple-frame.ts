@@ -22,4 +22,8 @@ export class SimpleFrame {
     this.rgb = rgb;
     this.duration = duration | 0;
   }
+
+  toString(): string {
+    return `SimpleFrame([${this.rgb.join(', ')}], ${this.duration})`;
+  }
 }

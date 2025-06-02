@@ -8,8 +8,11 @@ import { scheduler } from 'node:timers/promises';
 import { performance } from 'node:perf_hooks';
 import { Frame } from './frame/frame';
 import { convertArrayOfRgbTuplesToBulkSetBuffer } from '../utils/convert-array-of-rgb-tuples-to-bulk-set-buffer';
+import { WaitFrame } from './frame/wait-frame';
 
 const abortError = new Error('Animation aborted');
+
+let warningEverEmitted = false;
 
 /**
  * This class is responsible for running animations on a Blinkstick device.
@@ -52,6 +55,7 @@ export class AnimationRunner {
    * @param animations
    */
   async run(animations: FrameIterable[], { signal }: { signal?: AbortSignal } = {}) {
+    assert(animations.length > 0, 'At least one animation must be provided');
     if (this.isRunning) {
       throw new Error('Animation is already running');
     }
@@ -100,6 +104,9 @@ export class AnimationRunner {
         await this.applyFrame(frame, signal);
         const timeElapsed = performance.now() - t0;
         const frameDuration = frame.duration;
+        if (frameDuration < 16 && !(frame instanceof WaitFrame)) {
+          this.emitWarningForShortFrameDuration(frame);
+        }
         sumFrameDuration += frameDuration;
         sumTimeElapsed += timeElapsed;
       }
@@ -145,5 +152,17 @@ export class AnimationRunner {
     const timeElapsed = performance.now() - t0;
     const waitTime = Math.max(Math.round(duration - timeElapsed), 0);
     if (waitTime > 0) await scheduler.wait(waitTime, { signal });
+  }
+
+  private emitWarningForShortFrameDuration(frame: Frame) {
+    if (warningEverEmitted) return;
+    warningEverEmitted = true;
+    process.emitWarning(
+      `Frame ${frame.constructor.name} duration is too short. It may cause flickering.`,
+      {
+        code: 'AnimationFrameDurationTooShort',
+        detail: `Frame duration should be at least 16ms to avoid flickering. Current duration: ${frame.duration}ms`,
+      },
+    );
   }
 }

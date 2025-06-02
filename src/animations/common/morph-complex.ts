@@ -54,7 +54,9 @@ export function morphComplex(
   overMs: number,
   stepsRaw?: number,
 ): AsyncIterable<Frame> {
-  const steps = (stepsRaw ?? overMs / 17) | 0;
+  // Default to ~30 fps to avoid sending excessive number of HID reports on
+  // real BlinkStick hardware (USB latency makes >30 fps impractical).
+  const steps = (stepsRaw ?? overMs / 33) | 0; // ≈ 30 frames-per-second
   assert(steps > 0, 'Steps must be greater than 0');
   assertFpsBelow100(overMs, steps);
   return {

@@ -14,7 +14,6 @@ export type BlinkstickDeviceDefinition = {
  * Have a look at https://github.com/arvydas/blinkstick-python/blob/master/blinkstick/blinkstick.py#L302 to see existing code.
  */
 export const deviceDescriptions = {
-  // This one is tested...
   'BlinkStick Nano': {
     test: (d) => d.product === 'BlinkStick Nano' || d.release === 0x202,
     description: {
@@ -46,6 +45,9 @@ export const deviceDescriptions = {
       ledCount: 4,
     },
   },
+  /**
+   * @experimental
+   */
   'BlinkStick Pro': {
     // TODO: add serial-number test
     test: (d) => d.product === 'BlinkStick Pro',
@@ -54,6 +56,9 @@ export const deviceDescriptions = {
       variableLedCount: true,
     },
   },
+  /**
+   * @experimental
+   */
   'BlinkStick Flex': {
     test: (d) => d.product === 'BlinkStick Flex' || d.release === 0x203,
     description: {

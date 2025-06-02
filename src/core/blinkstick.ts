@@ -1,9 +1,9 @@
-import { Device, HID, HIDAsync } from 'node-hid';
+import { type Device, HID, HIDAsync } from 'node-hid';
 import { determineReportId } from '../utils/hid/determine-report-id';
 import { decimalToHex } from '../utils/decimal-to-hex';
 import { getInfoBlockRaw } from '../utils/hid/get-info-block';
 import { setInfoBlock } from '../utils/hid/set-info-block';
-import { ColorOptions, NormalizedColorOptions } from '../types/color-options';
+import type { ColorOptions, NormalizedColorOptions } from '../types/color-options';
 import { clampRgb } from '../utils/clamp';
 import { setTimeout } from 'timers/promises';
 import { blinkstickFinalizationRegistry } from './blinkstick-finalization-registry';
@@ -15,7 +15,7 @@ import {
   interpretParameters,
   interpretParametersInversed,
 } from '../utils/colors/interpret-parameters';
-import { BlinkStickProMode } from '../types/enums/mode';
+import type { BlinkStickProMode } from '../types/enums/mode';
 import {
   attemptToGetDeviceDescription,
   BlinkstickDeviceDefinition,
@@ -25,8 +25,52 @@ import { AnimationRunner } from '../animations/animation-runner';
 import { LedGroup } from '../led/led-group';
 import { asBuffer } from '../utils/as-buffer';
 import { Led } from '../led/led';
-import { RgbTuple } from '../types/rgb-tuple';
-import { assert } from 'tsafe';
+import type { RgbTuple } from '../types/rgb-tuple';
+import { assert, typeGuard } from 'tsafe';
+import { createWriteStream, WriteStream } from 'node:fs';
+import { promisify } from 'node:util';
+import * as os from 'node:os';
+
+function wrapWithDebug<HidDevice extends HID | HIDAsync>(
+  device: HidDevice,
+  cb: (type: string, ...args: unknown[]) => void,
+): HidDevice {
+  let i = 0;
+  const originalMethods = {
+    sendFeatureReport: device.sendFeatureReport.bind(device),
+    getFeatureReport: device.getFeatureReport.bind(device),
+    write: device.write.bind(device),
+    setNonBlocking: device.setNonBlocking.bind(device),
+    getDeviceInfo: device.getDeviceInfo.bind(device),
+  };
+
+  return new Proxy(device, {
+    get(target, prop) {
+      if (typeGuard<keyof typeof originalMethods>(prop, prop in originalMethods)) {
+        const originalMethod = originalMethods[prop];
+        return (...args: Parameters<typeof originalMethod>[]) => {
+          const callId = i++;
+          cb(`call-${String(prop)}`, { callId }, ...args);
+          // @ts-expect-error Bad type inference, but we know the types are correct
+          const result = originalMethod(...args);
+          if (result instanceof Promise) {
+            return result
+              .then((res: unknown) => {
+                cb(`result-${String(prop)}`, { callId }, res);
+                return res;
+              })
+              .catch((err: unknown) => {
+                cb(`error-${String(prop)}`, { callId }, err);
+                throw err;
+              });
+          }
+          return result;
+        };
+      }
+      return Reflect.get(target, prop, target);
+    },
+  });
+}
 
 /**
  * Main class responsible for controlling BlinkStick devices.
@@ -49,6 +93,9 @@ export abstract class BlinkStick<HidDevice extends HID | HIDAsync = HID | HIDAsy
   protected _animation?: AnimationRunner;
   protected _inverse = false;
   protected deviceDescription: BlinkstickDeviceDefinition | null;
+  protected commandDebug: string | null;
+  protected debugWriteStream: WriteStream | null = null;
+  protected deviceInfo: Device;
 
   public interpretParameters: typeof interpretParameters = interpretParameters;
 
@@ -57,7 +104,15 @@ export abstract class BlinkStick<HidDevice extends HID | HIDAsync = HID | HIDAsy
    * @internal This is not intended to be used outside of the library. End-users should use `find*` functions
    */
   protected constructor(device: HidDevice, deviceInfo: Device) {
-    this.device = device;
+    this.commandDebug = process.env.BLINKSTICK_DEBUG ?? null;
+    if (this.commandDebug) {
+      this.device = wrapWithDebug(device, (type: string, ...args: unknown[]) =>
+        this.writeDebugCommand(type, ...args),
+      );
+    } else {
+      this.device = device;
+    }
+    this.deviceInfo = deviceInfo;
     this.serial = deviceInfo.serialNumber ?? '';
     this.manufacturer = deviceInfo.manufacturer ?? '';
     this.product = deviceInfo.product ?? '';
@@ -149,6 +204,10 @@ export abstract class BlinkStick<HidDevice extends HID | HIDAsync = HID | HIDAsy
     blinkstickFinalizationRegistry.unregister(this);
     await this.stop();
     await this.device.close();
+    if (this.debugWriteStream) {
+      await promisify((cb) => this.debugWriteStream!.end(cb))();
+      this.debugWriteStream = null;
+    }
   }
 
   /**
@@ -273,7 +332,7 @@ export abstract class BlinkStick<HidDevice extends HID | HIDAsync = HID | HIDAsy
   async getLedCountFromDevice(): Promise<number> {
     const ret = await this.getFeatureReport(0x81, 2);
     assert(ret.length === 2, `Expected report length to be 2, got ${ret.length}`);
-    assert(ret[1] > 0, 'LED count must be greater than 0');
+    assert(ret[1] > 0, `LED count must be greater than 0 (found: ${ret[1]})`);
     return ret[1];
   }
 
@@ -282,8 +341,7 @@ export abstract class BlinkStick<HidDevice extends HID | HIDAsync = HID | HIDAsy
    * @experimental
    */
   async loadLedCountFromDevice(): Promise<this> {
-    const ledCount = await this.getLedCountFromDevice();
-    this.ledCount = ledCount;
+    this.ledCount = await this.getLedCountFromDevice();
     this._animation?.stop();
     this._animation = undefined;
 
@@ -455,6 +513,69 @@ export abstract class BlinkStick<HidDevice extends HID | HIDAsync = HID | HIDAsy
       reportId: data[0],
       dataLength: data.length,
     });
+  }
+
+  protected getDebugWriteStream(): WriteStream {
+    if (this.debugWriteStream) {
+      return this.debugWriteStream;
+    }
+    if (!this.commandDebug) {
+      throw new Error('Command debug is not enabled');
+    }
+    const filePath = this.commandDebug
+      .replace('%SERIAL', this.serial)
+      .replace('%RELEASE', String(this.deviceInfo.release))
+      .replace('%PID', String(process.pid))
+      .replace('%NAME', this.product);
+
+    process.emitWarning(`Debugging commands will be written to ${filePath}`);
+
+    this.debugWriteStream = createWriteStream(filePath, { flags: 'a' });
+
+    return this.debugWriteStream;
+  }
+
+  /**
+   * This method is used to write debug commands to the debug stream.
+   * It should never be called if `commandDebug` is not set.
+   */
+  protected writeDebugCommand(type: string, ...args: unknown[]) {
+    const debugInfo = {
+      serial: this.serial,
+      product: this.product,
+      release: this.deviceInfo.release,
+      pid: process.pid,
+      stack: new Error().stack
+        ?.split(os.EOL)
+        .slice(2)
+        .map((v) => v.trim().replace(/at (async )?/, ''))
+        .join(os.EOL)
+        .replaceAll(process.cwd(), '.'),
+    };
+    this.getDebugWriteStream().write(
+      JSON.stringify(
+        [debugInfo, type, ...args],
+        (_k, v) => {
+          if (typeof v === 'bigint') {
+            return v.toString();
+          }
+          if (v instanceof Buffer) {
+            return v.toString('hex');
+          }
+          if (v instanceof Error) {
+            return {
+              ...v,
+              name: v.name,
+              constructorName: v.constructor.name,
+              message: v.message,
+              stack: v.stack,
+            };
+          }
+          return v;
+        },
+        0,
+      ) + os.EOL,
+    );
   }
 
   /**

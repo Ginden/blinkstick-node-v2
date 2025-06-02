@@ -138,13 +138,19 @@ If you want to gift or buy me a BlinkStick device for testing purposes, please e
 
 _BlinkStick Flex_ and _BlinkStick Pro_ come with a variable number of LEDs.
 
-This library _probably can_ work with them, but you need to set the number of LEDs in the constructor before using any method.
+Library by default assumes that you have maximal number of LEDs available.
+
+If not, you can set the number of LEDs using `ledCount` property on `BlinkStick` instance:
 
 ```ts
 blinkstick.ledCount = 42;
 ```
 
-If you don't set the number of LEDs, the library will assume that you have one LED.
+or write it permanently to the device using `setLedCount` method:
+
+```ts
+await blinkstick.setLedCount(42);
+```
 
 <!-- TOC --><a name="requirements"></a>
 
@@ -406,6 +412,27 @@ As most interesting parts of the library require a Blinkstick device and human e
 Just run `npm test` and it will run the tests.
 
 <!-- TOC --><a name="coverage"></a>
+
+### Debug device commands
+
+You can track reads and writes to the device by setting certain environment variables.
+
+Eg.
+
+```
+export BLINKSTICK_DEBUG="/tmp/b-%PID.log"
+```
+
+The following variables are interpolated:
+
+- `%PID` – process ID of the current process
+- `%RELEASE` - release version of the device
+- `%SERIAL` - serial number of the device
+- `%NAME` - name of the device
+
+Then run your script, and it will log all reads and writes to the device to the specified file.
+
+This file is line-delimited JSON, with each line being a single read or write operation.
 
 ### Coverage
 

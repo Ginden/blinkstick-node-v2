@@ -1,6 +1,6 @@
 import { SimpleFrame } from '../frame/simple-frame';
 import { ComplexFrame } from '../frame/complex-frame';
-import { RgbTuple } from '../../types';
+import type { RgbTuple } from '../../types';
 import { assert } from 'tsafe';
 
 interface LedState {
@@ -45,7 +45,7 @@ export function convertSimpleFramesToComplexFrame(
             frames,
             index: 0,
             remaining: 0,
-            startedAtBoundary: false,
+            startedAtBoundary: true,
             lastRgb: fillMissingEndWith,
           };
         }
@@ -53,7 +53,7 @@ export function convertSimpleFramesToComplexFrame(
           frames,
           index: 0,
           remaining: frames[0].duration,
-          startedAtBoundary: false,
+          startedAtBoundary: true,
           lastRgb: frames[frames.length - 1].rgb,
         };
       });
@@ -82,11 +82,13 @@ export function convertSimpleFramesToComplexFrame(
           if (st.remaining === 0) {
             colourBuffer[i] = st.lastRgb;
           } else {
+            const rgb = st.frames[st.index].rgb;
+            assert(rgb, `RGB value for LED ${i} at index ${st.index} is not defined`);
             colourBuffer[i] = st.frames[st.index].rgb;
           }
         }
 
-        yield new ComplexFrame(colourBuffer.slice(), minStep);
+        yield ComplexFrame.createValid(colourBuffer.slice(), minStep);
 
         // Flag to indicate that at least one LED ends *naturally* with this slice.
         let someLedEnded = false;
@@ -111,10 +113,16 @@ export function convertSimpleFramesToComplexFrame(
             // Move to next frame if available.
             if (st.index + 1 < st.frames.length) {
               st.index += 1;
-              st.remaining = Math.min(
-                st.frames[st.index].duration,
-                shouldCut ? minStep : st.frames[st.index].duration,
-              );
+              // If we arrived here because of a forced cut, we want the first
+              // slice of the *new* frame to last exactly `minStep` – this
+              // keeps all LEDs in sync. Otherwise, play the frame in full.
+              st.remaining = shouldCut
+                ? Math.min(st.frames[st.index].duration, minStep)
+                : st.frames[st.index].duration;
+
+              // Mark as boundary-started ONLY when we transitioned due to a
+              // forced cut. Frames that begin after their *own* natural end
+              // should *not* be subject to an immediate cut in the next slice.
               st.startedAtBoundary = true;
             } else {
               // No more frames for this LED.

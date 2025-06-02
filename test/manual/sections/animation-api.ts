@@ -1,18 +1,22 @@
 import { assert } from 'tsafe';
 import {
   asyncCollect,
+  BlinkStick,
   BlinkstickAny,
   ComplexFrame,
   RgbTuple,
   SimpleFrame,
+  WaitFrame,
+  wave,
   wrapGeneratorForAnimation,
 } from '../../../src';
 import { yesOrThrow } from '../helpers';
 import { Animation } from '../../../src/animations/animation-description';
 import { AnimationBuilder } from '../../../src/animations/animation-builder';
 import { assertAnimationLength } from '../assert-animation-length';
+import * as fs from 'node:fs';
 
-export async function animationApi(blinkstickDevice: BlinkstickAny) {
+export async function animationApi(blinkstickDevice: BlinkStick) {
   const animationRunner = blinkstickDevice.animation;
   assert(animationRunner, 'Animation runner should be defined');
   const rainbowRgbs: RgbTuple[] = [
@@ -25,6 +29,48 @@ export async function animationApi(blinkstickDevice: BlinkstickAny) {
     [148, 0, 211],
     [0, 0, 0],
   ];
+
+  if (blinkstickDevice.ledCount > 4) {
+    console.log(`🌊 This device has more than 4 LEDs, so we can test the wave animation helper.`);
+    const waveDelay = 300;
+    const morphDuration = 600;
+    const singleLedWave = (await asyncCollect(
+      AnimationBuilder.startWithBlack(0)
+        .morphToColor('cyan', morphDuration)
+        .morphToColor('green', morphDuration)
+        .morphToColor('black', morphDuration)
+        .build(),
+    )) as SimpleFrame[];
+
+    const singleAnimationDuration = singleLedWave.reduce((acc, frame) => acc + frame.duration, 0);
+
+    const multiLedWave = wave(singleLedWave, {
+      lagMs: waveDelay,
+      fillWith: [0, 0, 0],
+      ledCount: blinkstickDevice.ledCount,
+    });
+
+    const multiLedWaveFrames = await asyncCollect(multiLedWave);
+    const multiLedWaveDuration = multiLedWaveFrames.reduce((acc, frame) => acc + frame.duration, 0);
+
+    console.log(
+      `🌊 Wave animation will take ${multiLedWaveDuration}ms to complete, with each LED changing color every ${waveDelay}ms.`,
+    );
+
+    const t0 = Date.now();
+    await animationRunner.run([multiLedWave]);
+
+    const elapsedTime = Date.now() - t0;
+    const duration = singleAnimationDuration + (blinkstickDevice.ledCount - 1) * waveDelay;
+    // Wave helper involves many short frames which incur USB/HID overhead.
+    // Allow 20% timing tolerance on real hardware.
+    assertAnimationLength(elapsedTime, duration, 0.2);
+    await yesOrThrow(
+      '🌊 Did all LEDs go through the wave animation?',
+      'All LEDs should be going through the wave animation',
+    );
+  }
+
   // Quick switch
   {
     const singleDuration = 300;
