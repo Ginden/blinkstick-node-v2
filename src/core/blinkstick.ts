@@ -16,10 +16,7 @@ import {
   interpretParametersInversed,
 } from '../utils/colors/interpret-parameters';
 import type { BlinkStickProMode } from '../types/enums/mode';
-import {
-  attemptToGetDeviceDescription,
-  BlinkstickDeviceDefinition,
-} from '../consts/device-descriptions';
+import { attemptToGetDeviceDescription } from '../consts/device-descriptions';
 import { isDefined } from '../utils/is-defined';
 import { AnimationRunner } from '../animations/animation-runner';
 import { LedGroup } from '../led/led-group';
@@ -30,7 +27,7 @@ import { assert, typeGuard } from 'tsafe';
 import { createWriteStream, WriteStream } from 'node:fs';
 import { promisify } from 'node:util';
 import * as os from 'node:os';
-import {scheduler} from "node:timers/promises";
+import { scheduler } from 'node:timers/promises';
 
 function wrapWithDebug<HidDevice extends HID | HIDAsync>(
   device: HidDevice,
@@ -93,7 +90,7 @@ export abstract class BlinkStick<HidDevice extends HID | HIDAsync = HID | HIDAsy
   readonly versionMinor: number;
   protected _animation?: AnimationRunner;
   protected _inverse = false;
-  public readonly deviceDescription: BlinkstickDeviceDefinition | null;
+  public readonly deviceDescription;
   protected commandDebug: string | null;
   protected debugWriteStream: WriteStream | null = null;
   protected deviceInfo: Device;
@@ -607,7 +604,7 @@ export abstract class BlinkStick<HidDevice extends HID | HIDAsync = HID | HIDAsy
 
     const duration = params.options.duration ?? 1000;
     let steps = params.options.steps;
-    if (steps === undefined || steps <= 0 || (duration / steps) < 17) {
+    if (steps === undefined || steps <= 0 || duration / steps < 17) {
       steps = (duration / 33) | 0; // 33ms is approximately 30 FPS
     }
     const stepDuration = Math.round(duration / steps);

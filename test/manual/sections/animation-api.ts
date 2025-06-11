@@ -165,25 +165,25 @@ export function animationApi(blinkstickDevice: BlinkStick): Record<string, Secti
     },
     'Animation builder': {
       enabled: true,
-      test: async () =>   {
+      test: async () => {
         assert(animationRunner, 'Animation runner should be defined');
         const singleDuration = 500;
 
         const duration = singleDuration * 10;
         console.log(
-            `🌈 Now we will use animation API to run a complex animation. This should take ${duration}ms.`,
+          `🌈 Now we will use animation API to run a complex animation. This should take ${duration}ms.`,
         );
 
         const animation = AnimationBuilder.startWithBlack(50)
-            .addPulse('red', singleDuration)
-            .addPulse('green', singleDuration)
-            .addPulse('blue', singleDuration)
-            .addStaticFrame(SimpleFrame.colorAndDuration('lightsteelblue', singleDuration))
-            .addPulse('red', singleDuration)
-            .stillColor('green', singleDuration)
-            .morphToColor('blue', singleDuration)
-            .morphToColor('black', singleDuration)
-            .build();
+          .addPulse('red', singleDuration)
+          .addPulse('green', singleDuration)
+          .addPulse('blue', singleDuration)
+          .addStaticFrame(SimpleFrame.colorAndDuration('lightsteelblue', singleDuration))
+          .addPulse('red', singleDuration)
+          .stillColor('green', singleDuration)
+          .morphToColor('blue', singleDuration)
+          .morphToColor('black', singleDuration)
+          .build();
 
         const collected = await asyncCollect(animation);
 
@@ -192,14 +192,12 @@ export function animationApi(blinkstickDevice: BlinkStick): Record<string, Secti
         const elapsedTime = Date.now() - t0;
         assertAnimationLength(elapsedTime, duration);
         await yesOrThrow(
-            'Did all LEDs go through the complex animation?',
-            'All LEDs should be going through the complex animation',
+          'Did all LEDs go through the complex animation?',
+          'All LEDs should be going through the complex animation',
         );
 
         await blinkstickDevice.turnOffAll();
-      }
-
-    }
+      },
+    },
   };
-
 }

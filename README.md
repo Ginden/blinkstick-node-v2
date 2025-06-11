@@ -413,6 +413,20 @@ Just run `npm test` and it will run the tests.
 
 <!-- TOC --><a name="coverage"></a>
 
+### REPL
+
+You can run `npm run repl` to start a REPL with the library loaded. This is useful for quick experiments and testing.
+
+```bash
+npm run repl
+```
+
+Then you can run commands like:
+
+```ts
+await blinkStickNano.morph('red');
+```
+
 ### Debug device commands
 
 You can track reads and writes to the device by setting certain environment variables.

@@ -7,14 +7,16 @@
   },
   "scripts": {
     "prepare": "husky",
-    "prepack": "tsc",
+    "build": "tsc",
+    "prepack": "npm run build",
     "test": "vitest run",
     "test:manual": "ts-node test/manual/manual-test.ts",
     "fix": "npm run prettier && npm run lint:fix",
     "lint": "eslint src",
     "lint:fix": "npm run lint -- --fix",
     "prettier:check": "prettier --check src test README.md",
-    "prettier": "prettier --write src test README.md"
+    "prettier": "prettier --write src test README.md",
+    "repl": "npm run prepack && node -r ./dist/repl-load.js"
   },
   "keywords": [
     "blinkstick",

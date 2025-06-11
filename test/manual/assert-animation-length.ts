@@ -13,12 +13,16 @@ export function assertAnimationLength(elapsed: number, expected: number, toleran
 
   if (elapsed > upperBound) {
     throw Object.assign(
-      new Error(`Animation took too long. Expected: ${expected}ms, Actual: ${formatNumber(elapsed)}ms`),
+      new Error(
+        `Animation took too long. Expected: ${expected}ms, Actual: ${formatNumber(elapsed)}ms`,
+      ),
       data,
     );
   } else if (elapsed < lowerBound) {
     throw Object.assign(
-      new Error(`Animation took too short. Expected: ${expected}ms, Actual: ${formatNumber(elapsed)}ms`),
+      new Error(
+        `Animation took too short. Expected: ${expected}ms, Actual: ${formatNumber(elapsed)}ms`,
+      ),
       data,
     );
   }
