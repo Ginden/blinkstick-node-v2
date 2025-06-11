@@ -1,4 +1,4 @@
-import prompts from 'prompts';
+import prompts, { Choice } from 'prompts';
 import {
   findRawDevicesAsync,
   BlinkstickAsync,
@@ -12,7 +12,7 @@ import { Device } from 'node-hid';
 import { writeFile } from 'node:fs/promises';
 import { questionsAsked } from './questions-asked';
 import { reportIssueUrl, settle, yesOrThrow } from './helpers';
-import { sections } from './sections';
+import { SectionDefinition, SectionFn, sections } from './sections';
 import { br, hr } from './print';
 import { benchmarkFps } from './benchmark-fps';
 import { asBuffer } from '../../src/utils';
@@ -74,24 +74,50 @@ let device: Device | null = null;
   await blinkstickDevice.turnOffAll();
   await yesOrThrow('Are all LEDs off?', 'All LEDs are should be off');
 
-  const { sectionsEnabled }: { sectionsEnabled: { name: string; fn: Function }[] } = await prompts({
-    message: `Select sections to test`,
-    type: 'multiselect',
-    name: 'sectionsEnabled',
-    choices: Object.entries(sections).map(([title, value]) => ({
-      title: title,
-      value: { name: title, fn: value },
-      selected: true,
-    })),
-  });
+  const { sectionsEnabled }: { sectionsEnabled: { name: string; fn: SectionFn }[] } = await prompts(
+    {
+      message: `Select sections to test`,
+      type: 'multiselect',
+      name: 'sectionsEnabled',
+      choices: Object.entries(sections).map(([title, value]) => ({
+        title: title,
+        value: { name: title, fn: value },
+        selected: true,
+      })),
+    },
+  );
 
   for (const { name, fn } of sectionsEnabled) {
     br();
-    console.log(`First, we will turn off all LEDs.`);
-    await blinkstickDevice.turnOffAll();
-    console.log(`Now we will run ${name} tests.`);
-    br();
-    await fn(blinkstickDevice);
+    console.log(`➡️ Running section: ${name}`);
+    const section = fn(blinkstickDevice, blinkstickDevice.deviceDescription!);
+    const subSectionChoices = Object.entries(section).map(([title, { test, enabled }]) => {
+      return {
+        title,
+        value: {
+          title,
+          enabled,
+          test,
+        },
+        selected: enabled,
+      } as const satisfies Choice;
+    });
+
+    const { subSectionsEnabled }: { subSectionsEnabled: { title: string; test: Function }[] } =
+      await prompts({
+        message: `Select sections to test`,
+        type: 'multiselect',
+        name: 'subSectionsEnabled',
+        choices: subSectionChoices,
+      });
+
+    for (const { test, title } of subSectionsEnabled) {
+      br();
+      console.log(`➡️ Running sub-section: ${title}`);
+      await test();
+      br();
+    }
+
     br();
     hr();
     br();

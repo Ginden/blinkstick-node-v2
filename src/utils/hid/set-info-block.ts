@@ -1,5 +1,4 @@
-import type { HID, HIDAsync } from 'node-hid';
-import { BlinkStick } from '../../core/blinkstick';
+import type { BlinkStick } from '../../core/blinkstick';
 import { asBuffer } from '../as-buffer';
 import { assert } from 'tsafe';
 
@@ -10,7 +9,7 @@ import { assert } from 'tsafe';
  * @param {String | Buffer} data The value to push to the device. Should be <= 32 chars.
  */
 export async function setInfoBlock(
-  device: Pick<BlinkStick<HIDAsync | HID>, 'setFeatureReport' | 'device'>,
+  device: Pick<BlinkStick, 'setFeatureReport' | 'device'>,
   location: number,
   data: string | Buffer,
 ) {

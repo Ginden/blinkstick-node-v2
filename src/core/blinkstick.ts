@@ -30,6 +30,7 @@ import { assert, typeGuard } from 'tsafe';
 import { createWriteStream, WriteStream } from 'node:fs';
 import { promisify } from 'node:util';
 import * as os from 'node:os';
+import {scheduler} from "node:timers/promises";
 
 function wrapWithDebug<HidDevice extends HID | HIDAsync>(
   device: HidDevice,
@@ -92,7 +93,7 @@ export abstract class BlinkStick<HidDevice extends HID | HIDAsync = HID | HIDAsy
   readonly versionMinor: number;
   protected _animation?: AnimationRunner;
   protected _inverse = false;
-  protected deviceDescription: BlinkstickDeviceDefinition | null;
+  public readonly deviceDescription: BlinkstickDeviceDefinition | null;
   protected commandDebug: string | null;
   protected debugWriteStream: WriteStream | null = null;
   protected deviceInfo: Device;
@@ -432,7 +433,9 @@ export abstract class BlinkStick<HidDevice extends HID | HIDAsync = HID | HIDAsy
    * Usage:
    *
    * @example
-   *     setInfoBlock1("abcdefg");
+   * ```
+   *     setInfoBlock1(Buffer.from("abcdefg", 'hex'));
+   * ```
    * @param data
    */
   async setInfoBlock1(data: Buffer) {
@@ -603,7 +606,10 @@ export abstract class BlinkStick<HidDevice extends HID | HIDAsync = HID | HIDAsy
     const params = interpretParameters(...args);
 
     const duration = params.options.duration ?? 1000;
-    const steps = params.options.steps ?? 50;
+    let steps = params.options.steps;
+    if (steps === undefined || steps <= 0 || (duration / steps) < 17) {
+      steps = (duration / 33) | 0; // 33ms is approximately 30 FPS
+    }
     const stepDuration = Math.round(duration / steps);
 
     const [cr, cg, cb] = await this.getColor(params.options.index ?? 0);
@@ -616,8 +622,16 @@ export abstract class BlinkStick<HidDevice extends HID | HIDAsync = HID | HIDAsy
       const nextRed = clampRgb(cr + ((params.r - cr) / steps) * count);
       const nextGreen = clampRgb(cg + ((params.g - cg) / steps) * count);
       const nextBlue = clampRgb(cb + ((params.b - cb) / steps) * count);
+      const t0 = performance.now();
       await this.setColor(nextRed, nextGreen, nextBlue, params.options);
-      await setTimeout(stepDuration, null, { signal });
+      const elapsedTime = performance.now() - t0;
+      const sleepTime = stepDuration - elapsedTime;
+      if (sleepTime > 0) {
+        await setTimeout(sleepTime, null, { signal });
+      } else if (this.isSync) {
+        // If we are in sync mode, release the event loop to allow other operations
+        await scheduler.yield();
+      }
     }
   }
 
@@ -638,7 +652,7 @@ export abstract class BlinkStick<HidDevice extends HID | HIDAsync = HID | HIDAsy
    *
    * - channel=0: Channel is represented as 0=R, 1=G, 2=B
    * - index=0: The index of the LED
-   * - duration=1000: How long should the pulse animation last in milliseconds
+   * - duration=1000: How long should the pulse animation last in milliseconds (this time is actually doubled, keeping it in-line with legacy behavior)
    * - steps=50: How many steps for color changes
    * @deprecated Use animation API instead
    */

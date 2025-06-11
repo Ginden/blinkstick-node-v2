@@ -4,12 +4,19 @@ import { bulkApi } from './sections/bulk-api';
 import { BlinkstickAny, BlinkstickDeviceDefinition } from '../../src';
 import { animationApi } from './sections/animation-api';
 
+export type SectionDefinition = {
+  enabled: boolean;
+  test: () => Promise<void>;
+};
+
+export type SectionFn = (
+  blinkstick: BlinkstickAny,
+  description: BlinkstickDeviceDefinition,
+) => Record<string, SectionDefinition>;
+
 export const sections = {
   Basic: basicQuestions,
   'Legacy animations': legacyAnimations,
   'Bulk API': bulkApi,
   'Animation API': animationApi,
-} satisfies Record<
-  string,
-  (blinkstick: BlinkstickAny, description: BlinkstickDeviceDefinition) => Promise<void>
->;
+} satisfies Record<string, SectionFn>;
