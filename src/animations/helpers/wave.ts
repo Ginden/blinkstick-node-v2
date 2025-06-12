@@ -16,6 +16,7 @@ export type WaveOptions = {
  * and avoids the subtle frame-cutting rules of
  * `convertSimpleFramesToComplexFrame`.
  * @experimental
+ * @category Animation
  */
 export function wave(
   animation: Iterable<SimpleFrame>,

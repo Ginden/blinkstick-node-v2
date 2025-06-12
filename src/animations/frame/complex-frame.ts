@@ -4,6 +4,7 @@ import { SimpleFrame } from './simple-frame';
 
 /**
  * Complex frame represents a single frame of animation with multiple colors and a specific duration.
+ * @category Animation
  */
 export class ComplexFrame {
   duration: number;

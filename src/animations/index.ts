@@ -15,6 +15,7 @@ export * from './helpers/convert-simple-frames-to-complex-frame';
 export * from './helpers/iterate';
 export * from './helpers/limit-duration';
 export * from './helpers/repeat';
+export * from './helpers/smooth-fps';
 export * from './helpers/transform-each-frame';
 export * from './helpers/wave';
 export * from './helpers/wrap-generator-function-in-object';

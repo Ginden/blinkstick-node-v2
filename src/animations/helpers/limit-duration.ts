@@ -9,6 +9,7 @@ import { WaitFrame } from '../frame/wait-frame';
  * Sets maximum duration for an animation.
  * The last frame can be shortened to fit the maximum duration.
  * Frames beyond the maximum duration are dropped
+ * @category Animation
  */
 export function limitDuration(
   animation: FrameIterable,

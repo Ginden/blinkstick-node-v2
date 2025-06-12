@@ -1,5 +1,6 @@
 /**
  * Color keywords, taken as-is from original library.
+ * @category Constants
  */
 export const COLOR_KEYWORDS = {
   aqua: '#00ffff',

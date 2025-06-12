@@ -20,6 +20,7 @@ let warningEverEmitted = false;
  * the animation state.
  *
  * It's bound to a single Blinkstick device and can only run one animation at a time.
+ * @category Animation
  */
 export class AnimationRunner {
   protected abortController = new AbortController();

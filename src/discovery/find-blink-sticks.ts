@@ -7,6 +7,7 @@ import { BlinkstickSync } from '../core/blinkstick.sync';
 /**
  * Find BlinkSticks using a filter, using synchronous USB device enumeration.
  * @param filter
+ * @category Discovery
  */
 export function findBlinkSticks(filter?: (device: usb.Device) => boolean): BlinkStick<HID>[] {
   if (!filter) {
@@ -26,6 +27,7 @@ export function findBlinkSticks(filter?: (device: usb.Device) => boolean): Blink
 /**
  * Find BlinkSticks using a filter, using asynchronous USB device enumeration.
  * @param filter
+ * @category Discovery
  */
 export async function findBlinkSticksAsync(
   filter?: (device: usb.Device) => boolean,

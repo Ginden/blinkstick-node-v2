@@ -5,6 +5,7 @@ import { colorInputToRgbTuple } from '../../utils';
 
 /**
  * SimpleFrame represents a single frame of animation with a specific color and duration.
+ * @category Animation
  */
 export class SimpleFrame {
   readonly duration: number;

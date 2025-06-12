@@ -7,6 +7,10 @@ import { morphMany } from './common/morph-many';
 import { Frame } from './frame/frame';
 import { assertFpsBelow100 } from './helpers/assert-fps-below-100';
 
+/**
+ * Bag of static methods for creating animations.
+ * @category Animation
+ */
 export abstract class Animation {
   /**
    * This class is not meant to be instantiated.
@@ -71,4 +75,7 @@ export abstract class Animation {
   }
 }
 
+/**
+ * @category Animations
+ */
 export type FrameIterable = Iterable<Frame> | AsyncIterable<Frame>;

@@ -4,6 +4,7 @@ import { ColorObject } from './color-object';
 
 /**
  * @deprecated Use newer APIs instead
+ * @category Legacy
  */
 export type ColorOptions<AdditionalOptions = AllPossibleColorOptions> =
   | [red: number, green: number, blue: number, additionalOptions?: AdditionalOptions]

@@ -4,6 +4,7 @@
  * This function asserts if the frame rate is below 100 FPS to prevent unexpected behavior for the user.
  * @param ms
  * @param steps
+ * @category Animation
  */
 export function assertFpsBelow100(ms: number, steps: number) {
   const timePerFrame = ms / steps;

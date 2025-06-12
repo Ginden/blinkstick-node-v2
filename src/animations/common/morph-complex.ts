@@ -11,6 +11,7 @@ import { assertFpsBelow100 } from '../helpers/assert-fps-below-100';
 
 /**
  * Morphs between two complex frames.
+ * @category Animations
  */
 export function morphBetweenComplexFrames(
   firstFrameAsComplexFrame: ComplexFrame,

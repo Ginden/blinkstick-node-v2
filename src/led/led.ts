@@ -3,6 +3,7 @@ import { RgbTuple } from '../types';
 
 /**
  * Class to control a single LED on a Blinkstick device.
+ * @category Implementation details
  */
 export class Led {
   constructor(

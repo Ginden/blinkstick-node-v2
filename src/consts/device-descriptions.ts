@@ -2,6 +2,7 @@ import type { Device } from 'node-hid';
 
 /**
  * Simple type that describes a Blinkstick device.
+ * @category Constants
  */
 export type BlinkstickDeviceDefinition = {
   // Number of LEDs
@@ -12,6 +13,7 @@ export type BlinkstickDeviceDefinition = {
 /**
  * Known Blinkstick devices and their LED counts.
  * Have a look at https://github.com/arvydas/blinkstick-python/blob/master/blinkstick/blinkstick.py#L302 to see existing code.
+ * @category Constants
  */
 export const deviceDescriptions = {
   'BlinkStick Nano': {

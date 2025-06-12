@@ -4,6 +4,10 @@ import { normalizeHexColor } from './normalize-hex-color';
 import { RgbTuple } from '../../types/rgb-tuple';
 import { typeGuard } from 'tsafe';
 
+/**
+ * Converts a color input (string, array, or object) to an RGB tuple.
+ * @param color
+ */
 export function colorInputToRgbTuple(color: ColorInput): RgbTuple {
   if (
     typeof color === 'string' &&

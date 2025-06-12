@@ -2,6 +2,7 @@ import { HIDAsync } from 'node-hid';
 
 /**
  * A FinalizationRegistry to ensure that HIDAsync devices are closed properly
+ * @category Implementation details
  */
 export const blinkstickFinalizationRegistry = new FinalizationRegistry((hidDevice: HIDAsync) => {
   // Access undocumented _closed property to check if the device is already closed

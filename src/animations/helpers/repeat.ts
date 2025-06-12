@@ -3,9 +3,9 @@ import { assert } from 'tsafe';
 import { types } from 'node:util';
 
 /**
+ * Repeats an animation a specified number of times.
  * Note that passing a generator object to repeat will not work as expected;
- * @param animation
- * @param times
+ * @category Animation
  */
 export function repeat(
   animation: FrameIterable | (() => FrameIterable),

@@ -23,6 +23,8 @@ interface LedState {
  *    LEDs perfectly aligned (see the third test case).
  *
  * 3. When a LED runs out of simple frames it transitions to `fillMissingEndWith` parameter value, defaulting to black.
+ * @experimental
+ * @category Animation
  */
 export function convertSimpleFramesToComplexFrame(
   simpleFrames: Exclude<Iterable<SimpleFrame>, Generator>[],

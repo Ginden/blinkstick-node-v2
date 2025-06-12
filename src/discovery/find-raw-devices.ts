@@ -3,6 +3,7 @@ import { PRODUCT_ID, VENDOR_ID } from '../consts/consts';
 
 /**
  * Find raw USB devices using synchronous USB device enumeration.
+ * @category Discovery
  */
 export function findRawDevicesSync(): usb.Device[] {
   return usb.devices(VENDOR_ID, PRODUCT_ID);
@@ -10,6 +11,7 @@ export function findRawDevicesSync(): usb.Device[] {
 
 /**
  * Find raw USB devices using asynchronous USB device enumeration.
+ * @category Discovery
  */
 export async function findRawDevicesAsync() {
   return await usb.devicesAsync(VENDOR_ID, PRODUCT_ID);

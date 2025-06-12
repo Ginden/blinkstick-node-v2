@@ -13,3 +13,6 @@ export * from './animations';
  * @module led
  */
 export * from './led';
+export * from './utils/colors/get-random-color';
+export * from './utils/colors/color-input-to-rgb-tuple';
+export * from './utils/colors/color-input-to-rgb-tuple';

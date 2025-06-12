@@ -5,6 +5,7 @@ export function normalizeHexColor(
   color: string,
   options?: AllPossibleColorOptions,
 ): NormalizedColorOptions {
+  // TODO: this can be cached, I guess, at least for COLOR_KEYWORDS
   if (color.startsWith('#')) {
     return normalizeHexColor(color.slice(1), options);
   }

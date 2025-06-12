@@ -13,6 +13,7 @@ function prepareBuffer(buffer: Buffer, red: number, green: number, blue: number)
 /**
  * Class to control a group of LEDs on a Blinkstick device.
  * Currently, it supports only "all LEDs" mode, but it can be extended to support more complex patterns.
+ * @category Implementation details
  */
 export class LedGroup {
   private readonly buffer: Buffer;

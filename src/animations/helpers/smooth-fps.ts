@@ -109,7 +109,8 @@ function buildAveragedFrame(
  * slice are calculated as the duration-weighted average of the covered source
  * frames. Works with both `Iterable` and `AsyncIterable` sources.
  *
- * The algorithm follows the spec in `DEV_NOTES_NEXT_STEPS.md`.
+ * @experimental
+ * @category Animation
  */
 export function smoothFps(animation: FrameIterable, maxFps = 60): AsyncIterable<Frame> {
   assert(maxFps > 0, 'maxFps must be greater than 0');

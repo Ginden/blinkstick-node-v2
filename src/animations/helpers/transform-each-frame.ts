@@ -1,6 +1,10 @@
 import { FrameIterable } from '../animation-description';
 import { Frame } from '../frame/frame';
 
+/**
+ * Callback function to transform each frame.
+ * @category Animation
+ */
 export type TransformEachFrameCb = (frame: Frame) => Frame;
 
 /**
@@ -8,6 +12,7 @@ export type TransformEachFrameCb = (frame: Frame) => Frame;
  * This is very advanced feature and should be used with caution.
  * @param frames
  * @param transform
+ * @category Animation
  */
 export function transformEachFrame(
   frames: FrameIterable,

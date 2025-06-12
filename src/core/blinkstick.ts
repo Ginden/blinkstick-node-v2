@@ -72,6 +72,7 @@ function wrapWithDebug<HidDevice extends HID | HIDAsync>(
 
 /**
  * Main class responsible for controlling BlinkStick devices.
+ * @category Core
  */
 export abstract class BlinkStick<HidDevice extends HID | HIDAsync = HID | HIDAsync> {
   public abstract readonly isSync: boolean;

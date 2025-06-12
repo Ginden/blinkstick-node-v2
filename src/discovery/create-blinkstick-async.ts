@@ -15,6 +15,7 @@ export type MinimalDevice = Pick<
  * This function is unlikely to be needed by end users, but you are an adult.
  *
  * @param device
+ * @category Discovery
  */
 export async function createBlinkstickAsync(device: MinimalDevice): Promise<BlinkstickAsync> {
   const hidDevice = device.path

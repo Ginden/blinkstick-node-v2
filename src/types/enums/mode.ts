@@ -1,11 +1,21 @@
+/**
+ * BlinkStick modes.
+ * @category Constants
+ */
 export const BlinkStickProMode = {
+  /**
+   * Normal mode, used by original BlinkStick,
+   */
   NORMAL: 0,
-  // Seemingly,
-  // some devices (aka "BlinkStick Pro" connected to IKEA Dioder) use
-  // a mode where [0,0,0] is white and [255,255,255] is black.
+  /**
+   * Inverse mode, where [0,0,0] is white and [255,255,255] is black.
+   * Used by some devices like "BlinkStick Pro" connected to IKEA Dioder.
+   */
   INVERSE: 1,
-  // Smart Pixel mode, where each LED is a WS2812 LED.
-  // This seems to be a default mode for all devices but BlinkStick Pro and original BlinkStick.
+  /**
+   * WS2812 mode, where each LED is a WS2812 LED.
+   * This seems to be a default mode for all devices but BlinkStick Pro and original BlinkStick
+   */
   WS2812: 2,
   /**
    * This mode is not documented in the official API, but it is used in the
@@ -16,4 +26,7 @@ export const BlinkStickProMode = {
   MULTI_LED_MIRROR: 3,
 } as const;
 
+/**
+ * @category Constants
+ */
 export type BlinkStickProMode = (typeof BlinkStickProMode)[keyof typeof BlinkStickProMode];

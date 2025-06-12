@@ -6,6 +6,7 @@ import { deviceDescriptions } from '../consts/device-descriptions';
 /**
  * Find first attached BlinkStick and create a BlinkStick object.
  * Optionally takes a product name to filter by.
+ * @category Discovery
  */
 export function findFirst(productName?: keyof typeof deviceDescriptions) {
   if (productName) {
@@ -17,7 +18,7 @@ export function findFirst(productName?: keyof typeof deviceDescriptions) {
 
 /**
  * Find first attached BlinkStick asynchronously and create a BlinkStick object.
- * @param productName
+ * @category Discovery
  */
 export async function findFirstAsync(productName?: keyof typeof deviceDescriptions) {
   const devices = await findRawDevicesAsync();
