@@ -4,7 +4,7 @@
 
 ## Why choose this fork?
 
-• **Modern development stack** – written in TypeScript, ships with type definitions, uses modern JS features.
+• **Modern development stack** – written in TypeScript, ships with type definitions, uses modern JS features
 • **Promises & `async`/`await` everywhere** – no legacy callbacks.  
 • **Rich animation toolkit** – create complex, FPS-safe animations with `Animation`, `AnimationBuilder` and helpers.  
 • **Color parsing super-powers** – English color names, CSS strings (`#ff0000`, `rgb(255,0,0)`), tuples… even `random`.  
