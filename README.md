@@ -112,6 +112,7 @@ What is BlinkStick? It's a tiny USB-controlled RGB LED device. Learn more at <ht
 ### Known issues
 
 - `BlinkStick Square` devices identify themselves as just `BlinkStick`. If you try to find base BlinkStick device using `findFirst("BlinkStick")`, it may find a `BlinkStick Square` instead. This is unlikely to affect users with only one BlinkStick device connected, but if you have both `BlinkStick` and `BlinkStick Square`, you may need to do some workarounds to distinguish them. Look at [consts/device-descriptions.ts](src/consts/device-descriptions.ts) for detection logic.
+- `BlinkStick Flex` won't work on Linux due to kernel limitations.
 
 <!-- TOC --><a name="devices"></a>
 
@@ -129,10 +130,11 @@ If you want to gift or buy me a BlinkStick device for testing purposes, please e
 - BlinkStick
 - BlinkStick Strip
 - BlinkStick Strip Mini
+- BlinkStick Flex on MacOS and Windows
 
 **Does not work**:
 
-- BlinkStick Flex
+- BlinkStick Flex on Linux
 
 **Variable LED count**
 

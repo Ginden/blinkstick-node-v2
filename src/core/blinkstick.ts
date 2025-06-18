@@ -28,6 +28,7 @@ import { createWriteStream, WriteStream } from 'node:fs';
 import { promisify } from 'node:util';
 import * as os from 'node:os';
 import { scheduler } from 'node:timers/promises';
+import { FeatureReportId } from '../types';
 
 function wrapWithDebug<HidDevice extends HID | HIDAsync>(
   device: HidDevice,
@@ -298,14 +299,16 @@ export abstract class BlinkStick<HidDevice extends HID | HIDAsync = HID | HIDAsy
    * http://www.blinkstick.com/help/tutorials/blinkstick-pro-modes
    */
   async setMode(mode: BlinkStickProMode): Promise<void> {
-    await this.setFeatureReport(asBuffer([0x0004, mode]));
+    await this.setFeatureReport(asBuffer([FeatureReportId.SetMode, mode]));
   }
 
   /**
    * Gets the current mode.
    */
   async getMode(): Promise<BlinkStickProMode> {
-    return asBuffer(await this.getFeatureReport(4, 33))[1] as BlinkStickProMode;
+    return asBuffer(
+      await this.getFeatureReport(FeatureReportId.SetMode, 33),
+    )[1] as BlinkStickProMode;
   }
 
   /**
@@ -561,7 +564,18 @@ export abstract class BlinkStick<HidDevice extends HID | HIDAsync = HID | HIDAsy
             return v.toString();
           }
           if (v instanceof Buffer) {
-            return v.toString('hex');
+            return {
+              type: 'Buffer',
+              data: asBuffer(v).toString('hex'),
+              length: v.length,
+            };
+          }
+          if (Array.isArray(v) && v.every((item) => typeof item === 'number')) {
+            return {
+              type: 'Buffer',
+              data: asBuffer(v).toString('hex'),
+              length: v.length,
+            };
           }
           if (v instanceof Error) {
             return {
