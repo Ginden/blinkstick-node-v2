@@ -1,5 +1,5 @@
 import usb from 'node-hid';
-import { PRODUCT_ID, VENDOR_ID } from '../consts/consts';
+import { PRODUCT_ID, VENDOR_ID } from '../../consts/consts';
 
 /**
  * Find raw USB devices using synchronous USB device enumeration.

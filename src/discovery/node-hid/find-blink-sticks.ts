@@ -1,15 +1,15 @@
-import usb, { HID, HIDAsync } from 'node-hid';
+import usb, { HID } from 'node-hid';
 import { findRawDevicesSync, findRawDevicesAsync } from './find-raw-devices';
-import { BlinkStick } from '../core/blinkstick';
 import { createBlinkstickAsync } from './create-blinkstick-async';
-import { BlinkstickSync } from '../core/blinkstick.sync';
+import { BlinkstickSync } from '../../core/blinkstick.sync';
+import { BlinkstickAsync } from '../../core';
 
 /**
  * Find BlinkSticks using a filter, using synchronous USB device enumeration.
  * @param filter
  * @category Discovery
  */
-export function findBlinkSticks(filter?: (device: usb.Device) => boolean): BlinkStick<HID>[] {
+export function findBlinkSticks(filter?: (device: usb.Device) => boolean): BlinkstickSync[] {
   if (!filter) {
     filter = () => true;
   }
@@ -31,7 +31,7 @@ export function findBlinkSticks(filter?: (device: usb.Device) => boolean): Blink
  */
 export async function findBlinkSticksAsync(
   filter?: (device: usb.Device) => boolean,
-): Promise<BlinkStick<HIDAsync>[]> {
+): Promise<BlinkstickAsync[]> {
   if (!filter) {
     filter = () => true;
   }

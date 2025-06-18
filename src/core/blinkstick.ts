@@ -1,4 +1,3 @@
-import { type Device, HID, HIDAsync } from 'node-hid';
 import { determineReportId } from '../utils/hid/determine-report-id';
 import { decimalToHex } from '../utils/decimal-to-hex';
 import { getInfoBlockRaw } from '../utils/hid/get-info-block';
@@ -29,17 +28,16 @@ import { promisify } from 'node:util';
 import * as os from 'node:os';
 import { scheduler } from 'node:timers/promises';
 import { FeatureReportId } from '../types';
+import { MinimalDeviceInfo, UsbTransport } from '../transport';
 
-function wrapWithDebug<HidDevice extends HID | HIDAsync>(
-  device: HidDevice,
+function wrapWithDebug<T extends UsbTransport>(
+  device: T,
   cb: (type: string, ...args: unknown[]) => void,
-): HidDevice {
+): T {
   let i = 0;
   const originalMethods = {
     sendFeatureReport: device.sendFeatureReport.bind(device),
     getFeatureReport: device.getFeatureReport.bind(device),
-    write: device.write.bind(device),
-    setNonBlocking: device.setNonBlocking.bind(device),
     getDeviceInfo: device.getDeviceInfo.bind(device),
   };
 
@@ -75,7 +73,7 @@ function wrapWithDebug<HidDevice extends HID | HIDAsync>(
  * Main class responsible for controlling BlinkStick devices.
  * @category Core
  */
-export abstract class BlinkStick<HidDevice extends HID | HIDAsync = HID | HIDAsync> {
+export abstract class BlinkStick<Transport extends UsbTransport = UsbTransport> {
   public abstract readonly isSync: boolean;
   protected abortController: AbortController = new AbortController();
   /**
@@ -84,7 +82,7 @@ export abstract class BlinkStick<HidDevice extends HID | HIDAsync = HID | HIDAsy
   public defaultRetryCount = 5;
   public ledCount: number;
   readonly requiresSoftwareColorPatch: boolean;
-  readonly device: HidDevice;
+  readonly device: Transport;
   readonly serial: string;
   readonly manufacturer: string;
   readonly product: string;
@@ -95,7 +93,7 @@ export abstract class BlinkStick<HidDevice extends HID | HIDAsync = HID | HIDAsy
   public readonly deviceDescription;
   protected commandDebug: string | null;
   protected debugWriteStream: WriteStream | null = null;
-  protected deviceInfo: Device;
+  protected deviceInfo: MinimalDeviceInfo;
 
   public interpretParameters: typeof interpretParameters = interpretParameters;
 
@@ -103,7 +101,7 @@ export abstract class BlinkStick<HidDevice extends HID | HIDAsync = HID | HIDAsy
    *
    * @internal This is not intended to be used outside of the library. End-users should use `find*` functions
    */
-  protected constructor(device: HidDevice, deviceInfo: Device) {
+  protected constructor(device: Transport) {
     this.commandDebug = process.env.BLINKSTICK_DEBUG ?? null;
     if (this.commandDebug) {
       this.device = wrapWithDebug(device, (type: string, ...args: unknown[]) =>
@@ -112,20 +110,20 @@ export abstract class BlinkStick<HidDevice extends HID | HIDAsync = HID | HIDAsy
     } else {
       this.device = device;
     }
-    this.deviceInfo = deviceInfo;
-    this.serial = deviceInfo.serialNumber ?? '';
-    this.manufacturer = deviceInfo.manufacturer ?? '';
-    this.product = deviceInfo.product ?? '';
+    this.deviceInfo = device.getDeviceInfo();
+    this.serial = this.deviceInfo.serialNumber ?? '';
+    this.manufacturer = this.deviceInfo.manufacturer ?? '';
+    this.product = this.deviceInfo.product ?? '';
     const [versionMajor, versionMinor] = this.serial.split('-').pop()!.split('.').map(Number);
     this.versionMajor = versionMajor;
     this.versionMinor = versionMinor;
 
-    this.deviceDescription = attemptToGetDeviceDescription(deviceInfo);
+    this.deviceDescription = attemptToGetDeviceDescription(this.deviceInfo);
     this.ledCount = this.deviceDescription?.ledCount ?? 0;
     if (this.ledCount === 0) {
       process.emitWarning(`Device ${this.product} does not have a known LED count.`, {
         code: `BlinkStickUnknownLedCount-${this.serial}`,
-        ...deviceInfo,
+        ...this.deviceInfo,
       });
     }
 
@@ -716,6 +714,10 @@ export abstract class BlinkStick<HidDevice extends HID | HIDAsync = HID | HIDAsy
 
     return new Led(this, index);
   }
+
+  public getTransport(): Transport {
+    return this.device;
+  }
 }
 
-export type BlinkstickAny = BlinkStick<HID | HIDAsync>;
+export type BlinkstickAny = BlinkStick<UsbTransport>;

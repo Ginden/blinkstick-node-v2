@@ -1,4 +1,5 @@
-export * from './discovery';
+export * from './discovery/node-hid';
+export * as usb from './discovery/usb';
 export * from './core';
 export * from './consts/consts';
 export * from './consts/color-keywords';
@@ -16,3 +17,4 @@ export * from './led';
 export * from './utils/colors/get-random-color';
 export * from './utils/colors/color-input-to-rgb-tuple';
 export * from './utils/colors/color-input-to-rgb-tuple';
+export * from './transport';

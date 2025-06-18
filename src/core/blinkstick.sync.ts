@@ -1,14 +1,15 @@
 import { BlinkStick } from './blinkstick';
 import { HID } from 'node-hid';
+import { NodeHidSyncTransport } from '../transport';
 
 /**
  * Synchronous version of BlinkStick class.
  * @category Core
  */
-export class BlinkstickSync extends BlinkStick<HID> {
+export class BlinkstickSync extends BlinkStick<NodeHidSyncTransport> {
   public readonly isSync = true;
 
   constructor(device: HID) {
-    super(device, device.getDeviceInfo());
+    super(new NodeHidSyncTransport(device));
   }
 }

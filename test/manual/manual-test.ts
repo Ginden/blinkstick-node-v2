@@ -6,6 +6,8 @@ import {
   createBlinkstickAsync,
   createBlinkstickSync,
   attemptToGetDeviceDescription,
+  usb,
+  BlinkStick,
 } from '../../src';
 import { assert } from 'tsafe';
 import { Device } from 'node-hid';
@@ -16,18 +18,39 @@ import { SectionDefinition, SectionFn, sections } from './sections';
 import { br, hr } from './print';
 import { benchmarkFps } from './benchmark-fps';
 import { asBuffer } from '../../src/utils';
+import { LibUsbTransport } from '../../src/transport/lib-usb-transport';
+import { BlinkStickLibUsb } from '../../src/core/blinkstick-lib-usb';
+import { createBlinkstickLibUsb } from '../../src/discovery/usb/create-blinkstick-libusb';
 
-let blinkstickDevice: BlinkstickAsync | BlinkstickSync | null = null;
+let blinkstickDevice: BlinkStick | null = null;
 let device: Device | null = null;
 
-(async () => {
-  const devices = await findRawDevicesAsync();
-  assert(devices.length > 0, 'No devices found');
-  const selection = await prompts({
-    type: 'select',
-    name: 'device',
-    message: 'Select a device',
-    choices: devices
+const library = process.env.USB_LIBRARY === 'libusb' ? 'libusb' : 'hid';
+
+type DeviceChoiceValue = {
+  title: string;
+  create: () => BlinkStick | Promise<BlinkStick>;
+};
+
+async function getDeviceChoices(): Promise<(Choice & { value: DeviceChoiceValue })[]> {
+  if (library === 'libusb') {
+    return await Promise.all(
+      usb.findRawDevices().map(async (device) => {
+        const deviceInfo = await LibUsbTransport.calculateMinimalDeviceInfo(device);
+        const title = `${attemptToGetDeviceDescription(deviceInfo)?.name ?? deviceInfo.product} at ${device.deviceAddress}`;
+        return {
+          title,
+          value: {
+            title,
+            create: async () => createBlinkstickLibUsb(device),
+          },
+        };
+      }),
+    );
+  } else {
+    const devices = await findRawDevicesAsync();
+
+    return devices
       .map((device) => ({
         title: `${attemptToGetDeviceDescription(device)?.name ?? device.product} at ${device.path}`,
         value: device,
@@ -37,34 +60,36 @@ let device: Device | null = null;
           title: `${title} (async mode)`,
           value: {
             title: `${title} (async mode)`,
-            device,
-            async: true,
+            create: () => createBlinkstickAsync(device),
           },
         },
         {
           title: `${title} (sync mode)`,
           value: {
             title: `${title} (async mode)`,
-            device,
-            async: false,
+            create: () => createBlinkstickSync(device),
           },
         },
-      ]),
-  });
-  const selectedDeviceOption = selection.device;
-  const { device: selectedDevice, title, async } = selectedDeviceOption;
+      ]);
+  }
+}
 
-  const selectedMode = async ? 'async' : 'sync';
+(async () => {
+  const choices = await getDeviceChoices();
+  assert(choices.length > 0, 'No devices found');
+
+  const selection = await prompts({
+    type: 'select',
+    name: 'device',
+    message: 'Select a device',
+    choices,
+  });
+  const selectedDeviceOption: DeviceChoiceValue = selection.device;
+  const { title, create } = selectedDeviceOption;
 
   console.log(`Selected device: ${title}`);
-  assert(selectedDevice, 'No device selected');
 
-  device = selectedDevice;
-
-  blinkstickDevice =
-    selectedMode === 'async'
-      ? await createBlinkstickAsync(selectedDevice)
-      : createBlinkstickSync(selectedDevice);
+  blinkstickDevice = await create();
 
   assert(blinkstickDevice);
 

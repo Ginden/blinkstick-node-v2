@@ -68,11 +68,18 @@
     "typedoc": "^0.28.3",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.31.1",
+    "usb": "^2.15.0",
     "vitest": "^3.1.4"
   },
   "dependencies": {
     "color-rgba": "^3.0.0",
     "node-hid": "^3.2.0",
     "tsafe": "^1.8.5"
+  },
+  "peerDependencies": {
+    "usb": "^2.15.0"
+  },
+  "optionalDependencies": {
+    "usb": "^2.15.0"
   }
 }

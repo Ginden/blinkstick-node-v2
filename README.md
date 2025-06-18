@@ -107,6 +107,12 @@ What is BlinkStick? It's a tiny USB-controlled RGB LED device. Learn more at <ht
 - Restored original return types of several methods
 - No `string` when dealing with low-level data - use `Buffer` instead, we assume that you know what you are doing
 
+### BlinkStick Flex on Linux
+
+Devices with more than 21 LEDs (like BlinkStick Flex) are not supported by `node-hid` on Linux due to kernel limitations (required HID report size is larger than 64+1 bytes).
+
+To avoid this, we use `usb` library. It must be installed as your dependency (`npm i usb`), as it's not pulled-in by default.
+
 <!-- TOC --><a name="known-issues"></a>
 
 ### Known issues

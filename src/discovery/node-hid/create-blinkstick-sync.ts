@@ -1,6 +1,6 @@
 import { MinimalDevice } from './create-blinkstick-async';
 import { HID } from 'node-hid';
-import { BlinkstickSync } from '../core/blinkstick.sync';
+import { BlinkstickSync } from '../../core/blinkstick.sync';
 
 /**
  * Creates a BlinkStick object from a USB device.

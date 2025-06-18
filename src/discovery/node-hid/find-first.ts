@@ -1,14 +1,15 @@
 import { createBlinkstickAsync } from './create-blinkstick-async';
 import { findBlinkSticks } from './find-blink-sticks';
 import { findRawDevicesAsync } from './find-raw-devices';
-import { deviceDescriptions } from '../consts/device-descriptions';
+import { deviceDescriptions } from '../../consts/device-descriptions';
+import { BlinkstickSync } from '../../core';
 
 /**
  * Find first attached BlinkStick and create a BlinkStick object.
  * Optionally takes a product name to filter by.
  * @category Discovery
  */
-export function findFirst(productName?: keyof typeof deviceDescriptions) {
+export function findFirst(productName?: keyof typeof deviceDescriptions): BlinkstickSync | null {
   if (productName) {
     const device = findBlinkSticks((device) => deviceDescriptions[productName].test(device))[0];
     return device ?? null;
