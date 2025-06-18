@@ -1,6 +1,6 @@
-import { SimpleFrame } from './simple-frame';
-import { ComplexFrame } from './complex-frame';
-import { WaitFrame } from './wait-frame';
+import type { SimpleFrame } from './simple-frame';
+import type { ComplexFrame } from './complex-frame';
+import type { WaitFrame } from './wait-frame';
 
 /**
  * @category Animation

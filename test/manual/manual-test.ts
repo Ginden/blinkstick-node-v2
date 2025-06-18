@@ -14,13 +14,13 @@ import { Device } from 'node-hid';
 import { writeFile } from 'node:fs/promises';
 import { questionsAsked } from './questions-asked';
 import { reportIssueUrl, settle, yesOrThrow } from './helpers';
-import { SectionDefinition, SectionFn, sections } from './sections';
+import { SectionFn, sections } from './sections';
 import { br, hr } from './print';
 import { benchmarkFps } from './benchmark-fps';
 import { asBuffer } from '../../src/utils';
 import { LibUsbTransport } from '../../src/transport/lib-usb-transport';
-import { BlinkStickLibUsb } from '../../src/core/blinkstick-lib-usb';
 import { createBlinkstickLibUsb } from '../../src/discovery/usb/create-blinkstick-libusb';
+import { getLibUsb } from '../../src/discovery/usb/get-lib-usb';
 
 let blinkstickDevice: BlinkStick | null = null;
 let device: Device | null = null;
@@ -34,6 +34,7 @@ type DeviceChoiceValue = {
 
 async function getDeviceChoices(): Promise<(Choice & { value: DeviceChoiceValue })[]> {
   if (library === 'libusb') {
+    getLibUsb().usb.setDebugLevel(2);
     return await Promise.all(
       usb.findRawDevices().map(async (device) => {
         const deviceInfo = await LibUsbTransport.calculateMinimalDeviceInfo(device);
@@ -90,6 +91,13 @@ async function getDeviceChoices(): Promise<(Choice & { value: DeviceChoiceValue 
   console.log(`Selected device: ${title}`);
 
   blinkstickDevice = await create();
+
+  try {
+    await blinkstickDevice.loadLedCountFromDevice();
+  } catch (err) {
+    console.error(`Failed to load LED count from device: ${err}`);
+    console.error(`Continuing with default LED count (${blinkstickDevice.ledCount})`);
+  }
 
   assert(blinkstickDevice);
 
@@ -151,7 +159,8 @@ async function getDeviceChoices(): Promise<(Choice & { value: DeviceChoiceValue 
   await yesOrThrow(`Was everything all right?`, 'User did not confirm to throw an error', true);
 })()
   .finally(() => {
-    return blinkstickDevice?.turnOffAll();
+    console.log(`Turning off all LEDs on the device...`);
+    // return blinkstickDevice?.turnOffAll();
   })
   .then(() => {
     console.log('Test completed successfully');
@@ -186,7 +195,7 @@ async function getDeviceChoices(): Promise<(Choice & { value: DeviceChoiceValue 
           major: blinkstickDevice?.versionMajor ?? null,
           minor: blinkstickDevice?.versionMinor ?? null,
         },
-        fpsBenchmark: blinkstickDevice ? await settle(benchmarkFps(blinkstickDevice)) : null,
+        // fpsBenchmark: blinkstickDevice ? await settle(benchmarkFps(blinkstickDevice)) : null,
       },
     };
 
@@ -222,6 +231,10 @@ async function getDeviceChoices(): Promise<(Choice & { value: DeviceChoiceValue 
         2,
       ),
     );
+
+    console.log(`Details saved to manual-test.log at repository root`);
+
+    await blinkstickDevice?.turnOffAll();
 
     process.exit(1);
   })

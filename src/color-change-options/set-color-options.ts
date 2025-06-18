@@ -7,5 +7,8 @@ import { Channel } from '../types';
  */
 export type SetColorOptions = {
   channel?: Channel;
+  /**
+   * Index of the LED to set the color for.
+   */
   index?: number;
 };

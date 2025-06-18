@@ -1,7 +1,7 @@
 import { SimpleFrame } from './frame/simple-frame';
-import { FrameIterable } from './animation-description';
-import { Frame } from './frame/frame';
-import { ColorInput } from '../types';
+import type { FrameIterable } from './animation-description';
+import type { Frame } from './frame/frame';
+import type { ColorInput } from '../types';
 import { colorInputToRgbTuple } from '../utils';
 import { pulse } from './common/pulse';
 import { combine } from './helpers/combine';

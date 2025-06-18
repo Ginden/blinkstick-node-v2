@@ -1,6 +1,6 @@
-import { RgbTuple } from '../../types/rgb-tuple';
-import { ConditionalPick, JsonValue } from 'type-fest';
-import { ColorInput } from '../../types';
+import type { RgbTuple } from '../../types';
+import type { ConditionalPick, JsonValue } from 'type-fest';
+import type { ColorInput } from '../../types';
 import { colorInputToRgbTuple } from '../../utils';
 
 /**

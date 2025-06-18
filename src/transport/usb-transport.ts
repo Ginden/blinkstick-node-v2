@@ -1,4 +1,4 @@
-import { asBuffer } from '../utils';
+import type { Buffer } from 'node:buffer';
 
 export type MinimalDeviceInfo = {
   product?: string | undefined;
@@ -10,12 +10,8 @@ export type MinimalDeviceInfo = {
 };
 
 export abstract class UsbTransport {
-  abstract sendFeatureReport(data: Buffer | number[]): Promise<number>;
+  abstract sendFeatureReport(data: Buffer): Promise<number>;
   abstract getFeatureReport(reportId: number, reportLength: number): Promise<Buffer>;
   abstract getDeviceInfo(): MinimalDeviceInfo;
   abstract close(): Promise<unknown>;
-
-  protected sanitizeInput(data: Buffer | number[]): Buffer {
-    return asBuffer(data);
-  }
 }

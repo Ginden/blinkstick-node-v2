@@ -1,4 +1,4 @@
-import { BlinkstickAny } from '../core/blinkstick';
+import { BlinkStick } from '../core/blinkstick';
 import { FrameIterable } from './animation-description';
 import { assert } from 'tsafe';
 import { combine } from './helpers/combine';
@@ -6,7 +6,7 @@ import { SimpleFrame } from './frame/simple-frame';
 import { ComplexFrame } from './frame/complex-frame';
 import { scheduler } from 'node:timers/promises';
 import { performance } from 'node:perf_hooks';
-import { Frame } from './frame/frame';
+import type { Frame } from './frame/frame';
 import { convertArrayOfRgbTuplesToBulkSetBuffer } from '../utils/convert-array-of-rgb-tuples-to-bulk-set-buffer';
 import { WaitFrame } from './frame/wait-frame';
 
@@ -30,7 +30,7 @@ export class AnimationRunner {
   protected buffer;
   protected isRunning = false;
 
-  constructor(public readonly blinkstick: BlinkstickAny) {
+  constructor(public readonly blinkstick: BlinkStick) {
     this.ledGroup = blinkstick.leds();
     this.leds = Array.from({ length: blinkstick.ledCount }, (_, index) =>
       this.blinkstick.led(index),

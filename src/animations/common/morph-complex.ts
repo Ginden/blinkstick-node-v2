@@ -1,12 +1,12 @@
 import assert from 'assert';
-import { FrameIterable } from '../animation-description';
-import { Frame } from '../frame/frame';
+import type { FrameIterable } from '../animation-description';
+import type { Frame } from '../frame/frame';
 import { ComplexFrame } from '../frame/complex-frame';
 import { SimpleFrame } from '../frame/simple-frame';
 import { WaitFrame } from '../frame/wait-frame';
 import { morph } from './morph';
 import { clampRgb } from '../../utils';
-import { RgbTuple } from '../../types';
+import type { RgbTuple } from '../../types';
 import { assertFpsBelow100 } from '../helpers/assert-fps-below-100';
 
 /**

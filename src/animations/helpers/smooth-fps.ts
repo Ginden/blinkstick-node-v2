@@ -1,11 +1,11 @@
 import { assert } from 'tsafe';
 
-import { FrameIterable } from '../animation-description';
-import { Frame } from '../frame/frame';
+import type { FrameIterable } from '../animation-description';
+import type { Frame } from '../frame/frame';
 import { SimpleFrame } from '../frame/simple-frame';
 import { ComplexFrame } from '../frame/complex-frame';
 import { WaitFrame } from '../frame/wait-frame';
-import { RgbTuple } from '../../types';
+import type { RgbTuple } from '../../types';
 
 type QueueItem = {
   frame: Frame;

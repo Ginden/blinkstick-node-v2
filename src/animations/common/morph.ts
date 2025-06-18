@@ -1,5 +1,5 @@
 import { assert } from 'tsafe';
-import { RgbTuple } from '../../types/rgb-tuple';
+import type { RgbTuple } from '../../types/rgb-tuple';
 import { clampRgb } from '../../utils/clamp';
 import { SimpleFrame } from '../frame/simple-frame';
 import { assertFpsBelow100 } from '../helpers/assert-fps-below-100';

@@ -1,5 +1,5 @@
 import { assert } from 'tsafe';
-import { RgbTuple } from '../../types/rgb-tuple';
+import type { RgbTuple } from '../../types/rgb-tuple';
 import { SimpleFrame } from './simple-frame';
 
 /**

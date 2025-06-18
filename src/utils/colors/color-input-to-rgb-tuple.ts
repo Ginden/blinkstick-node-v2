@@ -1,5 +1,5 @@
 import { ColorInput } from '../../types';
-import { COLOR_KEYWORDS } from '../../consts/color-keywords';
+import { COLOR_KEYWORD_RGB_TUPLES, COLOR_KEYWORDS } from '../../consts/color-keywords';
 import { normalizeHexColor } from './normalize-hex-color';
 import { RgbTuple } from '../../types/rgb-tuple';
 import { typeGuard } from 'tsafe';
@@ -13,8 +13,7 @@ export function colorInputToRgbTuple(color: ColorInput): RgbTuple {
     typeof color === 'string' &&
     typeGuard<keyof typeof COLOR_KEYWORDS>(color, color in COLOR_KEYWORDS)
   ) {
-    const { r, g, b } = normalizeHexColor(COLOR_KEYWORDS[color as keyof typeof COLOR_KEYWORDS]);
-    return [r, g, b];
+    return COLOR_KEYWORD_RGB_TUPLES[color];
   }
   if (Array.isArray(color)) {
     return [color[0] & 0xff, color[1] & 0xff, color[2] & 0xff];

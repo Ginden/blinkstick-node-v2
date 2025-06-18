@@ -1,6 +1,8 @@
 import { MinimalDeviceInfo, UsbTransport } from './usb-transport';
 import type { Device } from 'usb';
 import { promisify } from 'node:util';
+import { assert } from 'tsafe';
+import { asBuffer } from '../utils';
 
 function isDeviceOpen(device: Device): boolean {
   return Boolean(device.interfaces);
@@ -17,6 +19,13 @@ export class LibUsbTransport extends UsbTransport {
 
   static async buildFromDevice(device: Device): Promise<LibUsbTransport> {
     const minimimalDeviceInfo = await LibUsbTransport.calculateMinimalDeviceInfo(device);
+
+    const iface = device.interfaces?.[0];
+    assert(iface, 'Device must have at least one interface');
+    if (iface.isKernelDriverActive()) {
+      iface.detachKernelDriver();
+    }
+    iface.claim();
 
     return new LibUsbTransport(device, minimimalDeviceInfo);
   }
@@ -50,17 +59,19 @@ export class LibUsbTransport extends UsbTransport {
   }
 
   async sendFeatureReport(data: Buffer | number[]): Promise<number> {
-    const buffer = Buffer.from(data);
+    const buffer = asBuffer(data);
     const reportId = buffer[0]; // HID reports start with reportId
-    const reportData = buffer.subarray(1);
+
+    const bmRequestType = 0x20;
+    const wValue = (3 << 8) | reportId; // 3 = Feature report type
 
     const ret = await new Promise<Buffer | number | undefined>((resolve, reject) => {
       this.device.controlTransfer(
-        0x21, // bmRequestType: Host to device | Class | Interface
+        bmRequestType, // bmRequestType: Host to device | Class | Interface
         0x09, // bRequest: SET_REPORT
-        (3 << 8) | reportId, // wValue: (3=Feature) << 8 | reportId
+        wValue, // wValue: (3=Feature) << 8 | reportId
         this.wIndex, // wIndex: interface number
-        reportData,
+        buffer,
         (err, b) => (err ? reject(err) : resolve(b)),
       );
     });

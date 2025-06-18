@@ -1,6 +1,6 @@
-import { SimpleFrame } from '../frame/simple-frame';
+import type { SimpleFrame } from '../frame/simple-frame';
 import { ComplexFrame } from '../frame/complex-frame';
-import { RgbTuple } from '../../types';
+import type { RgbTuple } from '../../types';
 import { assert } from 'tsafe';
 
 export type WaveOptions = {

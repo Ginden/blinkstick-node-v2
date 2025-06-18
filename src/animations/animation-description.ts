@@ -1,10 +1,10 @@
-import { ColorInput } from '../types';
+import type { ColorInput } from '../types';
 import { pulse } from './common/pulse';
 import { repeat } from './helpers/repeat';
 import { colorInputToRgbTuple } from '../utils/colors/color-input-to-rgb-tuple';
 import { morph } from './common/morph';
 import { morphMany } from './common/morph-many';
-import { Frame } from './frame/frame';
+import type { Frame } from './frame/frame';
 import { assertFpsBelow100 } from './helpers/assert-fps-below-100';
 
 /**

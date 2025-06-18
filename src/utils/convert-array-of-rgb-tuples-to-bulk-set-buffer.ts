@@ -1,4 +1,5 @@
 import { RgbTuple } from '../types/rgb-tuple';
+import { Buffer } from 'node:buffer';
 
 /**
  * Converts an array of RGB tuples to a buffer for bulk setting.

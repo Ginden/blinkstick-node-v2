@@ -1,14 +1,15 @@
 import { asBuffer } from '../utils/as-buffer';
 import { MinimalDeviceInfo, UsbTransport } from './usb-transport';
 import { HID } from 'node-hid';
+import { Buffer } from 'node:buffer';
 
 export class NodeHidSyncTransport extends UsbTransport {
   constructor(private readonly device: HID) {
     super();
   }
 
-  async sendFeatureReport(data: Buffer | number[]): Promise<number> {
-    return this.device.sendFeatureReport(this.sanitizeInput(data));
+  async sendFeatureReport(data: Buffer): Promise<number> {
+    return this.device.sendFeatureReport(data);
   }
   async getFeatureReport(reportId: number, reportLength: number): Promise<Buffer> {
     const report = this.device.getFeatureReport(reportId, reportLength);

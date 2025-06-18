@@ -1,5 +1,6 @@
 import { NormalizedColorOptions } from '../../types/color-options';
 import { AllPossibleColorOptions } from '../../types/all-possible-color-options';
+import { RgbTuple } from '../../types';
 
 export function normalizeHexColor(
   color: string,
@@ -26,4 +27,9 @@ export function normalizeHexColor(
     };
   }
   throw new Error(`Invalid hex color: ${color}`);
+}
+
+export function hexToRgbTuple(color: string): RgbTuple {
+  const normalized = normalizeHexColor(color);
+  return [normalized.r, normalized.g, normalized.b] as const;
 }

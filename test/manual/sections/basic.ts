@@ -29,5 +29,26 @@ export function basicQuestions(blinkstickDevice: BlinkstickAny): Record<string, 
         );
       },
     },
+    'Multi-LEDs': {
+      enabled: ledCount > 2,
+      test: async () => {
+        const colors = ['red', 'green', 'blue', 'yellow', 'cyan', 'magenta'].sort(
+          () => Math.random() - 0.5,
+        );
+        console.log(
+          `🟥🟩🟦🟨🟦🟪 Now we will turn on the first ${ledCount} LEDs to a rainbow of colors.`,
+        );
+        await Promise.all(
+          Array.from({ length: ledCount }, (_, i) => {
+            const color = colors[i % colors.length];
+            return blinkstickDevice.setColor(color, { index: i });
+          }),
+        );
+        await yesOrThrow(
+          `Are the first ${ledCount} LEDs set to a rainbow of colors?`,
+          `First ${ledCount} LEDs should be set to a rainbow of colors`,
+        );
+      },
+    },
   };
 }

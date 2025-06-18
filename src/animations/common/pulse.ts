@@ -1,7 +1,7 @@
 import { SimpleFrame } from '../frame/simple-frame';
-import { RgbTuple } from '../../types/rgb-tuple';
+import type { RgbTuple } from '../../types/rgb-tuple';
 import { clampRgb } from '../../utils/clamp';
-import assert from 'assert';
+import { assert } from 'tsafe';
 import { assertFpsBelow100 } from '../helpers/assert-fps-below-100';
 
 export type PulseOptions = {

@@ -22,8 +22,8 @@ export class NodeHidAsyncTransport extends UsbTransport {
     return transport;
   }
 
-  sendFeatureReport(data: Buffer | number[]): Promise<number> {
-    return this.device.sendFeatureReport(this.sanitizeInput(data));
+  sendFeatureReport(data: Buffer): Promise<number> {
+    return this.device.sendFeatureReport(data);
   }
   getFeatureReport(reportId: number, reportLength: number): Promise<Buffer> {
     return this.device.getFeatureReport(reportId, reportLength);

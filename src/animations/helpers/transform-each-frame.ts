@@ -1,5 +1,5 @@
-import { FrameIterable } from '../animation-description';
-import { Frame } from '../frame/frame';
+import type { FrameIterable } from '../animation-description';
+import type { Frame } from '../frame/frame';
 
 /**
  * Callback function to transform each frame.

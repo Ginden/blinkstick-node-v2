@@ -29,6 +29,7 @@ import * as os from 'node:os';
 import { scheduler } from 'node:timers/promises';
 import { FeatureReportId } from '../types';
 import { MinimalDeviceInfo, UsbTransport } from '../transport';
+import { Buffer } from 'node:buffer';
 
 function wrapWithDebug<T extends UsbTransport>(
   device: T,
@@ -94,6 +95,7 @@ export abstract class BlinkStick<Transport extends UsbTransport = UsbTransport> 
   protected commandDebug: string | null;
   protected debugWriteStream: WriteStream | null = null;
   protected deviceInfo: MinimalDeviceInfo;
+  protected isLinux: boolean = process.platform === 'linux';
 
   public interpretParameters: typeof interpretParameters = interpretParameters;
 
@@ -174,7 +176,7 @@ export abstract class BlinkStick<Transport extends UsbTransport = UsbTransport> 
    * @param data
    */
   async sendFeatureReport(data: number[] | Buffer) {
-    return await this.device.sendFeatureReport(data);
+    return await this.device.sendFeatureReport(asBuffer(data));
   }
 
   /**
@@ -261,9 +263,11 @@ export abstract class BlinkStick<Transport extends UsbTransport = UsbTransport> 
       options: { channel = 0, index = 0 },
     } = params;
     if (params.options.channel === 0 && params.options.index === 0) {
-      return await this.setFeatureReport(Buffer.from([1, r, g, b]));
+      return await this.setFeatureReport(Buffer.from([FeatureReportId.SetFirst, r, g, b]));
     } else {
-      return await this.setFeatureReport(Buffer.from([5, channel, index, r, g, b]));
+      return await this.setFeatureReport(
+        Buffer.from([FeatureReportId.SetArbitraryPixel, channel, index, r, g, b]),
+      );
     }
   }
 
@@ -391,6 +395,10 @@ export abstract class BlinkStick<Transport extends UsbTransport = UsbTransport> 
    */
   async setColors(channel: Channel, data: number[] | Uint8Array | Buffer) {
     const { reportId, maxLeds } = determineReportId(data.length);
+    if (this.isLinux && data.length > 63) {
+      // Linux has a limit of 65 bytes for feature reports, so we need to split the data into multiple reports
+      return await this.setBigColorsOnLinux(channel, asBuffer(data));
+    }
     const maxDataBytes = maxLeds * 3;
     const offset = 2;
     const reportLength = offset + maxDataBytes;
@@ -403,6 +411,51 @@ export abstract class BlinkStick<Transport extends UsbTransport = UsbTransport> 
     source.copy(report, offset, 0, copyLength);
 
     await this.setFeatureReport(asBuffer(report));
+  }
+
+  private async setBigColorsOnLinux(channel: Channel, data: Buffer) {
+    assert(data.length % 3 === 0, 'Data length must be a multiple of 3');
+    const ledOffset = 16; // First 16 LEDs are set with a single feature report
+    const first16LedsData = data.subarray(0, ledOffset * 3);
+    await this.sendFeatureReport(
+      Buffer.from([FeatureReportId.Set16Pixels, channel, ...first16LedsData]),
+    );
+    const buff = asBuffer(data).subarray(ledOffset * 3); // Skip first 16 LEDs, as we use bulk transfer for those
+    // const buff = asBuffer(data);
+    const rgbTuples: { rgb: RgbTuple; ledIndex: number }[] = [];
+    for (let i = 0; i < buff.length; i += 3) {
+      const ledIndex = i + ledOffset; // Start from 16, as we already set first 16 LEDs
+      // Here data is in GBR format, so we need to convert it to RGB
+      const r = buff[i + 1] | 0;
+      const g = buff[i] | 0;
+      const b = buff[i + 2] | 0;
+      rgbTuples.push({ rgb: [r, g, b], ledIndex });
+    }
+
+    const shuffled = rgbTuples.sort(() => Math.random() - 0.5);
+
+    for (const {
+      rgb: [r, g, b],
+      ledIndex,
+    } of shuffled) {
+      try {
+        await retryNTimes(
+          3,
+          () =>
+            this.sendFeatureReport(
+              Buffer.from([FeatureReportId.SetArbitraryPixel, channel, ledIndex, r, g, b]),
+            ),
+          { ledIndex },
+          (n) => scheduler.wait((n + 1) ** 2 * 10),
+        );
+      } catch (err) {
+        if (ledIndex > 22) {
+          // Did you know? BlinkStick Flex firmware is buggy and LEDs 23+ are not supported?
+          continue;
+        }
+        throw err;
+      }
+    }
   }
 
   /**

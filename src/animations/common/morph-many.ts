@@ -1,4 +1,4 @@
-import { RgbTuple } from '../../types';
+import type { RgbTuple } from '../../types';
 import { SimpleFrame } from '../frame/simple-frame';
 import { clampRgb } from '../../utils';
 import { assertFpsBelow100 } from '../helpers/assert-fps-below-100';

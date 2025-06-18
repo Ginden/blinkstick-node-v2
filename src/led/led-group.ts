@@ -1,6 +1,7 @@
 import { BlinkstickAny } from '../core/blinkstick';
 import { ColorInput } from '../types';
 import { colorInputToRgbTuple } from '../utils/colors/color-input-to-rgb-tuple';
+import { Buffer } from 'node:buffer';
 
 function prepareBuffer(buffer: Buffer, red: number, green: number, blue: number) {
   for (let i = 0; i < buffer.length; i = (i + 3) | 0) {

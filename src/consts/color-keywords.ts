@@ -1,3 +1,6 @@
+import { RgbTuple } from '../types';
+import { hexToRgbTuple, normalizeHexColor } from '../utils';
+
 /**
  * Color keywords, taken as-is from original library.
  * @category Constants
@@ -152,3 +155,9 @@ export const COLOR_KEYWORDS = {
   yellow: '#ffff00',
   warmwhite: '#fdf5e6', // Non-standard. Added to support CheerLights.
 } as const satisfies Record<string, `#${string}`>;
+
+export type KnownColor = keyof typeof COLOR_KEYWORDS;
+
+export const COLOR_KEYWORD_RGB_TUPLES = Object.fromEntries(
+  Object.entries(COLOR_KEYWORDS).map(([key, value]) => [key as KnownColor, hexToRgbTuple(value)]),
+) as { readonly [K in KnownColor]: RgbTuple };

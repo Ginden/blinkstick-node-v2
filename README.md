@@ -42,6 +42,7 @@ await blinkstick.pulse('purple');
 - [About this project](#about-this-project)
 - [Changes from the original library in v2](#changes-from-the-original-library-in-v2)
 - [Big changes in v3](#big-changes-in-v3)
+  - [BlinkStick Flex on Linux](#blinkstick-flex-on-linux)
   - [Known issues](#known-issues)
 - [Devices](#devices)
 - [Requirements](#requirements)
@@ -55,20 +56,20 @@ await blinkstick.pulse('purple');
   - [Generators](#generators)
   - [Limitations](#limitations)
   - [Known issues](#known-issues-1)
-- [Missing information / help wanted 🕵️‍♀️](#missing-information-help-wanted-)
+- [Missing information / help wanted 🕵️‍♀️](#missing-information--help-wanted-)
 - [Permission problems](#permission-problems)
 - [Contributing](#contributing)
 - [Testing](#testing)
   - [Manual test](#manual-test)
   - [Automated tests](#automated-tests)
+  - [REPL](#repl)
+  - [Debug device commands](#debug-device-commands)
   - [Coverage](#coverage)
 - [Maintainer](#maintainer)
   - [Original maintainers](#original-maintainers)
 - [Copyright and License](#copyright-and-license)
 
 <!-- TOC end -->
-
-<!-- TOC --><a name="about-this-project"></a>
 
 ## About this project
 
@@ -79,8 +80,6 @@ BlinkStick Node provides an interface to control BlinkStick devices connected to
 
 What is BlinkStick? It's a tiny USB-controlled RGB LED device. Learn more at <https://www.blinkstick.com>.
 
-<!-- TOC --><a name="changes-from-the-original-library-in-v2"></a>
-
 ## Changes from the original library in v2
 
 - TypeScript
@@ -88,8 +87,6 @@ What is BlinkStick? It's a tiny USB-controlled RGB LED device. Learn more at <ht
 - Most animation methods allow `AbortSignal` (this is only partially supported, your mileage may vary)
 - ~~Many methods return results of setting a feature report on device instead of `undefined`~~ (this one was reverted in v3, as it caused crashes)
 - Requires Node.js 20.0 or higher
-
-<!-- TOC --><a name="big-changes-in-v3"></a>
 
 ## Big changes in v3
 
@@ -109,18 +106,12 @@ What is BlinkStick? It's a tiny USB-controlled RGB LED device. Learn more at <ht
 
 ### BlinkStick Flex on Linux
 
-Devices with more than 21 LEDs (like BlinkStick Flex) are not supported by `node-hid` on Linux due to kernel limitations (required HID report size is larger than 64+1 bytes).
-
-To avoid this, we use `usb` library. It must be installed as your dependency (`npm i usb`), as it's not pulled-in by default.
-
-<!-- TOC --><a name="known-issues"></a>
+Read [notes on hardware and firmware](./notes-on-hardware.md).
 
 ### Known issues
 
 - `BlinkStick Square` devices identify themselves as just `BlinkStick`. If you try to find base BlinkStick device using `findFirst("BlinkStick")`, it may find a `BlinkStick Square` instead. This is unlikely to affect users with only one BlinkStick device connected, but if you have both `BlinkStick` and `BlinkStick Square`, you may need to do some workarounds to distinguish them. Look at [consts/device-descriptions.ts](src/consts/device-descriptions.ts) for detection logic.
-- `BlinkStick Flex` won't work on Linux due to kernel limitations.
-
-<!-- TOC --><a name="devices"></a>
+- `BlinkStick Flex` won't work on Linux due to [kernel limitations](./notes-on-hardware.md).
 
 ## Devices
 
@@ -160,13 +151,9 @@ or write it permanently to the device using `setLedCount` method:
 await blinkstick.setLedCount(42);
 ```
 
-<!-- TOC --><a name="requirements"></a>
-
 ## Requirements
 
 - Node.js, version 20.0 or higher
-
-<!-- TOC --><a name="install-blinkstick-node-module"></a>
 
 ## Install BlinkStick node module
 
@@ -176,11 +163,7 @@ Install using npm:
 npm install @ginden/blinkstick-v2
 ```
 
-<!-- TOC --><a name="getting-started"></a>
-
 ## Getting started
-
-<!-- TOC --><a name="async-recommended"></a>
 
 ### Async (recommended)
 
@@ -199,8 +182,6 @@ import { BlinkStick, findFirstAsync } from '@ginden/blinkstick-v2';
 const blinkstick = await findFirstAsync();
 ```
 
-<!-- TOC --><a name="easy-mistakes"></a>
-
 #### Easy mistakes
 
 If you are using Async API, you might accidentally let `Blinkstick` instance to be garbage-collected. This will emit a
@@ -209,8 +190,6 @@ use [explicit resource management](https://github.com/tc39/proposal-explicit-res
 
 Direct construction of `BlinkStick` is not recommended.
 
-<!-- TOC --><a name="sync-api"></a>
-
 ### Sync API
 
 ```ts
@@ -218,8 +197,6 @@ import { BlinkStick, findFirst } from '@ginden/blinkstick-v2';
 
 const blinkstick = findFirst();
 ```
-
-<!-- TOC --><a name="usage-examples"></a>
 
 #### Usage examples
 
@@ -247,7 +224,19 @@ await blinkstick.led(1).setColor('blue');
 await blinkstick.leds().setColor('yellow');
 ```
 
-<!-- TOC --><a name="animation-api"></a>
+### libusb
+
+If you want to use `usb` instead of `node-hid`, you can do so by using functions provided within `usb` namespace, like that:
+
+```ts
+import { usb } from '@ginden/blinkstick-v2';
+
+const stick = await usb.findFirst();
+```
+
+### Custom tansport
+
+See [advanced.md](./advanced.md).
 
 ## Animation API
 
@@ -325,8 +314,6 @@ type FrameIterable = Iterable<Frame> | AsyncIterable<Frame>;
 
 `WaitFrame` is a class of `{duration: number}`. It's used by animation runner to wait for a given duration.
 
-<!-- TOC --><a name="generators"></a>
-
 ### Generators
 
 Most of Animation APIs will throw if you pass a generator. This is there to prevent you from shooting yourself in the foot.
@@ -346,22 +333,16 @@ repeat(gen(), 3);
 // This would yield only 2 frames - generator doesn't implicitly "fork" when iterated multiple times
 ```
 
-<!-- TOC --><a name="limitations"></a>
-
 ### Limitations
 
 All built-in methods will throw if you try to generate animation with FPS higher than 100. As `BlinkStick Nano` is de facto limited to 75 FPS, it should be enough.
 
 Your custom animation may be "faster" than that, but expect drift and other issues.
 
-<!-- TOC --><a name="known-issues-1"></a>
-
 ### Known issues
 
 - Dreaded `could not get feature report from device` - this error occurs somewhere in the `node-hid` library and its dependencies,
   and is most likely to occur when calling methods in tight loops. See https://github.com/node-hid/node-hid/issues/561
-
-<!-- TOC --><a name="missing-information-help-wanted-"></a>
 
 ## Missing information / help wanted 🕵️‍♀️
 
@@ -374,8 +355,6 @@ The project is already usable in production, however some pieces of documentatio
 5. **Troubleshooting on Windows** – the `udev` paragraph covers Linux, but Windows quirks and Zadig drivers need love too.
 
 Your contributions are highly appreciated! 🙏
-
-<!-- TOC --><a name="permission-problems"></a>
 
 ## Permission problems
 
@@ -391,35 +370,31 @@ Then either restart the computer or run the following command to reload udev rul
 
     sudo udevadm control --reload-rules && sudo udevadm trigger
 
-<!-- TOC --><a name="contributing"></a>
+If you use `libusb`, you may need slightly different rule:
+
+```
+SUBSYSTEM=="usb", ATTR{idVendor}=="20a0", ATTR{idProduct}=="41e5", MODE="0666"
+```
 
 ## Contributing
 
 Open pull requests, you are welcome.
-
-<!-- TOC --><a name="testing"></a>
 
 ## Testing
 
 To run tests, you need to have Blinkstick device connected to your computer. This makes it impossible to run tests on
 CI, and even typical automated testing is rather challenging.
 
-<!-- TOC --><a name="manual-test"></a>
-
 ### Manual test
 
 Run `npm run test:manual` and follow the instructions. You should physically see the device changing colors, and you
 will answer yes/no to the questions.
-
-<!-- TOC --><a name="automated-tests"></a>
 
 ### Automated tests
 
 As most interesting parts of the library require a Blinkstick device and human eye to operate (both unavailable in GitHub Actions), we have rather limited automated tests, testing mostly utility functions and frame generation.
 
 Just run `npm test` and it will run the tests.
-
-<!-- TOC --><a name="coverage"></a>
 
 ### REPL
 
@@ -460,20 +435,14 @@ This file is line-delimited JSON, with each line being a single read or write op
 
 A proper coverage report would run both manual and automated tests. Feel free to open a PR if you have an idea how to do it.
 
-<!-- TOC --><a name="maintainer"></a>
-
 ## Maintainer
 
 - Michał Wadas - [https://github.com/Ginden](https://github.com/Ginden)
-
-<!-- TOC --><a name="original-maintainers"></a>
 
 ### Original maintainers
 
 - Arvydas Juskevicius - [http://twitter.com/arvydev](http://twitter.com/arvydev)
 - Paul Cuthbertson - [http://twitter.com/paulcuth](http://twitter.com/paulcuth)
-
-<!-- TOC --><a name="copyright-and-license"></a>
 
 ## Copyright and License
 

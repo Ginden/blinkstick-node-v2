@@ -1,7 +1,7 @@
 import { BlinkStickLibUsb } from '../../core/blinkstick-lib-usb';
 import { LibUsbTransport } from '../../transport/lib-usb-transport';
 import { blinkstickFinalizationRegistry } from '../../core/blinkstick-finalization-registry';
-import { Device } from 'usb';
+import type { Device } from 'usb';
 
 export async function createBlinkstickLibUsb(device: Device): Promise<BlinkStickLibUsb> {
   device.open();

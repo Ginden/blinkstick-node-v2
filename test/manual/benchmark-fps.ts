@@ -19,6 +19,7 @@ export async function benchmarkFps(
   blinkstickDevice: BlinkStick,
   frames = 300,
 ): Promise<{ deciles: DecileStats[]; average: number }> {
+  console.log(`Benchmarking FPS for ${blinkstickDevice.product}, this may take a while.`);
   const leds = blinkstickDevice.leds();
 
   // If LEDs group is not available (e.g. inverse mode) bail out.
