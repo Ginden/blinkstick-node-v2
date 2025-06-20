@@ -18,7 +18,7 @@ export const BlinkStickProMode = {
    */
   WS2812: 2,
   /**
-   * This mode is not documented in the official API, but it is used in the
+   * This mode is not documented in the official API nor in open-source firmware, but it is used in the
    * BlinkStickClient .NET library:
    * @see https://github.com/arvydas/blinkstick-client/blob/5f32a3d8c812abf521f99d54196784ab38c80ba7/BlinkStickClient/Widgets/BlinkStickInfoWidget.cs#L72
    * @experimental

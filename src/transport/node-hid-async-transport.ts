@@ -4,7 +4,7 @@ import type { Device, HIDAsync } from 'node-hid';
 export class NodeHidAsyncTransport extends UsbTransport {
   protected deviceInfo!: Device;
 
-  private constructor(private readonly device: HIDAsync) {
+  protected constructor(protected readonly device: HIDAsync) {
     super();
   }
 

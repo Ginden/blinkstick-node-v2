@@ -1,12 +1,11 @@
-import { NormalizedColorOptions } from '../../types/color-options';
-import { AllPossibleColorOptions } from '../../types/all-possible-color-options';
-import { RgbTuple } from '../../types';
+import type { NormalizedColorOptions } from '../../types/color-options';
+import type { AllPossibleColorOptions } from '../../types/all-possible-color-options';
+import type { RgbTuple } from '../../types';
 
 export function normalizeHexColor(
   color: string,
   options?: AllPossibleColorOptions,
 ): NormalizedColorOptions {
-  // TODO: this can be cached, I guess, at least for COLOR_KEYWORDS
   if (color.startsWith('#')) {
     return normalizeHexColor(color.slice(1), options);
   }

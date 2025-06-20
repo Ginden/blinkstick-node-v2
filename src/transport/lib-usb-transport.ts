@@ -12,11 +12,14 @@ export class LibUsbTransport extends UsbTransport {
   protected readonly wIndex = 0;
   public constructor(
     public device: Device,
-    private readonly minimalDeviceInfo: MinimalDeviceInfo,
+    protected readonly minimalDeviceInfo: MinimalDeviceInfo,
   ) {
     super();
   }
 
+  /**
+   * Creates a new instance of LibUsbTransport from a USB device.
+   */
   static async buildFromDevice(device: Device): Promise<LibUsbTransport> {
     const minimimalDeviceInfo = await LibUsbTransport.calculateMinimalDeviceInfo(device);
 
@@ -30,6 +33,10 @@ export class LibUsbTransport extends UsbTransport {
     return new LibUsbTransport(device, minimimalDeviceInfo);
   }
 
+  /**
+   * Calculates minimal device information from a USB device.
+   * This includes vendorId, productId, release, manufacturer, product, and serialNumber.
+   */
   static async calculateMinimalDeviceInfo(device: Device): Promise<MinimalDeviceInfo> {
     if (isDeviceOpen(device)) {
       const desc = device.deviceDescriptor;
@@ -67,7 +74,7 @@ export class LibUsbTransport extends UsbTransport {
 
     const ret = await new Promise<Buffer | number | undefined>((resolve, reject) => {
       this.device.controlTransfer(
-        bmRequestType, // bmRequestType: Host to device | Class | Interface
+        bmRequestType,
         0x09, // bRequest: SET_REPORT
         wValue, // wValue: (3=Feature) << 8 | reportId
         this.wIndex, // wIndex: interface number

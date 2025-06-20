@@ -1,5 +1,5 @@
-import { RgbTuple } from '../types';
-import { hexToRgbTuple, normalizeHexColor } from '../utils';
+import type { RgbTuple } from '../types';
+import { hexToRgbTuple } from '../utils/colors/normalize-hex-color';
 
 /**
  * Color keywords, taken as-is from original library.

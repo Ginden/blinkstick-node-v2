@@ -1,5 +1,5 @@
-import { BlinkStick } from '../core/blinkstick';
-import { FrameIterable } from './animation-description';
+import type { BlinkstickAny } from '../core/blinkstick';
+import type { FrameIterable } from './animation-description';
 import { assert } from 'tsafe';
 import { combine } from './helpers/combine';
 import { SimpleFrame } from './frame/simple-frame';
@@ -30,7 +30,7 @@ export class AnimationRunner {
   protected buffer;
   protected isRunning = false;
 
-  constructor(public readonly blinkstick: BlinkStick) {
+  constructor(public readonly blinkstick: BlinkstickAny) {
     this.ledGroup = blinkstick.leds();
     this.leds = Array.from({ length: blinkstick.ledCount }, (_, index) =>
       this.blinkstick.led(index),
@@ -155,7 +155,7 @@ export class AnimationRunner {
     if (waitTime > 0) await scheduler.wait(waitTime, { signal });
   }
 
-  private emitWarningForShortFrameDuration(frame: Frame) {
+  protected emitWarningForShortFrameDuration(frame: Frame) {
     if (warningEverEmitted) return;
     warningEverEmitted = true;
     process.emitWarning(

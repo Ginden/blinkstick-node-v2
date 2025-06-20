@@ -83,15 +83,28 @@ export const deviceDescriptions = {
   }
 >;
 
+/**
+ * @useDeclaredType
+ */
 export type KnownDeviceName = keyof typeof deviceDescriptions;
 
-export function attemptToGetDeviceDescription(device: MinimalDeviceInfo) {
+/**
+ * @useDeclaredType
+ */
+export type KnownDeviceInfo = {
+  [K in KnownDeviceName]: { name: K } & (typeof deviceDescriptions)[K]['description'];
+}[KnownDeviceName];
+
+/**
+ * @expandType KnownDeviceInfo
+ */
+export function attemptToGetDeviceDescription(device: MinimalDeviceInfo): KnownDeviceInfo | null {
   for (const [name, { test, description }] of Object.entries(deviceDescriptions)) {
     if (test(device)) {
       return {
         name,
         ...description,
-      };
+      } as KnownDeviceInfo;
     }
   }
   return null;

@@ -4,7 +4,7 @@ import { HID } from 'node-hid';
 import { Buffer } from 'node:buffer';
 
 export class NodeHidSyncTransport extends UsbTransport {
-  constructor(private readonly device: HID) {
+  constructor(protected readonly device: HID) {
     super();
   }
 

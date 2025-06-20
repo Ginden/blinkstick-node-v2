@@ -1,6 +1,5 @@
 import { ColorInput } from '../../types';
 import { COLOR_KEYWORD_RGB_TUPLES, COLOR_KEYWORDS } from '../../consts/color-keywords';
-import { normalizeHexColor } from './normalize-hex-color';
 import { RgbTuple } from '../../types/rgb-tuple';
 import { typeGuard } from 'tsafe';
 

@@ -1,5 +1,5 @@
-import { RgbTuple } from '../types/rgb-tuple';
-import { Buffer } from 'node:buffer';
+import type { RgbTuple } from '../types/rgb-tuple';
+import type { Buffer } from 'node:buffer';
 
 /**
  * Converts an array of RGB tuples to a buffer for bulk setting.
@@ -11,9 +11,11 @@ export function convertArrayOfRgbTuplesToBulkSetBuffer(tuples: RgbTuple[], buffe
 
   for (const [index, tuple] of tuples.entries()) {
     const offset = index * 3;
-    buffer.writeUInt8(tuple[1], offset); // R
-    buffer.writeUInt8(tuple[0], offset + 1); // G
-    buffer.writeUInt8(tuple[2], offset + 2); // B
+    const [r, g, b] = tuple;
+    // We need to write GRB format
+    buffer.writeUInt8(g, offset);
+    buffer.writeUInt8(r, offset + 1);
+    buffer.writeUInt8(b, offset + 2);
   }
 
   return buffer;

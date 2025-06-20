@@ -30,6 +30,7 @@ import { scheduler } from 'node:timers/promises';
 import { FeatureReportId } from '../types';
 import { MinimalDeviceInfo, UsbTransport } from '../transport';
 import { Buffer } from 'node:buffer';
+import { getRandomColor } from '../utils';
 
 function wrapWithDebug<T extends UsbTransport>(
   device: T,
@@ -129,6 +130,7 @@ export abstract class BlinkStick<Transport extends UsbTransport = UsbTransport> 
       });
     }
 
+    // This seems relevant only for a base device?
     this.requiresSoftwareColorPatch =
       this.versionMajor == 1 && this.versionMinor >= 1 && this.versionMinor <= 3;
   }
@@ -215,6 +217,7 @@ export abstract class BlinkStick<Transport extends UsbTransport = UsbTransport> 
    */
   async stop() {
     await this.animation?.stop();
+    this.abortController.abort();
     this.abortController = new AbortController();
   }
 
@@ -315,6 +318,7 @@ export abstract class BlinkStick<Transport extends UsbTransport = UsbTransport> 
 
   /**
    * Sets the number of LEDs on "supported" devices.
+   * Note that unplugging and plugging the device may be necessary for the change to take effect.
    * @param count
    * @experimental
    */
@@ -352,8 +356,12 @@ export abstract class BlinkStick<Transport extends UsbTransport = UsbTransport> 
     return this;
   }
 
-  async setRandomColor() {
-    return await this.setColor('random');
+  /**
+   * Set a random color on BlinkStick.
+   * @param index The index of the LED, 0 is default
+   */
+  async setRandomColor(index = 0) {
+    return await this.setColor(getRandomColor(), { index });
   }
 
   /**
@@ -413,7 +421,12 @@ export abstract class BlinkStick<Transport extends UsbTransport = UsbTransport> 
     await this.setFeatureReport(asBuffer(report));
   }
 
-  private async setBigColorsOnLinux(channel: Channel, data: Buffer) {
+  /**
+   * A workaround for setting colors on Flex on Linux.
+   * @param channel
+   * @param data
+   */
+  protected async setBigColorsOnLinux(channel: Channel, data: Buffer) {
     assert(data.length % 3 === 0, 'Data length must be a multiple of 3');
     const ledOffset = 16; // First 16 LEDs are set with a single feature report
     const first16LedsData = data.subarray(0, ledOffset * 3);
@@ -425,7 +438,7 @@ export abstract class BlinkStick<Transport extends UsbTransport = UsbTransport> 
     const rgbTuples: { rgb: RgbTuple; ledIndex: number }[] = [];
     for (let i = 0; i < buff.length; i += 3) {
       const ledIndex = i + ledOffset; // Start from 16, as we already set first 16 LEDs
-      // Here data is in GBR format, so we need to convert it to RGB
+      // Here data is in GRB format, so we need to convert it to RGB
       const r = buff[i + 1] | 0;
       const g = buff[i] | 0;
       const b = buff[i + 2] | 0;
@@ -491,27 +504,19 @@ export abstract class BlinkStick<Transport extends UsbTransport = UsbTransport> 
    * @param data
    */
   async setInfoBlock1(data: Buffer) {
-    return await setInfoBlock(this, 0x0002, data);
+    return await setInfoBlock(this, FeatureReportId.InfoBlock1, data);
   }
 
   /**
    * Get the infoblock2 of the device.
    * This is a 32 byte array that can contain any data.
-   *
-   * Usage:
-   *
-   * @example
-   *     getInfoBlock2(function(err, data) {
-   *         console.log(data);
-   *     });
-   *
    */
   async getInfoBlock2() {
-    return await getInfoBlockRaw(this, 0x0003);
+    return await getInfoBlockRaw(this, FeatureReportId.InfoBlock2);
   }
 
   async setInfoBlock2(data: Buffer) {
-    return await setInfoBlock(this, 0x0003, data);
+    return await setInfoBlock(this, FeatureReportId.InfoBlock2, data);
   }
 
   turnOff(index: number = 0) {
@@ -522,6 +527,9 @@ export abstract class BlinkStick<Transport extends UsbTransport = UsbTransport> 
     await this.leds().setColor([0, 0, 0]);
   }
 
+  /**
+   * @deprecated Use Animation API instead
+   */
   async blink(...options: ColorOptions) {
     const { interpretParameters } = this;
     const params = interpretParameters(...options);
@@ -736,7 +744,7 @@ export abstract class BlinkStick<Transport extends UsbTransport = UsbTransport> 
   async getFeatureReport(
     reportId: number,
     length: number,
-    maxRetries: number = 5,
+    maxRetries: number = this.defaultRetryCount,
   ): Promise<Buffer> {
     return retryNTimes(maxRetries, async () => this.getFeatureReportRaw(reportId, length));
   }
@@ -773,4 +781,5 @@ export abstract class BlinkStick<Transport extends UsbTransport = UsbTransport> 
   }
 }
 
-export type BlinkstickAny = BlinkStick<UsbTransport>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type BlinkstickAny = BlinkStick<any>;

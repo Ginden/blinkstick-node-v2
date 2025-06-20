@@ -1,13 +1,16 @@
 import { BlinkStickLibUsb } from '../../core/blinkstick-lib-usb';
-import { DiscoveryFilter } from '../discovery-filter';
+import { createDiscoverFilterFn, DiscoveryFilter } from '../discovery-filter';
 import { getLibUsb } from './get-lib-usb';
 import { LibUsbTransport } from '../../transport/lib-usb-transport';
-import { deviceDescriptions } from '../../consts/device-descriptions';
 import { createBlinkstickLibUsb } from './create-blinkstick-libusb';
 
+/**
+ * Finds all BlinkStick devices using libusb.
+ * @category Discovery
+ */
 export async function findAll(filter: DiscoveryFilter = () => true): Promise<BlinkStickLibUsb[]> {
-  const actualFilter = typeof filter === 'string' ? deviceDescriptions[filter].test : filter;
-  const libUsb = await getLibUsb();
+  const actualFilter = createDiscoverFilterFn(filter);
+  const libUsb = getLibUsb();
   const devices = libUsb.getDeviceList();
 
   const devicesRaw = await Promise.all(

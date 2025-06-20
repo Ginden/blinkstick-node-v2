@@ -24,19 +24,19 @@ export const FeatureReportDescription = {
   },
   Set8Pixels: {
     reportId: 0x06,
-    bufferLength: 1 + 3 * 8,
+    bufferLength: 25,
   },
   Set16Pixels: {
     reportId: 0x07,
-    bufferLength: 1 + 3 * 16,
+    bufferLength: 49 /* 1 + 3 * 16 */,
   },
   Set32Pixels: {
     reportId: 0x08,
-    bufferLength: 1 + 3 * 32,
+    bufferLength: 97 /* 1 + 3 * 32 */,
   },
   Set64Pixels: {
     reportId: 0x09,
-    bufferLength: 1 + 3 * 64,
+    bufferLength: 193 /* 1 + 3 * 64 */,
   },
 } as const;
 
@@ -45,3 +45,5 @@ export const FeatureReportId = Object.fromEntries(
 ) as {
   [key in keyof typeof FeatureReportDescription]: (typeof FeatureReportDescription)[key]['reportId'];
 };
+
+export type FeatureReportId = (typeof FeatureReportId)[keyof typeof FeatureReportId];
