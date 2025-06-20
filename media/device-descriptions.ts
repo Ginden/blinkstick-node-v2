@@ -1,4 +1,4 @@
-import type { Device } from 'node-hid';
+import { MinimalDeviceInfo } from '../transport';
 
 /**
  * Simple type that describes a Blinkstick device.
@@ -78,18 +78,33 @@ export const deviceDescriptions = {
 } as const satisfies Record<
   string,
   {
-    test: (device: Device) => boolean;
+    test: (device: MinimalDeviceInfo) => boolean;
     description: BlinkstickDeviceDefinition;
   }
 >;
 
-export function attemptToGetDeviceDescription(device: Device) {
+/**
+ * @useDeclaredType
+ */
+export type KnownDeviceName = keyof typeof deviceDescriptions;
+
+/**
+ * @useDeclaredType
+ */
+export type KnownDeviceInfo = {
+  [K in KnownDeviceName]: { name: K } & (typeof deviceDescriptions)[K]['description'];
+}[KnownDeviceName];
+
+/**
+ * @expandType KnownDeviceInfo
+ */
+export function attemptToGetDeviceDescription(device: MinimalDeviceInfo): KnownDeviceInfo | null {
   for (const [name, { test, description }] of Object.entries(deviceDescriptions)) {
     if (test(device)) {
       return {
         name,
         ...description,
-      };
+      } as KnownDeviceInfo;
     }
   }
   return null;
