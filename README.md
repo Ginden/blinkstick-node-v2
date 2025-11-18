@@ -71,6 +71,21 @@ await blinkstick.pulse('purple');
 
 <!-- TOC end -->
 
+### Jump to REPL
+
+````bash
+git clone git@github.com:Ginden/blinkstick-node-v2.git
+cd blinkstick-node-v2
+npm ci
+npm run repl
+````
+
+This will automatically find all your BlinkStick devices and assign them to global variables. Just type:
+
+```js
+blinkStickNano.leds().setColor('red')
+```
+
 ## About this project
 
 This project is a **fork** of the original [blinkstick-node](https://github.com/arvydas/blinkstick-node) library.  
@@ -103,6 +118,15 @@ What is BlinkStick? It's a tiny USB-controlled RGB LED device. Learn more at <ht
 
 - Restored original return types of several methods
 - No `string` when dealing with low-level data - use `Buffer` instead, we assume that you know what you are doing
+
+### Manual testing
+
+To see what a library can do, clone git repository and run:
+
+```bash
+npm run test:manual
+```
+
 
 ### BlinkStick Flex on Linux
 

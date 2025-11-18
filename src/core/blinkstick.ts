@@ -85,18 +85,49 @@ export abstract class BlinkStick<Transport extends UsbTransport = UsbTransport> 
      * Changes the default retry count for sending feature reports.
      */
     public defaultRetryCount = 5;
+    /**
+     * LED count of the device, based on known device descriptions.
+     */
     public ledCount: number;
     readonly requiresSoftwareColorPatch: boolean;
     readonly device: Transport;
+    /**
+     * Serial number of the device. Format: BSnnnnnn-x.y
+     */
     readonly serial: string;
+    /**
+     * Manufacturer of the device (always 'Agile Innovative Ltd')
+     */
     readonly manufacturer: string;
+    /**
+     * Product name of the device (e.g., 'BlinkStick Nano'). MAY be wrong (eg. BlinkStick Square identifies as "BlinkStick")
+     */
     readonly product: string;
+    /**
+     * Version, small integer representing major version (x in BSnnnnnn-x.y)
+     */
     readonly versionMajor: number;
+    /**
+     * Version, small integer representing minor version (y in BSnnnnnn-x.y)
+     */
     readonly versionMinor: number;
+    readonly deviceDescription;
+
+    /**
+     * @hidden
+     */
     protected _animation?: AnimationRunner;
+    /**
+     * @hidden
+     */
     protected _inverse = false;
-    public readonly deviceDescription;
+    /**
+     * @hidden
+     */
     protected commandDebug: string | null;
+    /**
+     * @hidden
+     */
     protected debugWriteStream: WriteStream | null = null;
     protected deviceInfo: MinimalDeviceInfo;
     protected isLinux: boolean = process.platform === 'linux';
@@ -185,7 +216,7 @@ export abstract class BlinkStick<Transport extends UsbTransport = UsbTransport> 
     }
 
     /**
-     * Low-level method that directly sends a feature report to the device.
+     * @summary Low-level method that directly sends a feature report to the device.
      * @param data
      */
     async sendFeatureReport(data: number[] | Buffer) {
@@ -211,7 +242,7 @@ export abstract class BlinkStick<Transport extends UsbTransport = UsbTransport> 
     }
 
     /**
-     * Close BlinkStick device and stop all animations
+     * @summary Close BlinkStick device and stop all animations
      */
     async close() {
         blinkstickFinalizationRegistry.unregister(this);

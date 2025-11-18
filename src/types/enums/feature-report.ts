@@ -2,6 +2,7 @@
  * @summary Descriptions of HID feature reports for BlinkStick devices.
  * @remarks Based on https://github.com/subzey/blinkstick-webhid
  * @category Constants
+ * @enum
  */
 export const FeatureReportDescription = {
   SetFirst: {
@@ -44,6 +45,7 @@ export const FeatureReportDescription = {
 
 /**
  * @category Constants
+ * @enum
  */
 export const FeatureReportId = Object.fromEntries(
   Object.entries(FeatureReportDescription).map(([key, value]) => [key, value.reportId]),
@@ -53,5 +55,6 @@ export const FeatureReportId = Object.fromEntries(
 
 /**
  * @category Constants
+ * @internal
  */
 export type FeatureReportId = (typeof FeatureReportId)[keyof typeof FeatureReportId];

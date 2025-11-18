@@ -1,6 +1,7 @@
 /**
  * @summary BlinkStick modes (applicable to BlinkStick Pro).
  * @category Constants
+ * @enum
  */
 export const BlinkStickProMode = {
   /**
@@ -27,5 +28,6 @@ export const BlinkStickProMode = {
 
 /**
  * @category Constants
+ * @internal
  */
 export type BlinkStickProMode = (typeof BlinkStickProMode)[keyof typeof BlinkStickProMode];

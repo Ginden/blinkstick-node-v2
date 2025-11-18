@@ -1,15 +1,10 @@
 import { findByIdAsync, findFirst, findFirstAsync } from './find/find-first';
 import { findBlinkSticks, findBlinkSticksAsync } from './find/find-blink-sticks';
 
-/**
- * Find BlinkStick devices.
- * @namespace findBlinkstick
- * @category Discovery
- */
-export const findBlinkstick = {
-  firstSync: findFirst,
-  first: findFirstAsync,
-  allSync: findBlinkSticks,
-  all: findBlinkSticksAsync,
-  byId: findByIdAsync,
-};
+export {
+    findByIdAsync as byId,
+    findFirst as firstSync,
+    findFirstAsync as first,
+    findBlinkSticks as allSync,
+    findBlinkSticksAsync as all,
+}

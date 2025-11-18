@@ -4,6 +4,7 @@ import { hexToRgbTuple } from '../utils/colors/normalize-hex-color';
 /**
  * @summary Color keywords, taken as-is from original library.
  * @category Constants
+ * @enum
  */
 export const COLOR_KEYWORDS = {
   aqua: '#00ffff',
