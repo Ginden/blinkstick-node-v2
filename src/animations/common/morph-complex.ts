@@ -11,7 +11,7 @@ import { assertFpsBelow100 } from '../helpers/assert-fps-below-100';
 
 /**
  * @summary Morphs between two complex frames.
- * @category Animations
+ * @category Animation
  */
 export function morphBetweenComplexFrames(
   firstFrameAsComplexFrame: ComplexFrame,
@@ -48,7 +48,7 @@ export function morphBetweenComplexFrames(
 
 /**
  * @summary Smooth transition between two animations.
- * @category Animations
+ * @category Animation
  */
 export function morphComplex(
   source: FrameIterable,

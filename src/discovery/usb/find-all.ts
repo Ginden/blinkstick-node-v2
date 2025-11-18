@@ -5,7 +5,7 @@ import { LibUsbTransport } from '../../transport/lib-usb-transport';
 import { createBlinkstickLibUsb } from './create-blinkstick-libusb';
 
 /**
- * Finds all BlinkStick devices using libusb.
+ * @summary Finds all BlinkStick devices using libusb.
  * @category Discovery
  */
 export async function findAll(filter: DiscoveryFilter = () => true): Promise<BlinkStickLibUsb[]> {

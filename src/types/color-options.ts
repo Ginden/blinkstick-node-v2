@@ -3,6 +3,7 @@ import { AllPossibleColorOptions } from './all-possible-color-options';
 import { ColorObject } from './color-object';
 
 /**
+ * @summary Legacy list of all possible ways to specify a color along with additional options.
  * @deprecated Use newer APIs instead
  * @category Legacy
  */
@@ -18,6 +19,10 @@ export type ColorOptions<AdditionalOptions = AllPossibleColorOptions> =
   | [ColorObject, additionalOptions?: AdditionalOptions]
   | [css: string, additionalOptions?: AdditionalOptions];
 
+/**
+ * @deprecated Use newer APIs instead
+ * @category Legacy
+ */
 export interface NormalizedColorOptions<AdditionalOptions = AllPossibleColorOptions>
   extends ColorObject {
   options: AdditionalOptions;

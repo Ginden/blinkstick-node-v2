@@ -2,6 +2,7 @@ import { MinimalDeviceInfo, UsbTransport } from './usb-transport';
 import type { Device, HIDAsync } from 'node-hid';
 
 /**
+ * @summary UsbTransport implementation using the 'node-hid' library with asynchronous methods.
  * @category Adapters
  */
 export class NodeHidAsyncTransport extends UsbTransport {

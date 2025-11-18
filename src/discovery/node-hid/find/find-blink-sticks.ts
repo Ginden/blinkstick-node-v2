@@ -4,10 +4,13 @@ import { createBlinkstickAsync } from '../create/create-blinkstick-async';
 import { BlinkstickSync } from '../../../core/versions/blinkstick.sync';
 import { BlinkstickAsync } from '../../../core';
 
+/**
+ * @summary A filter function for Node-HID devices.
+ */
 export type NodeHidFilterFunction = (device: usb.Device) => boolean;
 
 /**
- * Find BlinkSticks using a filter, using synchronous USB device enumeration.
+ * @summary Find BlinkSticks using a filter, using synchronous USB device enumeration.
  * @category Discovery
  */
 export function findBlinkSticksSync(filter: NodeHidFilterFunction = () => true): BlinkstickSync[] {
@@ -27,7 +30,7 @@ export function findBlinkSticksSync(filter: NodeHidFilterFunction = () => true):
 export { findBlinkSticksSync as findBlinkSticks };
 
 /**
- * Find BlinkSticks using a filter, using asynchronous USB device enumeration.
+ * @summary Find BlinkSticks using a filter, using asynchronous USB device enumeration.
  * @param filter
  * @category Discovery
  */

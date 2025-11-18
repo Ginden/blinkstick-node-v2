@@ -1,10 +1,16 @@
 export * from './discovery/node-hid';
 /**
- * `libusb` based discovery module for BlinkStick devices.
+ * @summary `libusb` based discovery module for BlinkStick devices.
  * @module Discovery
  * @namespace usb
  */
 export * as usb from './discovery/usb';
+/**
+ * @summary `node-hid` based discovery module for BlinkStick devices.
+ * @module Discovery
+ * @namespace nodeHid
+ */
+export * as nodeHid from './discovery/node-hid';
 export * from './discovery/discovery-filter';
 export * from './core';
 export * from './consts/consts';

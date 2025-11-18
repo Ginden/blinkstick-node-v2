@@ -9,6 +9,7 @@ function isDeviceOpen(device: LibUsbDevice): boolean {
 }
 
 /**
+ * @summary UsbTransport implementation using the 'usb' (libusb) library.
  * @category Adapters
  */
 export class LibUsbTransport extends UsbTransport {

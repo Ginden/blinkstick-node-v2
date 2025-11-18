@@ -51,8 +51,9 @@ export class AnimationRunner {
   }
 
   /**
-   * Runs the animation
-   * If the animation is already running, it will throw an error
+   * @summary Runs the animation
+   *
+   * @remarks If the animation is already running, it will throw an error
    *
    * Will wait for the animation to finish before returning
    * @param animations
@@ -66,8 +67,8 @@ export class AnimationRunner {
   }
 
   /**
-   * Will replace the current animation and run the new one
-   * Optional callback will be called when the animation is finished
+   * @summary Will replace the current animation and run the new one, returning immediately
+   * @remarks Optional callback will be called when the animation is finished (may be never)
    */
   runAndForget(
     animations: FrameIterable[],
@@ -85,9 +86,9 @@ export class AnimationRunner {
   }
 
   /**
-   * Runs the animation, replacing the current one
+   * @summary Runs the animation, replacing the current one
    *
-   * If the animation is already running, it will be stopped
+   * @remarks If the animation is already running, it will be stopped
    *
    * You can pass an optional AbortSignal to cancel the animation at any time
    */

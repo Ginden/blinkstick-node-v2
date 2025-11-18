@@ -1,5 +1,6 @@
 /**
- * Based on https://github.com/subzey/blinkstick-webhid
+ * @summary Descriptions of HID feature reports for BlinkStick devices.
+ * @remarks Based on https://github.com/subzey/blinkstick-webhid
  * @category Constants
  */
 export const FeatureReportDescription = {

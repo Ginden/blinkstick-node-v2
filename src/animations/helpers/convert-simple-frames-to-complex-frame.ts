@@ -12,6 +12,8 @@ interface LedState {
 }
 
 /**
+ * @summary Converts multiple simple frame iterables (one per LED) into a single complex frame iterable.
+ * @remarks
  * This function allows you to convert a set of simple frames into complex frames -
  * effectively animating each LED independently.
  *

@@ -4,7 +4,7 @@ import { blinkstickFinalizationRegistry } from '../../core/blinkstick-finalizati
 import type { Device } from 'usb';
 
 /**
- * Creates a BlinkStickLibUsb instance from a USB device.
+ * @summary Creates a BlinkStickLibUsb instance from a USB device.
  * @category Discovery
  */
 export async function createBlinkstickLibUsb(device: Device): Promise<BlinkStickLibUsb> {

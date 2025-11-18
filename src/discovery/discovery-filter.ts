@@ -15,7 +15,7 @@ export type DiscoveryFilter = KnownDeviceName | DiscoverFilterFunction;
 
 
 /**
- * Creates a discovery filter function from a given filter.
+ * @summary Creates a discovery filter function from a given filter.
  * @param filter
  * @category Discovery
  */

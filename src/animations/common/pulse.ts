@@ -5,7 +5,7 @@ import { assert } from 'tsafe';
 import { assertFpsBelow100 } from '../helpers/assert-fps-below-100';
 
 /**
- * @category Animations
+ * @category Animation
  * @category Inputs
  */
 export type PulseOptions = {
@@ -15,7 +15,7 @@ export type PulseOptions = {
 
 /**
  * @summary Pulses a color and backs off to black.
- * @category Animations
+ * @category Animation
  */
 export function pulse(
   [r, g, b]: RgbTuple,

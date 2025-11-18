@@ -102,9 +102,9 @@ function buildAveragedFrame(
 }
 
 /**
- * **Streaming** FPS smoother.
+ * @summary **Streaming** FPS smoother.
  *
- * Guarantees that no more than `maxFps` frames per second are produced **while
+ * @remarks Guarantees that no more than `maxFps` frames per second are produced **while
  * preserving the original animation duration**. Colours inside every output
  * slice are calculated as the duration-weighted average of the covered source
  * frames. Works with both `Iterable` and `AsyncIterable` sources.

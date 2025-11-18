@@ -6,7 +6,7 @@ import { Frame } from '../frame/frame';
 import { WaitFrame } from '../frame/wait-frame';
 
 /**
- * Sets maximum duration for an animation.
+ * @summary Sets maximum duration for an animation.
  * The last frame can be shortened to fit the maximum duration.
  * Frames beyond the maximum duration are dropped
  * @category Animation

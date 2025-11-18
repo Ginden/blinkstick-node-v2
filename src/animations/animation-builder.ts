@@ -24,11 +24,17 @@ import { assert } from 'tsafe';
 export class AnimationBuilder {
   protected subAnimations: FrameIterable[] = [];
 
+    /**
+     * @summary Starts an animation with a black frame.
+     */
   static startWithBlack(ms: number): AnimationBuilder {
     const builder = new AnimationBuilder();
     return builder.addStaticFrame(new SimpleFrame([0, 0, 0], ms));
   }
 
+    /**
+     * @summary Starts an animation with a given color.
+     */
   static startWithColor(color: ColorInput, ms: number): AnimationBuilder {
     const builder = new AnimationBuilder();
     return builder.addStaticFrame(new SimpleFrame(colorInputToRgbTuple(color), ms));
@@ -45,7 +51,8 @@ export class AnimationBuilder {
   }
 
   /**
-   * Forks the current animation builder, allowing to create a new animation
+   * @summary Forks the current animation builder
+   * @remarks Forks the current animation builder allowing to create a new animation
    * that is a copy of the current one.
    * If any of the animations are generators, an error will be thrown.
    */
@@ -56,18 +63,24 @@ export class AnimationBuilder {
     return builder;
   }
 
-  /*
-   * Adds a static frame to the animation.
+  /**
+   * @summary Adds a static frame of single color to the animation.
    */
   public stillColor(color: ColorInput, ms: number) {
     return this.addStaticFrame(new SimpleFrame(colorInputToRgbTuple(color), ms));
   }
 
+    /**
+     * @summary Adds a static frame to the animation.
+     */
   public addStaticFrame(simpleFrame: Frame) {
     this.subAnimations.push([simpleFrame]);
     return this;
   }
 
+    /**
+     * @summary Adds a pulse animation to the current animation.
+     */
   public addPulse(color: ColorInput, overMs: number, steps = overMs / 60) {
     assertFpsBelow100(overMs, steps);
     this.subAnimations.push(pulse(colorInputToRgbTuple(color), { steps, overMs }));
@@ -75,8 +88,7 @@ export class AnimationBuilder {
   }
 
   /**
-   * Appends a new animation to the current one.
-   * @param animation
+   * @summary Appends a new animation to the current one.
    */
   public append(animation: FrameIterable) {
     this.subAnimations.push(animation);
@@ -84,8 +96,9 @@ export class AnimationBuilder {
   }
 
   /**
-   * Appends a new animation to the current one, but provides smooth transition between last frame of the current animation
+   * @summary Appends a new animation to the current one, but provides smooth transition between last frame of the current animation
    * and first frame of the new one.
+   * @throws If any of the current sub-animations are generators.
    */
   smoothTransitionToAnimation(animation: FrameIterable, ms: number, steps = ms / 60) {
     this.assertNoGenerators();
@@ -94,9 +107,8 @@ export class AnimationBuilder {
   }
 
   /**
-   * Morphs the current animation to the given color.
-   * @param color
-   * @param ms
+   * @summary Morphs the current animation to the given color.
+   * @throws If any of the current sub-animations are generators.
    */
   morphToColor(color: ColorInput, ms: number) {
     this.assertNoGenerators();
@@ -111,7 +123,7 @@ export class AnimationBuilder {
   }
 
   /**
-   * Waits for the given time, retaining current color and state.
+   * @summary Waits for the given time, retaining current color and state.
    * @param ms
    */
   public wait(ms: number) {
@@ -119,8 +131,8 @@ export class AnimationBuilder {
   }
 
   /**
-   * Repeats the current animation the given number of times.
-   * @param times
+   * @summary Repeats the current animation the given number of times.
+   * @throws If any of the current sub-animations are generators.
    */
   repeat(times: number) {
     this.assertNoGenerators();
@@ -128,12 +140,19 @@ export class AnimationBuilder {
     return this;
   }
 
+    /**
+     * @summary Apply a transformation to each frame of the current animation.
+     * @throws If any of the current sub-animations are generators.
+     */
   transformEachFrame(transform: TransformEachFrameCb) {
     this.assertNoGenerators();
     this.subAnimations = [transformEachFrame(combine(...this.subAnimations), transform)];
     return this;
   }
 
+    /**
+     * @summary Builds the final animation.
+     */
   build() {
     assert(this.subAnimations.length > 0, 'No animations to build');
     return combine(...this.subAnimations);

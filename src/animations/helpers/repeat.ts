@@ -3,8 +3,8 @@ import { assert } from 'tsafe';
 import { types } from 'node:util';
 
 /**
- * Repeats an animation a specified number of times.
- * Note that passing a generator object to repeat will not work as expected;
+ * @summary Repeats an animation a specified number of times.
+ * @remarks Note that passing a generator object to repeat will not work as expected;
  * @category Animation
  */
 export function repeat(

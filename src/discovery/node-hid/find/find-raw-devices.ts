@@ -2,7 +2,7 @@ import usb from 'node-hid';
 import { PRODUCT_ID, VENDOR_ID } from '../../../consts/consts';
 
 /**
- * Find raw USB devices using synchronous USB device enumeration.
+ * @summary Find raw USB devices using synchronous USB device enumeration.
  * @category Discovery
  */
 export function findRawDevicesSync(): usb.Device[] {
@@ -10,7 +10,7 @@ export function findRawDevicesSync(): usb.Device[] {
 }
 
 /**
- * Find raw USB devices using asynchronous USB device enumeration.
+ * @summary Find raw USB devices using asynchronous USB device enumeration.
  * @category Discovery
  */
 export async function findRawDevicesAsync() {

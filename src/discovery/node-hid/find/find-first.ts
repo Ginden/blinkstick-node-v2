@@ -5,8 +5,9 @@ import { type BlinkstickSync } from '../../../core';
 import { createDiscoverFilterFn, DiscoveryFilter } from '../../discovery-filter';
 
 /**
- * Find first attached BlinkStick and create a BlinkStick object.
- * Optionally takes a product name to filter by.
+ * @summary Find first attached BlinkStick and create a BlinkStickSync object.
+ * @remarks Optionally takes a filter (device name or function) to find a specific BlinkStick.
+ * Returns null if no BlinkStick is found.
  * @category Discovery
  */
 export function findFirstSync(
@@ -22,7 +23,7 @@ export function findFirstSync(
 export { findFirstSync as findFirst };
 
 /**
- * Find first attached BlinkStick asynchronously and create a BlinkStick object.
+ * @summary Find first attached BlinkStick asynchronously and create a BlinkStickAsync instance.
  * @category Discovery
  */
 export async function findFirstAsync(discoveryFilter: DiscoveryFilter = () => true) {
@@ -37,7 +38,7 @@ export async function findFirstAsync(discoveryFilter: DiscoveryFilter = () => tr
 }
 
 /**
- * Finds a blinkstick by its ID.
+ * @summary Finds a blinkstick by its ID.
  * @param id The ID of the blinkstick to find, created via `blinkstick.id`.
  * @returns The found blinkstick or null if not found.
  * @category Discovery

@@ -13,7 +13,9 @@ export type WaveOptions = {
 };
 
 /**
- * Build wave effect by time-line stitching – this guarantees the overall
+ * @summary Build wave effect
+ *
+ * @remarks Build wave effect by time-line stitching – this guarantees the overall
  * duration is exactly:
  *    animationDuration + lagMs × (ledCount - 1)
  * and avoids the subtle frame-cutting rules of

@@ -13,6 +13,8 @@ export type MinimalDeviceInfo = {
 };
 
 /**
+ * @summary Abstract class representing a USB transport layer.
+ * @remarks This class can be extended by users to implement custom USB transport mechanisms. MQTT? Bluetooth? Whatever you want!
  * @category Adapters
  */
 export abstract class UsbTransport {

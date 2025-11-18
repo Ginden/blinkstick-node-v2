@@ -1,5 +1,5 @@
 /**
- * Channel for BlinkStick Pro devices.
+ * @summary Channel for BlinkStick Pro devices.
  * @category Constants
  */
 export const Channel = {

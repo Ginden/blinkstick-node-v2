@@ -4,6 +4,7 @@ import { HID } from 'node-hid';
 import { Buffer } from 'node:buffer';
 
 /**
+ * @summary UsbTransport implementation using the 'node-hid' library with synchronous methods.
  * @category Adapters
  */
 export class NodeHidSyncTransport extends UsbTransport {

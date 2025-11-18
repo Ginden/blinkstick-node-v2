@@ -1,8 +1,8 @@
 import { Buffer } from 'node:buffer';
 
 /**
- * Coerce a number array, Buffer, or Uint8Array to a Buffer.
- * Already existing Buffers are returned as-is.
+ * @summary Coerce a number array, Buffer, or Uint8Array to a Buffer.
+ * @remarks Already existing Buffers are returned as-is.
  * Uint8Arrays are converted to Buffers without copying.
  * @param data
  */

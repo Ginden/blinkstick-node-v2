@@ -6,7 +6,7 @@ import { assertFpsBelow100 } from '../helpers/assert-fps-below-100';
 
 /**
  * @summary Generates intermediate frames between two RGB colors. These don't include the start and end frames.
- * @category Animations
+ * @category Animation
  */
 export function morph(
   from: RgbTuple,

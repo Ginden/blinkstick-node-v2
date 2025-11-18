@@ -25,7 +25,7 @@ export class LedGroup {
   }
 
   /**
-   * Sets the color of all LEDs
+   * @summary Sets the color of all LEDs
    * @param color
    */
   public async setColor(color: ColorInput) {
@@ -44,7 +44,7 @@ export class LedGroup {
   }
 
   /**
-   * Turns off all LEDs by setting their color to black (0, 0, 0).
+   * @summary Turns off all LEDs by setting their color to black (0, 0, 0).
    */
   public async turnOff() {
     return await this.setColor([0, 0, 0]);

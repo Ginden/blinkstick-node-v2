@@ -5,7 +5,7 @@ import { LibUsbTransport } from '../../transport/lib-usb-transport';
 import { createBlinkstickLibUsb } from './create-blinkstick-libusb';
 
 /**
- * Find first attached BlinkStick using libusb and create a BlinkStick object.
+ * @summary Find first attached BlinkStick using libusb and create a BlinkStickLibUsb instance.
  * @category Discovery
  */
 export async function findFirst(filter: DiscoveryFilter = () => true): Promise<BlinkStickLibUsb> {

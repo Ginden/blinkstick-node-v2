@@ -6,7 +6,7 @@ import { assert } from 'tsafe';
 
 /**
  * @summary Smooth transition between multiple RGB colors.
- * @category Animations
+ * @category Animation
  */
 export function morphMany(
   tuples: RgbTuple[],

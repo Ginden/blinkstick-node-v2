@@ -18,7 +18,7 @@ export abstract class Animation {
    */
   private constructor() {}
   /**
-   * Shorthand for `repeat`
+   * @summary Shorthand for `repeat`
    * @param animation
    * @param repeatCount
    */
@@ -27,7 +27,7 @@ export abstract class Animation {
   }
 
   /**
-   * Shorthand for `repeat(pulse(color, overMs, steps), repeatCount)`
+   * @summary Shorthand for `repeat(pulse(color, overMs, steps), repeatCount)`
    */
   static pulse(
     color: ColorInput,
@@ -45,11 +45,7 @@ export abstract class Animation {
   }
 
   /**
-   * Shorthand for `morph(from, to, overMs, steps)`
-   * @param from
-   * @param to
-   * @param overMs
-   * @param steps
+   * @summary Shorthand for `morph(from, to, overMs, steps)`
    */
   static morph(
     from: ColorInput,
@@ -64,10 +60,7 @@ export abstract class Animation {
   }
 
   /**
-   * Shorthand for `morphMany(tuples, overMs, steps)`
-   * @param tuples
-   * @param overMs
-   * @param steps
+   * @summary Shorthand for `morphMany(tuples, overMs, steps)`
    */
   static morphMany(tuples: ColorInput[], overMs: number, steps = overMs / 17) {
     assertFpsBelow100(overMs, steps);
@@ -76,6 +69,6 @@ export abstract class Animation {
 }
 
 /**
- * @category Animations
+ * @category Animation
  */
 export type FrameIterable = Iterable<Frame> | AsyncIterable<Frame>;

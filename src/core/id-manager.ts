@@ -14,6 +14,12 @@ const identifierLength = Buffer.from(crypto.randomUUID().replaceAll('-', ''), 'h
 export class DeviceIdManager {
   public constructor(private readonly blinkstick: BlinkStick) {}
 
+    /**
+     * @summary Sets the device identifier.
+     * @remarks The identifier must be a Buffer of length 16 bytes.
+     * Prints the new identifier to stderr.
+     * @param id
+     */
   async setId(id: Buffer) {
     if (id.length !== identifierLength) {
       throw new Error(`Identifier length must be ${identifierLength} bytes`);
@@ -36,7 +42,7 @@ export class DeviceIdManager {
   }
 
   /**
-   * Gets the device identifier, creating a new one if none is set.
+   * @summary Gets the device identifier, creating a new one if none is set.
    */
   async getOrCreateId() {
     const existingId = await this.getId();
@@ -47,8 +53,8 @@ export class DeviceIdManager {
   }
 
   /**
-   * Gets the device identifier.
-   * Returns null if no identifier is set.
+   * @summary Gets the device identifier or null.
+   * @remarks Returns null if no identifier is set.
    */
   public async getId(): Promise<string | null> {
     const infoBlock2 = await this.blinkstick.getInfoBlock2();
