@@ -5,7 +5,7 @@ import { assertFpsBelow100 } from '../helpers/assert-fps-below-100';
 import { assert } from 'tsafe';
 
 /**
- * Smooth transition between multiple RGB colors.
+ * @summary Smooth transition between multiple RGB colors.
  * @category Animations
  */
 export function morphMany(

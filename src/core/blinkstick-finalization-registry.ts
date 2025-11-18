@@ -2,7 +2,7 @@ import { LibUsbTransport } from '../transport/lib-usb-transport';
 import { NodeHidAsyncTransport } from '../transport';
 
 /**
- * A FinalizationRegistry to ensure that HIDAsync devices are closed properly
+ * @summary A FinalizationRegistry instance to ensure that HIDAsync devices are closed properly
  * @category Implementation details
  */
 export const blinkstickFinalizationRegistry = new FinalizationRegistry(

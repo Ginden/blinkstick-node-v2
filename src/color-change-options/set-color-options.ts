@@ -1,8 +1,8 @@
 import { Channel } from '../types';
 
 /**
- * Use LED API instead.
- * @deprecated
+ * @summary Legacy options for setting color on LEDs.
+ * @deprecated Use LED API instead.
  * @category Legacy
  */
 export type SetColorOptions = {

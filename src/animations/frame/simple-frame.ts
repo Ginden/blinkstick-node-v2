@@ -4,7 +4,7 @@ import type { ColorInput } from '../../types';
 import { colorInputToRgbTuple } from '../../utils';
 
 /**
- * SimpleFrame represents a single frame of animation with a specific color and duration.
+ * @summary SimpleFrame represents a single frame of animation with a specific color and duration.
  * @category Animation
  */
 export class SimpleFrame {

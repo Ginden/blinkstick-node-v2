@@ -6,7 +6,8 @@ const header = Buffer.from(`BLINK_ID`, 'ascii');
 const identifierLength = Buffer.from(crypto.randomUUID().replaceAll('-', ''), 'hex').length;
 
 /**
- * OK, let's not complicate it.
+ * @summary Class to manage IDs on BlinkStick devices.
+ * @remarks OK, let's not complicate it.
  * We just take over infoBlock2
  * @category Core
  */

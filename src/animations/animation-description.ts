@@ -8,7 +8,7 @@ import type { Frame } from './frame/frame';
 import { assertFpsBelow100 } from './helpers/assert-fps-below-100';
 
 /**
- * Bag of static methods for creating animations.
+ * @summary Bag of static methods for creating animations.
  * @category Animation
  */
 export abstract class Animation {

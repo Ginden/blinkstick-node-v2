@@ -2,7 +2,8 @@ import { BlinkStick } from '../blinkstick';
 import { LibUsbTransport } from '../../transport/lib-usb-transport';
 
 /**
- * Version of BlinkStick that uses libusb for communication.
+ * @summary Version of BlinkStick that uses libusb for communication.
+ * @category Core
  */
 export class BlinkStickLibUsb extends BlinkStick<LibUsbTransport> {
   isSync = false;

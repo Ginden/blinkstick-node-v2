@@ -3,7 +3,7 @@ import type { RgbTuple } from '../../types/rgb-tuple';
 import { SimpleFrame } from './simple-frame';
 
 /**
- * Complex frame represents a single frame of animation with multiple colors and a specific duration.
+ * @summary ComplexFrame instance represents a single frame of animation with multiple colors and a specific duration.
  * @category Animation
  */
 export class ComplexFrame {

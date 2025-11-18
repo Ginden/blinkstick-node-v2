@@ -2,7 +2,7 @@ import type { RgbTuple } from '../types';
 import { hexToRgbTuple } from '../utils/colors/normalize-hex-color';
 
 /**
- * Color keywords, taken as-is from original library.
+ * @summary Color keywords, taken as-is from original library.
  * @category Constants
  */
 export const COLOR_KEYWORDS = {

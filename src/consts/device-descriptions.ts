@@ -1,7 +1,7 @@
 import { MinimalDeviceInfo } from '../transport';
 
 /**
- * Simple type that describes a Blinkstick device.
+ * @summary Type used to describe a Blinkstick device.
  * @category Constants
  */
 export type BlinkstickDeviceDefinition = {
@@ -11,8 +11,8 @@ export type BlinkstickDeviceDefinition = {
 };
 
 /**
- * Known Blinkstick devices and their LED counts.
- * Have a look at https://github.com/arvydas/blinkstick-python/blob/master/blinkstick/blinkstick.py#L302 to see existing code.
+ * @summary Known Blinkstick devices and their LED counts.
+ * @remarks Have a look at https://github.com/arvydas/blinkstick-python/blob/master/blinkstick/blinkstick.py#L302 to see existing code.
  * @category Constants
  */
 export const deviceDescriptions = {

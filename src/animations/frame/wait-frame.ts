@@ -1,5 +1,5 @@
 /**
- * Null frame doesn't change the state of the LEDs. It just waits.
+ * @summary Null frame doesn't change the state of the LEDs. It just waits.
  * @category Animation
  */
 export class WaitFrame {

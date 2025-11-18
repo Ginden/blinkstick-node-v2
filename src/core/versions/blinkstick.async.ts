@@ -3,7 +3,7 @@ import type { Device, HIDAsync } from 'node-hid';
 import { NodeHidAsyncTransport } from '../../transport/node-hid-async-transport';
 
 /**
- * Async version of BlinkStick class.
+ * @summary Async and recommended version of BlinkStick class.
  * @category Core
  */
 export class BlinkstickAsync extends BlinkStick<NodeHidAsyncTransport> {

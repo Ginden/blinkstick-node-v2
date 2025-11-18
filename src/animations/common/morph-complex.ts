@@ -10,7 +10,7 @@ import type { RgbTuple } from '../../types';
 import { assertFpsBelow100 } from '../helpers/assert-fps-below-100';
 
 /**
- * Morphs between two complex frames.
+ * @summary Morphs between two complex frames.
  * @category Animations
  */
 export function morphBetweenComplexFrames(
@@ -47,7 +47,7 @@ export function morphBetweenComplexFrames(
 }
 
 /**
- * Smooth transition between two animations.
+ * @summary Smooth transition between two animations.
  * @category Animations
  */
 export function morphComplex(

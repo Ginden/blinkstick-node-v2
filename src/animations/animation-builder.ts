@@ -15,7 +15,8 @@ import { transformEachFrame, TransformEachFrameCb } from './helpers/transform-ea
 import { assert } from 'tsafe';
 
 /**
- * Our primary class for building complex animations.
+ * @summary Class to build complex animations.
+ * @remarks Our primary class for building complex animations.
  * You SHOULD use static methods to create an instance of this class,
  * but you are an adult. You can extend this class and use it as you want.
  * @category Animation

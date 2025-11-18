@@ -75,7 +75,7 @@ function wrapWithDebug<T extends UsbTransport>(
 }
 
 /**
- * Main class responsible for controlling BlinkStick devices.
+ * @summary Main class responsible for controlling BlinkStick devices.
  * @category Core
  */
 export abstract class BlinkStick<Transport extends UsbTransport = UsbTransport> {

@@ -4,7 +4,7 @@ import { NodeHidSyncTransport } from '../../transport';
 import { LimitedBlinkStick } from '../schedulable-operations';
 
 /**
- * Synchronous version of BlinkStick class.
+ * @summary Synchronous version of BlinkStick class for smoother migration from old API.
  * @category Core
  */
 export class BlinkstickSync extends BlinkStick<NodeHidSyncTransport> {

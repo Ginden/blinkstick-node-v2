@@ -8,8 +8,8 @@ export type MinimalDevice = Pick<
 >;
 
 /**
- * This function creates a BlinkStick object from a USB device.
- * It also registers the BlinkStick object in a FinalizationRegistry to increase chance that the device will be closed
+ * @summary This function creates a BlinkstickAsync instance from a USB device.
+ * @remarks It also registers the BlinkStick object in a FinalizationRegistry to increase the chance that the device will be closed
  * when the object is garbage collected.
  *
  * This function is unlikely to be needed by end users, but you are an adult.

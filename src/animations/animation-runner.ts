@@ -15,6 +15,8 @@ const abortError = new Error('Animation aborted');
 let warningEverEmitted = false;
 
 /**
+ * @summary Class to run animations on a Blinkstick device.
+ * @remarks
  * This class is responsible for running animations on a Blinkstick device.
  * It handles the animation loop, applying frames to the device, and managing
  * the animation state.

@@ -14,7 +14,7 @@ export type PulseOptions = {
 };
 
 /**
- * Pulses a color and backs off to black.
+ * @summary Pulses a color and backs off to black.
  * @category Animations
  */
 export function pulse(

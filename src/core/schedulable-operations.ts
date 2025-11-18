@@ -21,7 +21,8 @@ export type SchedulableOperations = Constraint<
 >;
 
 /**
- * Limited version of BlinkStick that only includes schedulable operations and properties.
- * All of these operations are related to device configuration and state management.
+ * @summary Limited version of BlinkStick that only includes schedulable operations and properties.
+ * @remarks All of these operations are related to device configuration and state management.
+ * This one is used only for Sync version
  */
 export type LimitedBlinkStick<B extends BlinkStick> = Pick<B, SchedulableOperations | Properties>;
