@@ -1,5 +1,5 @@
 import { BlinkStick } from './blinkstick';
-import { Device, HIDAsync } from 'node-hid';
+import type { Device, HIDAsync } from 'node-hid';
 import { NodeHidAsyncTransport } from '../transport/node-hid-async-transport';
 
 /**

@@ -1,5 +1,5 @@
 import { BlinkStick } from './blinkstick';
-import { HID } from 'node-hid';
+import { type HID } from 'node-hid';
 import { NodeHidSyncTransport } from '../transport';
 import { LimitedBlinkStick } from './schedulable-operations';
 

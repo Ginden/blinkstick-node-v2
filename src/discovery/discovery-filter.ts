@@ -5,6 +5,7 @@ export type DiscoverFilterFunction = (device: MinimalDeviceInfo) => boolean;
 
 export type DiscoveryFilter = KnownDeviceName | DiscoverFilterFunction;
 
+
 export function createDiscoverFilterFn(filter: DiscoveryFilter | null): DiscoverFilterFunction {
   if (typeof filter === 'function') {
     return filter;

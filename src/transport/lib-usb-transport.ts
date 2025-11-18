@@ -1,17 +1,17 @@
 import { MinimalDeviceInfo, UsbTransport } from './usb-transport';
-import type { Device } from 'usb';
+import type { Device as LibUsbDevice } from 'usb';
 import { promisify } from 'node:util';
 import { assert } from 'tsafe';
 import { asBuffer } from '../utils';
 
-function isDeviceOpen(device: Device): boolean {
+function isDeviceOpen(device: LibUsbDevice): boolean {
   return Boolean(device.interfaces);
 }
 
 export class LibUsbTransport extends UsbTransport {
   protected readonly wIndex = 0;
   public constructor(
-    public device: Device,
+    public device: LibUsbDevice,
     protected readonly minimalDeviceInfo: MinimalDeviceInfo,
   ) {
     super();
@@ -20,7 +20,7 @@ export class LibUsbTransport extends UsbTransport {
   /**
    * Creates a new instance of LibUsbTransport from a USB device.
    */
-  static async buildFromDevice(device: Device): Promise<LibUsbTransport> {
+  static async buildFromDevice(device: LibUsbDevice): Promise<LibUsbTransport> {
     const minimimalDeviceInfo = await LibUsbTransport.calculateMinimalDeviceInfo(device);
 
     const iface = device.interfaces?.[0];
@@ -37,7 +37,7 @@ export class LibUsbTransport extends UsbTransport {
    * Calculates minimal device information from a USB device.
    * This includes vendorId, productId, release, manufacturer, product, and serialNumber.
    */
-  static async calculateMinimalDeviceInfo(device: Device): Promise<MinimalDeviceInfo> {
+  static async calculateMinimalDeviceInfo(device: LibUsbDevice): Promise<MinimalDeviceInfo> {
     if (isDeviceOpen(device)) {
       const desc = device.deviceDescriptor;
 
