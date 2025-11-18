@@ -48,6 +48,7 @@ export function morphBetweenComplexFrames(
 
 /**
  * Smooth transition between two animations.
+ * @category Animations
  */
 export function morphComplex(
   source: FrameIterable,

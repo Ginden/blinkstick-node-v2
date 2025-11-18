@@ -6,6 +6,9 @@ import { ConditionalPick, JsonPrimitive } from 'type-fest';
  */
 export type Constraint<T, U extends T> = U;
 
+/**
+ * @internal
+ */
 export type Properties = keyof ConditionalPick<BlinkStick, JsonPrimitive>;
 
 export type SchedulableOperations = Constraint<

@@ -1,7 +1,7 @@
 import usb, { HID } from 'node-hid';
 import { findRawDevicesSync, findRawDevicesAsync } from './find-raw-devices';
 import { createBlinkstickAsync } from '../create/create-blinkstick-async';
-import { BlinkstickSync } from '../../../core/blinkstick.sync';
+import { BlinkstickSync } from '../../../core/versions/blinkstick.sync';
 import { BlinkstickAsync } from '../../../core';
 
 export type NodeHidFilterFunction = (device: usb.Device) => boolean;

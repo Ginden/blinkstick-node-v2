@@ -1,5 +1,8 @@
 import type { Buffer } from 'node:buffer';
 
+/**
+ * @category Adapters
+ */
 export type MinimalDeviceInfo = {
   product?: string | undefined;
   serialNumber?: string;
@@ -9,6 +12,9 @@ export type MinimalDeviceInfo = {
   release: number;
 };
 
+/**
+ * @category Adapters
+ */
 export abstract class UsbTransport {
   abstract sendFeatureReport(data: Buffer): Promise<number>;
   abstract getFeatureReport(reportId: number, reportLength: number): Promise<Buffer>;

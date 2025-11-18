@@ -8,6 +8,7 @@ const identifierLength = Buffer.from(crypto.randomUUID().replaceAll('-', ''), 'h
 /**
  * OK, let's not complicate it.
  * We just take over infoBlock2
+ * @category Core
  */
 export class DeviceIdManager {
   public constructor(private readonly blinkstick: BlinkStick) {}

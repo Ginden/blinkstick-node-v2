@@ -1,7 +1,7 @@
-import { BlinkStick } from './blinkstick';
+import { BlinkStick } from '../blinkstick';
 import { type HID } from 'node-hid';
-import { NodeHidSyncTransport } from '../transport';
-import { LimitedBlinkStick } from './schedulable-operations';
+import { NodeHidSyncTransport } from '../../transport';
+import { LimitedBlinkStick } from '../schedulable-operations';
 
 /**
  * Synchronous version of BlinkStick class.

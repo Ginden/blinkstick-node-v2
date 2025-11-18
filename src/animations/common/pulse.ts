@@ -4,6 +4,10 @@ import { clampRgb } from '../../utils/clamp';
 import { assert } from 'tsafe';
 import { assertFpsBelow100 } from '../helpers/assert-fps-below-100';
 
+/**
+ * @category Animations
+ * @category Inputs
+ */
 export type PulseOptions = {
   steps?: number;
   overMs: number;

@@ -1,5 +1,6 @@
 /**
  * Based on https://github.com/subzey/blinkstick-webhid
+ * @category Constants
  */
 export const FeatureReportDescription = {
   SetFirst: {
@@ -40,10 +41,16 @@ export const FeatureReportDescription = {
   },
 } as const;
 
+/**
+ * @category Constants
+ */
 export const FeatureReportId = Object.fromEntries(
   Object.entries(FeatureReportDescription).map(([key, value]) => [key, value.reportId]),
 ) as {
   [key in keyof typeof FeatureReportDescription]: (typeof FeatureReportDescription)[key]['reportId'];
 };
 
+/**
+ * @category Constants
+ */
 export type FeatureReportId = (typeof FeatureReportId)[keyof typeof FeatureReportId];

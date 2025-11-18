@@ -1,4 +1,4 @@
-import { BlinkStickLibUsb } from '../../core/blinkstick-lib-usb';
+import { BlinkStickLibUsb } from '../../core/versions/blinkstick-lib-usb';
 import { createDiscoverFilterFn, DiscoveryFilter } from '../discovery-filter';
 import { getLibUsb } from './get-lib-usb';
 import { LibUsbTransport } from '../../transport/lib-usb-transport';

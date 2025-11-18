@@ -528,9 +528,9 @@ export abstract class BlinkStick<Transport extends UsbTransport = UsbTransport> 
     }
 
     /**
-     * Sets the infoblock2 with specified string.
+     * Sets the infoblock2 with specified Buffer of length of 33.
+     * The first byte of the buffer is report ID, the rest is data.
      * @param data
-     * @param preserveId
      */
     async setInfoBlock2(data: Buffer) {
         return await setInfoBlock(this, FeatureReportId.InfoBlock2, data);

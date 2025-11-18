@@ -3,6 +3,9 @@ import { MinimalDeviceInfo, UsbTransport } from './usb-transport';
 import { HID } from 'node-hid';
 import { Buffer } from 'node:buffer';
 
+/**
+ * @category Adapters
+ */
 export class NodeHidSyncTransport extends UsbTransport {
   constructor(protected readonly device: HID) {
     super();

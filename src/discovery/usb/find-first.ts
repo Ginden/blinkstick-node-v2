@@ -1,5 +1,5 @@
 import { createDiscoverFilterFn, DiscoveryFilter } from '../discovery-filter';
-import { BlinkStickLibUsb } from '../../core/blinkstick-lib-usb';
+import { BlinkStickLibUsb } from '../../core/versions/blinkstick-lib-usb';
 import { findRawDevices } from './find-raw-devices';
 import { LibUsbTransport } from '../../transport/lib-usb-transport';
 import { createBlinkstickLibUsb } from './create-blinkstick-libusb';

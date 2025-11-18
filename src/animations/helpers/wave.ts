@@ -3,6 +3,9 @@ import { ComplexFrame } from '../frame/complex-frame';
 import type { RgbTuple } from '../../types';
 import { assert } from 'tsafe';
 
+/**
+ * @category Animation
+ */
 export type WaveOptions = {
   fillWith?: RgbTuple;
   lagMs: number;

@@ -8,6 +8,9 @@ function isDeviceOpen(device: LibUsbDevice): boolean {
   return Boolean(device.interfaces);
 }
 
+/**
+ * @category Adapters
+ */
 export class LibUsbTransport extends UsbTransport {
   protected readonly wIndex = 0;
   public constructor(
