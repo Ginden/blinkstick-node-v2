@@ -9,7 +9,10 @@ import { assertFpsBelow100 } from './helpers/assert-fps-below-100';
 
 /**
  * @summary Bag of static methods for creating animations.
+ * @remarks This class is a collection of static methods to create common animations.
+ * You should use these methods to create animations easily.
  * @category Animation
+ * @namespace Animation
  */
 export abstract class Animation {
   /**
