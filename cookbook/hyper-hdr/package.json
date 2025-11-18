@@ -1,0 +1,22 @@
+{
+  "name": "hyper-hdr",
+  "version": "1.0.0",
+  "description": "Example how to set up BlinkStick with Hyperion or HyperHDR",
+  "main": "index.mts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node --experimental-strip-types index.mts"
+  },
+  "engines": {
+    "node": ">=22.6.0"
+  },
+  "author": "Michał Wadas",
+  "license": "MIT",
+  "dependencies": {
+    "@ginden/blinkstick-v2": "^3.4.0",
+    "lodash-es": "^4.17.21"
+  },
+  "devDependencies": {
+    "@types/lodash-es": "^4.17.12"
+  }
+}
