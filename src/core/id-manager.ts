@@ -57,7 +57,9 @@ export class DeviceIdManager {
    * @remarks Returns null if no identifier is set.
    */
   public async getId(): Promise<string | null> {
-    const infoBlock2 = await this.blinkstick.getInfoBlock2();
+    const infoBlock2 = (await this.blinkstick.getInfoBlock2())
+      // Remove report ID byte
+      .subarray(1);
     if (infoBlock2.subarray(0, header.length).equals(header)) {
       const id = infoBlock2.subarray(header.length, header.length + identifierLength);
       return id.toString('hex');

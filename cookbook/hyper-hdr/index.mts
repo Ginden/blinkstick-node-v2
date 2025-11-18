@@ -27,14 +27,13 @@ for (const [i, device] of blinkStickDevices.entries()) {
     console.log(`Device with ID ${id} is listening on 127.0.0.1:${startPortUdp + i}`);
   });
   socket.on('message', (msg, rinfo) => {
-    console.log(
-      `Device ID: ${id} received: ${msg.toString('hex')} from ${rinfo.address}:${rinfo.port}`,
-    );
     if (msg.length === 3) {
       // Set all LEDs to the same color, because you configured HyperHDR to send only 3 bytes (1 RGB color)
       void device.leds().setColor(Array.from(msg) as RgbTuple);
     } else if (msg.length % 3 === 0) {
       void device.setColors(0, msg);
+    } else {
+      console.warn(`Malformed UDP packet received on device ID ${id}: ${msg.toString('hex')}`);
     }
   });
 }

@@ -525,12 +525,13 @@ export abstract class BlinkStick<Transport extends UsbTransport = UsbTransport> 
 
   /**
    * Get the infoblock1 of the device.
-   * This is a 32 byte array that can contain any data. It's supposed to
+   * This is a 33 byte Buffer that can contain any data. It's supposed to
    * hold the "Name" of the device making it easier to identify rather than
    * a serial number.
+   * First byte is report ID, the rest is data.
    */
   async getInfoBlock1(): Promise<Buffer> {
-    return await getInfoBlockRaw(this, 0x0002);
+    return await getInfoBlockRaw(this, FeatureReportId.InfoBlock1);
   }
 
   /**
@@ -551,10 +552,11 @@ export abstract class BlinkStick<Transport extends UsbTransport = UsbTransport> 
 
   /**
    * Get the infoblock2 of the device.
-   * This is a 32 byte array that can contain any data.
+   * This is a 33 byte array that can contain any data.
+   * First byte is report ID, the rest is data.
    * Using it is INCOMPATIBLE with DeviceIdManager.
    */
-  async getInfoBlock2() {
+  async getInfoBlock2(): Promise<Buffer> {
     return await getInfoBlockRaw(this, FeatureReportId.InfoBlock2);
   }
 
