@@ -24,17 +24,17 @@ import { assert } from 'tsafe';
 export class AnimationBuilder {
   protected subAnimations: FrameIterable[] = [];
 
-    /**
-     * @summary Starts an animation with a black frame.
-     */
+  /**
+   * @summary Starts an animation with a black frame.
+   */
   static startWithBlack(ms: number): AnimationBuilder {
     const builder = new AnimationBuilder();
     return builder.addStaticFrame(new SimpleFrame([0, 0, 0], ms));
   }
 
-    /**
-     * @summary Starts an animation with a given color.
-     */
+  /**
+   * @summary Starts an animation with a given color.
+   */
   static startWithColor(color: ColorInput, ms: number): AnimationBuilder {
     const builder = new AnimationBuilder();
     return builder.addStaticFrame(new SimpleFrame(colorInputToRgbTuple(color), ms));
@@ -70,17 +70,17 @@ export class AnimationBuilder {
     return this.addStaticFrame(new SimpleFrame(colorInputToRgbTuple(color), ms));
   }
 
-    /**
-     * @summary Adds a static frame to the animation.
-     */
+  /**
+   * @summary Adds a static frame to the animation.
+   */
   public addStaticFrame(simpleFrame: Frame) {
     this.subAnimations.push([simpleFrame]);
     return this;
   }
 
-    /**
-     * @summary Adds a pulse animation to the current animation.
-     */
+  /**
+   * @summary Adds a pulse animation to the current animation.
+   */
   public addPulse(color: ColorInput, overMs: number, steps = overMs / 60) {
     assertFpsBelow100(overMs, steps);
     this.subAnimations.push(pulse(colorInputToRgbTuple(color), { steps, overMs }));
@@ -140,19 +140,19 @@ export class AnimationBuilder {
     return this;
   }
 
-    /**
-     * @summary Apply a transformation to each frame of the current animation.
-     * @throws If any of the current sub-animations are generators.
-     */
+  /**
+   * @summary Apply a transformation to each frame of the current animation.
+   * @throws If any of the current sub-animations are generators.
+   */
   transformEachFrame(transform: TransformEachFrameCb) {
     this.assertNoGenerators();
     this.subAnimations = [transformEachFrame(combine(...this.subAnimations), transform)];
     return this;
   }
 
-    /**
-     * @summary Builds the final animation.
-     */
+  /**
+   * @summary Builds the final animation.
+   */
   build() {
     assert(this.subAnimations.length > 0, 'No animations to build');
     return combine(...this.subAnimations);

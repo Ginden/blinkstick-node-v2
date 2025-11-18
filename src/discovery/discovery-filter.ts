@@ -13,7 +13,6 @@ export type DiscoverFilterFunction = (device: MinimalDeviceInfo) => boolean;
  */
 export type DiscoveryFilter = KnownDeviceName | DiscoverFilterFunction;
 
-
 /**
  * @summary Creates a discovery filter function from a given filter.
  * @param filter

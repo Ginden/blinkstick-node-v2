@@ -73,17 +73,17 @@ await blinkstick.pulse('purple');
 
 ### Jump to REPL
 
-````bash
+```bash
 git clone git@github.com:Ginden/blinkstick-node-v2.git
 cd blinkstick-node-v2
 npm ci
 npm run repl
-````
+```
 
 This will automatically find all your BlinkStick devices and assign them to global variables. Just type:
 
 ```js
-blinkStickNano.leds().setColor('red')
+blinkStickNano.leds().setColor('red');
 ```
 
 ## About this project
@@ -126,7 +126,6 @@ To see what a library can do, clone git repository and run:
 ```bash
 npm run test:manual
 ```
-
 
 ### BlinkStick Flex on Linux
 

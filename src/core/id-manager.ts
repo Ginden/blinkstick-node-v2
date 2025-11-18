@@ -1,6 +1,6 @@
 import { type BlinkStick } from './blinkstick';
 import { FeatureReportDescription } from '../types';
-import {Console} from "node:console";
+import { Console } from 'node:console';
 
 const header = Buffer.from(`BLINK_ID`, 'ascii');
 const identifierLength = Buffer.from(crypto.randomUUID().replaceAll('-', ''), 'hex').length;
@@ -14,12 +14,12 @@ const identifierLength = Buffer.from(crypto.randomUUID().replaceAll('-', ''), 'h
 export class DeviceIdManager {
   public constructor(private readonly blinkstick: BlinkStick) {}
 
-    /**
-     * @summary Sets the device identifier.
-     * @remarks The identifier must be a Buffer of length 16 bytes.
-     * Prints the new identifier to stderr.
-     * @param id
-     */
+  /**
+   * @summary Sets the device identifier.
+   * @remarks The identifier must be a Buffer of length 16 bytes.
+   * Prints the new identifier to stderr.
+   * @param id
+   */
   async setId(id: Buffer) {
     if (id.length !== identifierLength) {
       throw new Error(`Identifier length must be ${identifierLength} bytes`);
@@ -33,10 +33,10 @@ export class DeviceIdManager {
 
     const idString = id.toString('hex');
 
-      (new Console(process.stderr, process.stderr)).info(
-          `Your device has been assigned a new identifier: ${idString}`,
-          this.blinkstick.deviceDescription
-      )
+    new Console(process.stderr, process.stderr).info(
+      `Your device has been assigned a new identifier: ${idString}`,
+      this.blinkstick.deviceDescription,
+    );
 
     return id.toString('hex');
   }
