@@ -2,6 +2,7 @@ import { ColorInput } from '../../types';
 import { COLOR_KEYWORD_RGB_TUPLES, COLOR_KEYWORDS } from '../../consts/color-keywords';
 import { RgbTuple } from '../../types/rgb-tuple';
 import { typeGuard } from 'tsafe';
+import { getRandomColorTuple } from './get-random-color';
 
 /**
  * Converts a color input (string, array, or object) to an RGB tuple.
@@ -13,6 +14,9 @@ export function colorInputToRgbTuple(color: ColorInput): RgbTuple {
     typeGuard<keyof typeof COLOR_KEYWORDS>(color, color in COLOR_KEYWORDS)
   ) {
     return COLOR_KEYWORD_RGB_TUPLES[color];
+  }
+  if (color === 'random') {
+    return getRandomColorTuple();
   }
   if (Array.isArray(color)) {
     return [color[0] & 0xff, color[1] & 0xff, color[2] & 0xff];

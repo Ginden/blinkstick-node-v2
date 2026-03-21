@@ -12,6 +12,8 @@ const globalScopeAdditions = {
   findAllAsync: blinkstick.findBlinkSticksAsync,
   AnimationBuilder: blinkstick.AnimationBuilder,
   asBuffer: asBuffer,
+  getRandomColor: blinkstick.getRandomColor(),
+  getRandomColorTuple: blinkstick.getRandomColorTuple(),
 };
 
 Object.assign(global, globalScopeAdditions);
@@ -20,7 +22,7 @@ const availableDevices: Record<string, blinkstick.BlinkStick> = {};
 
 let i = 0;
 
-for (const device of blinkstick.findBlinkSticks()) {
+for (const [index, device] of blinkstick.findBlinkSticks().entries()) {
   let name = (device.deviceDescription?.name || 'BlinkStick Unknown')
     .replace(/\s+/g, '_')
     .split('_')
@@ -31,6 +33,7 @@ for (const device of blinkstick.findBlinkSticks()) {
     name += `${++i}`;
   }
   availableDevices[name] = device;
+  availableDevices[`bl${index}`] = device;
 }
 
 Object.assign(global, availableDevices);

@@ -10,4 +10,4 @@ import { ColorObject } from './color-object';
  *
  * @category Inputs
  */
-export type ColorInput = RgbTuple | ColorObject | keyof typeof COLOR_KEYWORDS;
+export type ColorInput = RgbTuple | ColorObject | keyof typeof COLOR_KEYWORDS | 'random';
